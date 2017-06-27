@@ -6,6 +6,37 @@ File Format Specification - Project File
 
 == Summary
 This document defines the file format for project files.
-Project files are the top level files that link everything together that is needed to create an executable / a firmware. 
+Project files are the top level files that link everything together that is needed to create an executable / a firmware.
 
-== Overview
+== File format
+Project files are xml files. The root element is a "project" element.
+
+=== project element
+==== Attributes
+None.
+==== child elements
+The project element can have a maximum of one "environment" element.
+The project element can have a maximum of one "solution" element.
+
+=== environment element
+==== Attributes
+the "ref" attributes contains the file name of the environment File.
+==== child elements
+Instead of a reference to an external file the complete environment tree can also be in this element. In that case the only child of this element would be the root element of an environment file. For the definition of that tag see the documentation for the file format of the environment file.
+
+=== solution element
+==== Attributes
+the "ref" attributes contains the file name of the solution File.
+==== child elements
+Instead of a reference to an external file the complete solution tree can also be in this element. In that case the only child of this element would be the root element of an solution file. For the definition of that tag see the documentation for the file format of the solution file.
+
+== Example
+
+[source,xml]
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<project>
+  <environment ref="hardware.xml" />
+  <solution ref="solution.xml" />
+</project>
+----

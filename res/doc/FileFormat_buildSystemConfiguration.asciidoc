@@ -1,0 +1,125 @@
+File Format Specification - build system configuration
+======================================================
+:toc:
+:numbered:
+:showcomments:
+
+== Summary
+This document defines the file format for build system configuration files.
+These files provide necessary configuration of the build system for a specific device or architecture.
+
+== File format
+build system configuration files are xml files. The root element is a "build_cfg" element.
+
+=== build_cfg element
+==== Attributes
+None.
+==== child elements
+The build_cfg element can have a exactly one "required" element. The required tag list all the information that needs to go into the build system.
+The build_cfg element can have a exactly one "variables" element. The variables tag can have additional variables that can go into the build system if needed.
+
+=== required element
+==== Attributes
+None.
+==== child elements
+The required element can have a exactly one "targets" element.
+The required element can have a exactly one "variables" element.
+The required element can have a exactly one "files" element.
+
+=== targets element
+==== Attributes
+None.
+==== child elements
+The targets element can have "target" elements.
+
+=== target element
+==== Attributes
+None.
+==== child elements
+The target element must have exactly one "source" element.
+The target element must have exactly one "output" element.
+The target element must have exactly one "rule" element.
+
+=== files element
+==== Attributes
+None.
+==== child elements
+The files element can have "unstructured" elements.
+
+
+=== variables element
+==== Attributes
+None.
+==== child elements
+All child elements have to comply with the "variable_definition" element style.
+
+=== variable_definition element
+the tag name is the name of the variable.
+==== Attributes
+None.
+==== child elements
+The content is the value of the variable.
+
+== Example
+
+[source,xml]
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<build_cfg>
+  <required>
+    <variables>
+      <CC>arm-none-eabi-gcc</CC>
+      <LD>arm-none-eabi-ld</LD>
+      <LKR_SCRIPT>stm32_minimal.ld</>
+      <CFLAGS>-c -fno-common -O0 -g -mcpu=cortex-m3 -mthumb</>
+      <LFLAGS>-nostartfiles -T$(LKR_SCRIPT)</>
+      <CPFLAGS>-Obinary</>
+    </variables>
+    <targets>
+      <target>
+        <source>%o</source>
+        <output>$(project)elf</output>
+        <rule>$(LD) $(LFLAGS) -o main.elf main.o</rule>
+      </target>
+    </targets>
+    <files>
+      <unstructured>
+        <filename>stm32_minimal.ld>/filename>
+        <content><![CDATA[
+/*****************************************
+ * stm32 minimal example stm32_minimal.ld
+ *****************************************/
+
+/* memory layout for an STM32F103RB */
+MEMORY
+{
+    FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 128K
+    SRAM (xrw)  : ORIGIN = 0x20000000, LENGTH = 20K
+}
+
+/* output sections */
+SECTIONS
+{
+    /* program code into FLASH */
+    .text :
+    {
+        *(.vector_table)    /* Vector table */
+        *(.text)            /* Program code */
+    } >FLASH
+
+    /* uninitialized global and static variables (which
+       we don't have any in this example) into SRAM */
+    .data :
+    {
+        *(.data)
+    } >SRAM
+}
+        ]]></content>
+      </unstructured>
+    </files>
+  </required>
+  <variables>
+    <CP>arm-none-eabi-objcopy</CP>
+  </variables>
+</build_cfg>
+----

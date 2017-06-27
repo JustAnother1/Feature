@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="pwm_task" api="run">
+  <configurationAttribute name="frequency" type="UnitValue"/>
+  <configurationAttribute name="dutyCycle" type="percent"/>
+  <required>
+    <parameter ref="dutyCycle" as="dutycycle" />
+    <childElement type="binaryOut" as="out"/>
+  </required>
+  <if cond="is(singleTask)">
+    <c_code>
+      <additonal>
+        <include>util/delay.h</include>
+      </additonal>
+      <function  name="initialize">
+        <![CDATA[$$$initialize$$$]]>
+      </function>
+      <function name="execute">
+              <![CDATA[
+    $$$setValue(true)$$$
+    _delay_ms(1000);        //Delay for 1000ms => 1 sec
+    $$$setValue(false)$$$
+    _delay_ms(1000);        //Delay for 1000ms => 1 sec
+]]>
+
+      </function>
+    </c_code>
+  </if>
+  <if cond="(frequency smallerThan 1001) and has(msTimer)">
+   <c_code>
+    <function  name="initialize">
+        <![CDATA[{
+  $$$initialize$$$
+  for(;;)
+  {
+    $$$execute$$$
+  }
+}]]>
+    </function>
+    <function name="execute">
+      <![CDATA[{
+
+}]]>
+    </function>
+    <additonal>
+      <function name="">
+        <![CDATA[{
+
+}]]>
+      </function>
+    </additonal>
+   </c_code>
+  </if>
+</algorithm>

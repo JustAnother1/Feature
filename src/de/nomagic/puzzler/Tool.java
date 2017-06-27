@@ -14,8 +14,12 @@
  */
 package de.nomagic.puzzler;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /** collection of general utility functions.
  *
@@ -27,6 +31,13 @@ public final class Tool
     private Tool()
     {
         // Not used !
+    }
+
+    public static String curentDateTime()
+    {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        return dateFormat.format(date);
     }
 
     public static String fromExceptionToString(final Throwable e)
@@ -175,5 +186,22 @@ public final class Tool
             }
             return res.toString();
         }
+    }
+
+    public static String validatePath(String path)
+    {
+        if(null == path)
+        {
+            return "";
+        }
+        if(1 > path.length())
+        {
+            return "";
+        }
+        if(false == path.endsWith(File.separator))
+        {
+            return path + File.separator;
+        }
+        return path;
     }
 }

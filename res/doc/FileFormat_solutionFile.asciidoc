@@ -5,7 +5,30 @@ File Format Specification - Project File
 :showcomments:
 
 == Summary
-This document defines the file format for project files.
-Project files are the top level files that link everything together that is needed to create an executable / a firmware. 
+This document defines the file format for solution files.
+Solution files define the logic of the application..
 
-== Overview
+== File format
+Solution files are xml files. The root element is a "solution" element.
+
+=== solution element
+==== Attributes
+None.
+==== child elements
+The solution element has exactly one child element. The direct child element need to comply with the algorithm element style. The child must implement the "program_entry_point" API.
+
+For the definition of algorithm element style see the documentation for the file format of the algorithm file.
+
+== Example
+
+[source,xml]
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<solution>
+  <os algorithm="super_loop">
+    <blink algorithm="pwm_task" frequency="1Hz" dutyCycle="50%" >
+      <greenLed />
+    </blink>
+  </os>
+</solution>
+----

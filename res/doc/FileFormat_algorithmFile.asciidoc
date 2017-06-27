@@ -1,11 +1,114 @@
-File Format Specification - Project File
+File Format Specification - Algorithm File
 ========================================
 :toc:
 :numbered:
 :showcomments:
 
 == Summary
-This document defines the file format for project files.
-Project files are the top level files that link everything together that is needed to create an executable / a firmware. 
+This document defines the file format for algorithm files.
+Algorithm files define the implementation of an algorithm.
 
-== Overview
+== File format
+Algorithm files are xml files. The root element is a "algorithm" element.
+
+=== algorithm element
+==== Attributes
+The attribute "name" defines the name of the attribute. The name is also part of the filename.
+The attribute "api" defines the Interfaces that the algorithm fulfils. Each Interface is defined in a API File. For details see the API File Format definition.
+
+==== child elements
+The algorithm element may have a "required" element.
+The algorithm element may have a "provides" element.
+The algorithm element must have function elements for all functions defined in the apis listed in the "api" attribute.
+All child elements may be wrapped in "if" elements.
+
+=== provides element
+==== Attributes
+None.
+
+==== child elements
+The algorithm element may have many child elements. All child elements have to comply with the "algorithm_information" style.
+
+=== algorithm_information element style
+The name defines the name of the algorithm information object.
+==== Attributes
+The attribute "type" defines the type of information object. Valid types are: bool, int, float, string.
+AThe attribute value defines the value of the information object. To assign a value to a "bool" information object a boolean expression may be used. To assign the value of an "int" or "float" information object a mathematic expression may be used.
+
+==== child elements
+None.
+
+
+=== required element
+==== Attributes
+None.
+
+==== child elements
+The provides element may have many child elements. All children have to be either "childElement" or "parameter" elements.
+
+=== childElement element
+==== Attributes
+The "type" attribute defines the Interface (api) that child elements need to implement.
+
+==== child elements
+The provides element may have many child elements. All children have to be either "childElement" or "parameter" elements.
+
+=== parameter element
+==== Attributes
+The attribute "ref" defines the name of a parameter that need to be given to this algorithm.
+
+==== child elements
+None.
+
+
+
+=== function element
+==== Attributes
+The attribute "name" defines the name of the function.The function must be a part of an Interface that this algorithm implements. Each Interface is defined in a API File. For details see the API File Format definition.
+
+==== child elements
+The function element may have a "c_code" element.
+
+
+
+=== if element
+==== Attributes
+The attribute "cond" defines the condition of the if element. If the condition is true then the child is used as if it was in the location of the if element. If the condition is false then the child element is not used.
+
+==== child elements
+the if element is a wrapper therefore the child elements must be of the type that is allowed wherever the if element has been used.
+
+
+=== c_code element
+==== Attributes
+None
+
+==== child elements
+The content is a CDATA section that contains C-Code that implement the function. This C-Code also contains markers. These markers define locations in the code where c_code of child elements will be added.
+
+
+== Example
+
+[source,xml]
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="super_loop" api="program_entry_point">
+  <required>
+    <childElement type="run" />
+  </required>
+  <provides>
+    <singleTask type="bool" value="1==numOfChild"/>
+  </provides>
+  <function name="main">
+    <c_code>
+      <![CDATA[{
+  $$$initialize$$$
+  for(;;)
+  {
+    $$$execute$$$
+  }
+}]]>
+    </c_code>
+  </function>
+</algorithm>
+----

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<build_cfg>
+  <required>
+    <variables>
+      <CC>avr-gcc</CC>
+      <LD>avr-ld</LD>
+      <CFLAGS> -c -fno-common -O0 -g </CFLAGS>
+      <LFLAGS>-nostartfiles -T$(LKR_SCRIPT)</LFLAGS>
+      <CPFLAGS>-Obinary</CPFLAGS>
+    </variables>
+    <targets>
+      <target>
+        <source>$(OBJS)</source>
+        <output>$(project).elf</output>
+        <rule>$(LD) $(LFLAGS) -o main.elf main.o</rule>
+      </target>
+    </targets>
+  </required>
+  <variables>
+  </variables>
+</build_cfg>

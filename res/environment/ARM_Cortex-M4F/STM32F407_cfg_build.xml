@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<build_cfg>
+  <required>
+    <files>
+      <unstructured>
+        <filename>stm32_minimal.ld</filename>
+        <content><![CDATA[
+/*****************************************
+ * stm32 minimal example stm32_minimal.ld
+ *****************************************/
+
+/* memory layout for an STM32F103RB */
+MEMORY
+{
+    FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 128K
+    SRAM (xrw)  : ORIGIN = 0x20000000, LENGTH = 20K
+}
+
+/* output sections */
+SECTIONS
+{
+    /* program code into FLASH */
+    .text :
+    {
+        *(.vector_table)    /* Vector table */
+        *(.text)            /* Program code */
+    } >FLASH
+
+    /* uninitialized global and static variables (which
+       we don't have any in this example) into SRAM */
+    .data :
+    {
+        *(.data)
+    } >SRAM
+}
+        ]]></content>
+      </unstructured>
+    </files>
+  </required>
+</build_cfg>

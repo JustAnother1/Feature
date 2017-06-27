@@ -1,0 +1,39 @@
+Software Development Process using Puzzler
+==========================================
+:toc:
+:numbered:
+:showcomments:
+
+== Abstract
+
+This document defines the software development process using puzzler. puzzler is only one step in a multiple step process. To highlight the differences of the puzzler process and to define the position in the process that puzzler covers it is compared to other software development processes.
+
+== Environment
+
+The usual environment for a software development project ususally starts with a customer. The customer has a very specific need for a software. He needs the software to execute a function in his process. The customer has usually only limited knowleadge of the software development process, but has a very detailed knowleadge of the feature he needs. All other peolpe involved do not share this knowleadge. It is therefore important to establish a common understanding of the needed functionality.
+
+The usual approcah for this is to collect use cases / stories and requirements. This customer input is then used to create a design. The design should be a complete desctription of all functionality needed by the customer. In most cases it is not a complete description and that causes many issues.
+The design is then used to create an implementation. In most cases the step from design to implementation is a manual one. A programmer looks at the design and creates source code that matches his understanding of the design. This is another step that can create issues.
+A problem is that the step of going from design to implementation needs to solve all the implementtation details. Discussing these implementation details with the customer is not efficient, as the customer does not have the in deepth knowleadge of software development to be able to make an informed decision.
+The implementation is then testsed against the requirements. In this step soem of the mis understanding happened in the earlier steps can be eliminated. Especially if the tester is not the sae person as the implementer.
+In the end the customer receives the tested implemtnation.
+
+== How puzzler fits into the process
+
+Puzzler requires the design to be specified as executeable definition. It defines an xml based file format for designs. The design files refere to algorithms and data structures. Those are also defined as file formats. The algorithms can have definitions for a simulator /symbolic execution. This makes it possible to achieve an fully executeable design.
+puzzler allos to automatically create an implementation from the design. The implementation details are resolved by puzzler based on guidelines defined in the design.
+
+
+== The puzzler process
+
+The puzzler process creates an implementation. The whole process runs automatically. Therefore all information has to be available before the process can be executed successfully.
+
+The needed information for a successful run of the puzzler process are these:
+
+.needed input
+project file:: Defines the target environment that the implementation should execute in.
+solution file:: The "software design". This is defines the logic/ functionality of the implementation.
+algorithm files:: These define the attributes of a algorithm. Algorithm files are needed for all used algorithms
+data structure file:: The data structure file defines the memory layout and other attributes of the data structures they define. data structure files are needed for all used data structures
+
+

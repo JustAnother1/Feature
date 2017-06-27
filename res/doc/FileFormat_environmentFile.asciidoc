@@ -1,0 +1,68 @@
+File Format Specification - Environment File
+============================================
+:toc:
+:numbered:
+:showcomments:
+
+== Summary
+This document defines the file format for environment files.
+Environment files describe the environment that the solution should execute in.
+
+== File format
+Environment files are xml files. The root element is a "environment" element.
+
+=== environment element
+==== Attributes
+None.
+==== child elements
+The environment element must have a exactly one "cpu" element.
+
+=== cpu element
+==== Attributes
+None.
+==== child elements
+The cpu element must have a exactly one "architecture" element.
+The cpu element can have a maximum of one "pinMapping" element.
+
+=== architecture element
+==== Attributes
+the "name" attribute contains the name of the cpu architecture. This is needed to generate the correct binary code for that machine. Examples for Architectures are "x86", "x86-64", "ARM_Cortex-M3", "ARM_Cortex-M4F"..
+
+the "device" attribute contains the full name of the used device.
+
+the optional "family" attribute can name a family of devices that this device belongs to.
+
+==== child elements
+None.
+
+=== pinMapping element
+==== Attributes
+None
+==== child elements
+All child elements have to comply with the pin element style.
+
+=== pin element style
+==== Attributes
+The element needs to have the "type" attribute. The type attribute defines the usage of the pin. Allowed types are : "digital out", "digital in", "analog in", "special function"
+
+The element needs to have a "port" attribute. The port attribute defines the port that the pin belongs to. If the ports are named "PA", "PB", "PC", .. then the port attribute only defines the varying part. For example "A" instead of "PA".
+
+The element needs to have a "pin" attribute. The pin attribute defines the index of the pin in the port. The lowest index is 0.
+
+==== child elements
+None.
+
+== Example
+
+[source,xml]
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<environment>
+  <cpu>
+    <architecture name="AVR" device="atmega2560"/>>
+    <pinMapping>
+      <greenLed type="digital out" port="A" pin="3" />
+    </pinMapping>
+  </cpu>
+</environment>
+----

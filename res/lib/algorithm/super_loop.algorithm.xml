@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="super_loop" api="program_entry_point">
+  <required>
+    <childElement type="run" />
+  </required>
+  <provides>
+    <singleTask type="bool" value="1==numOfChild"/>
+  </provides>
+  <c_code>
+    <function name="main">
+      <![CDATA[{
+  $$$initialize$$$
+  for(;;)
+  {
+    $$$execute$$$
+  }
+}]]>
+    </function>
+  </c_code>
+</algorithm>

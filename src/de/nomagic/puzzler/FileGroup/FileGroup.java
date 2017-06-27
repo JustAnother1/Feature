@@ -8,43 +8,65 @@ import java.util.Map.Entry;
 
 import de.nomagic.puzzler.progress.ProgressReport;
 
-public class FileGroup 
+public class FileGroup
 {
-	private HashMap<String, TextFile> files = new HashMap<String,TextFile>();
+    private HashMap<String, AbstractFile> files = new HashMap<String,AbstractFile>();
 
-	public FileGroup() 
-	{
-	}
+    public FileGroup()
+    {
+    }
 
-	public void add(TextFile aFile) 
-	{
-		files.put(aFile.getFileName(), aFile);
-	}
+    public void add(AbstractFile aFile)
+    {
+        if(null != aFile)
+        {
+            files.put(aFile.getFileName(), aFile);
+        }
+    }
 
-	public boolean saveToFolder(String folder, ProgressReport report) 
-	{
-		File f = new File(folder);
-		if(false == f.exists())
-		{
-			if(false == f.mkdirs())
-			{
-				report.addError(this, "could not create the output folder (" + folder + ")");
-				return false;
-			}
-			// else ok
-		}
-		// else ok
-		Iterator<Entry<String, TextFile>> it = files.entrySet().iterator();
-	    while (it.hasNext()) 
-	    {
-	        Entry<String, TextFile> pair = it.next();
-	        if(false == pair.getValue().saveToFolder(folder, report))
-	        {
-	        	return false;
-	        }
-	        // else ok
-	    }
-		return true;
-	}
+    public boolean saveToFolder(String folder, ProgressReport report)
+    {
+        File f = new File(folder);
+        if(false == f.exists())
+        {
+            if(false == f.mkdirs())
+            {
+                report.addError(this, "could not create the output folder (" + folder + ")");
+                return false;
+            }
+            // else ok
+        }
+        // else ok
+        Iterator<Entry<String, AbstractFile>> it = files.entrySet().iterator();
+        while (it.hasNext())
+        {
+            Entry<String, AbstractFile> pair = it.next();
+            if(false == pair.getValue().saveToFolder(folder, report))
+            {
+                return false;
+            }
+            // else ok
+        }
+        return true;
+    }
+
+    public Iterator<String> getFileIterator()
+    {
+        return files.keySet().iterator();
+    }
+
+    public AbstractFile getFileWithName(String fileName)
+    {
+        return files.get(fileName);
+    }
+
+    public void addAll(FileGroup otherGroup)
+    {
+        Iterator<String> it = otherGroup.getFileIterator();
+        while(it.hasNext())
+        {
+            add(otherGroup.getFileWithName(it.next()));
+        }
+    }
 
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="gpio" api="binaryOut,binaryIn">
+  <configurationAttribute name="Port" type="character"/>
+  <configurationAttribute name="Pin" type="unsigned integer"/>
+  <required>
+    <parameter ref="port" />
+    <parameter ref="pin" />
+  </required>
+  <c_code>
+    <function  name="setValue"  param="bool">
+      <![CDATA[{
+  $$$initialize$$$
+  for(;;)
+  {
+    $$$execute$$$
+  }
+}]]>
+    </function>
+
+    <function  name="getValue" result="bool">
+<![CDATA[{
+  $$$initialize$$$
+  for(;;)
+  {
+    $$$execute$$$
+  }
+}]]>
+    </function>
+  </c_code>
+</algorithm>

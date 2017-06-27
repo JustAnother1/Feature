@@ -1,0 +1,36 @@
+File Format Specification - API File
+====================================
+:toc:
+:numbered:
+:showcomments:
+
+== Summary
+This document defines the file format for API files.
+API files define an Interface that algorithms can use.
+
+== File format
+API files are xml files. The root element is a "api" element.
+
+=== api element
+==== Attributes
+the "name" attribute defines the name of the Interface. The name is also used in the filename.
+==== child elements
+The API element can have many child elements of type function element.
+
+=== function element
+==== Attributes
+ The "name" attribute defines the function name.
+ The "type" attribute defines if this function must be present ("required") to fulfil the interface.
+==== child elements
+none.
+
+== Example
+
+[source,xml]
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="run" >
+  <function name="execute" type="required" />
+  <function  name="initialize" type="optional" />
+</api>
+----

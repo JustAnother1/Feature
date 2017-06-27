@@ -13,7 +13,7 @@
  *
  */
 /** puzzler "compiles" solutions into binaries.
- * 
+ *
  */
 package de.nomagic.puzzler;
 
@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -45,21 +46,19 @@ import de.nomagic.puzzler.solution.Solution;
  * (<a href=mailto:Lars_Poetter@gmx.de>Lars_Poetter@gmx.de</a>)
  *
  */
-public class PuzzlerMain 
+public class PuzzlerMain
 {
-	public final static String ROOT_PATH_CFG = "work_directory";
-	public final static String LIB_PATH_CFG = "library_path";
-	public final static String OUTPUT_PATH_CFG = "output_path";
-	
-	private Configuration cfg = null;
-	private ProgressReport report = null;
-	private boolean successful = false;
-	
-	public PuzzlerMain()
-	{
-		
-	}
-	
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
+    private Configuration cfg = null;
+    private ProgressReport report = null;
+    private boolean successful = false;
+
+    public PuzzlerMain()
+    {
+
+    }
+
     public static String getCommitID()
     {
         try
@@ -89,17 +88,27 @@ public class PuzzlerMain
             return e.toString();
         }
     }
-    
+
     public void printHelp()
     {
-        System.out.println("Feature Puzzler");
+        System.out.println("Feature Puzzler [Parameters] [Project File]");
         System.out.println("Parameters:");
+        System.out.println("-e /--environment_dirctory : directory with environment configuration.");
+
         System.out.println("-h / --help                : print this message.");
+
+        System.out.println("-l /--library_dirctory     : directory for library of Algorithms and APIs.");
+        System.out.println("                           : This parameter can be specified multiple times.");
+
+        System.out.println("-o /--output_dirctory      : directory for created data.");
+
         System.out.println("-v                         : verbose output for even more messages use -v -v");
+
         System.out.println("-w / --work_dirctory       : root directory for file search.");
+
         System.out.println("<Projectfile>.xml          : define the project to process.");
     }
-    
+
     private void startLogging(final String[] args)
     {
         int numOfV = 0;
@@ -162,28 +171,80 @@ public class PuzzlerMain
         }
         StatusPrinter.printInCaseOfErrorsOrWarnings(context);
     }
-	
-	public boolean parseCommandLineParameters(String[] args) 
-	{
-		Configuration cfg = new Configuration();
+
+    public boolean parseCommandLineParameters(String[] args)
+    {
+        boolean found_outputDirectory = false;
+        boolean found_libDirectory = false;
+        Configuration cfg = new Configuration();
         for(int i = 0; i < args.length; i++)
         {
             if(true == args[i].startsWith("-"))
             {
                 if( (true == "-h".equals(args[i])) || (true == "--help".equals(args[i])))
                 {
-                	printHelp();
+                    // help
+                    printHelp();
                     return false;
                 }
                 else if(true == "-v".equals(args[i]))
                 {
+                    // verbose output
                     // already handled -> ignore
                 }
                 else if( (true == "-w".equals(args[i])) || (true == "--work_dirctory".equals(args[i])))
                 {
-                	i++;
-                	String workDirectory = args[i];
-                	cfg.setString(ROOT_PATH_CFG, workDirectory);
+                    // working directory
+                    i++;
+                    String workDirectory = Tool.validatePath(args[i]);
+                    if(1 > workDirectory.length())
+                    {
+                        System.err.println("Invalid Parameter : " + args[i]);
+                        return false;
+                    }
+                    cfg.setString(Configuration.ROOT_PATH_CFG, workDirectory);
+                    log.trace("command Line config: work Directory {}", workDirectory);
+                }
+                else if( (true == "-l".equals(args[i])) || (true == "--library_dirctory".equals(args[i])))
+                {
+                    // Library directory
+                    i++;
+                    String libDir = Tool.validatePath(args[i]);
+                    if(1 > libDir.length())
+                    {
+                        System.err.println("Invalid Parameter : " + args[i]);
+                        return false;
+                    }
+                    cfg.setString(Configuration.LIB_PATH_CFG, libDir);
+                    found_libDirectory = true;
+                    log.trace("command Line config: library Directory {}", libDir);
+                }
+                else if( (true == "-o".equals(args[i])) || (true == "--output_dirctory".equals(args[i])))
+                {
+                    // output directory
+                    i++;
+                    String outputDirectory = Tool.validatePath(args[i]);
+                    if(1 > outputDirectory.length())
+                    {
+                        System.err.println("Invalid Parameter : " + args[i]);
+                        return false;
+                    }
+                    cfg.setString(Configuration.OUTPUT_PATH_CFG, outputDirectory);
+                    found_outputDirectory = true;
+                    log.trace("command Line config: output Directory {}", outputDirectory);
+                }
+                else if( (true == "-e".equals(args[i])) || (true == "--environment_dirctory".equals(args[i])))
+                {
+                    // environment directory
+                    i++;
+                    String envDir = Tool.validatePath(args[i]);
+                    if(1 > envDir.length())
+                    {
+                        System.err.println("Invalid Parameter : " + args[i]);
+                        return false;
+                    }
+                    cfg.setString(Configuration.ENVIRONMENT_PATH_CFG, envDir);
+                    log.trace("command Line config: environment Directory {}", envDir);
                 }
                 else
                 {
@@ -193,120 +254,130 @@ public class PuzzlerMain
             }
             else
             {
-            	if(true == args[i].endsWith(".xml"))
-            	{
-            		cfg.setString(Project.PROJECT_FILE_CFG, args[i]);
-            	}
-            	else
-            	{
-            		System.err.println("Invalid Parameter : " + args[i]);
-                	return false;
-            	}
+                if(true == args[i].endsWith(".xml"))
+                {
+                    String ProjectName =  args[i].substring(0, args[i].length() - ".xml".length());
+                    cfg.setString(Configuration.PROJECT_FILE_CFG, ProjectName);
+                }
+                else
+                {
+                    System.err.println("Invalid Parameter : " + args[i]);
+                    return false;
+                }
             }
         }
-		// TODO check parameters
+        // check parameters
+        if(false == found_outputDirectory)
+        {
+            System.err.println("ERROR: You need to provide the output directory");
+            return false;
+        }
         // TODO give them command line parameters
-    	cfg.setString(Project.PROJECT_PATH_CFG, cfg.getString(ROOT_PATH_CFG));
-    	cfg.setString(LIB_PATH_CFG, cfg.getString(ROOT_PATH_CFG) + "lib/");
-        
+        cfg.setString(Configuration.PROJECT_PATH_CFG, cfg.getString(Configuration.ROOT_PATH_CFG));
+        if(false == found_libDirectory)
+        {
+            cfg.setString(Configuration.LIB_PATH_CFG, cfg.getString(Configuration.ROOT_PATH_CFG) + "lib/");
+        }
+
         this.cfg = cfg;
         return true;
-	}	
-	
-	public void execute() 
-	{
-		if(null == cfg)
-		{
-			return;
-		}
-		report = ProgressReportFactory.getReportFor(cfg);
-		// open Project file
-		Project pro = new Project(report);
-		pro.setConfiguration(cfg);
-		if(false == pro.getFromFiles())
-		{
-			report.close();
-			return;
-		}
-		
-		// Find environment
-		Environment e = new Environment(report);
-		e.setConfiguration(cfg);
-		if(false == e.getFromProject(pro))
-		{
-			report.close();
-			return;
-		}
-		
-		// find solution
-		Solution s = new Solution(report);
-		s.setConfiguration(cfg);
-		if(false == s.getFromProject(pro))
-		{
-			report.close();
-			return;
-		}
-		
-		// check if solution refers to undefined entities
-		// test that all environment References are meet by the environment.
-		if(false == s.checkAndTestAgainst(e))
-		{
-			report.close();
-			return;
-		}
-		
-		// create "code creator" back end (creates the C Source Code)
-		Generator gen = new C_CodeGenerator(report);
-		gen.setConfiguration(cfg);
-		// give solution to code creator to create code project
-		FileGroup files = gen.generateFor(s);
-		if(null == files)
-		{
-			report.close();
-			return;
-		}
-		// check tool chain to create makefile
-		BuildSystem make = new MakeBuildSystem(report);
-		make.setConfiguration(cfg);
-		if(false == make.createBuildFor(files))
-		{
-			report.close();
-			return;
-		}
-		
-		if(false ==files.saveToFolder(cfg.getString(OUTPUT_PATH_CFG), report))
-		{
-			report.close();
-			return;
-		}
-		// success !
-		report.setSucessful();
-		report.close();
-		successful = true;
-	}
+    }
 
-	public static void main(String[] args) 
-	{
-		PuzzlerMain m = new PuzzlerMain();
-		m.startLogging(args);
-		if(true == m.parseCommandLineParameters(args))
-		{
-			m.execute();
-			if(true == m.successful)
-			{
-				// OK
-				System.exit(0);
-			}
-			else
-			{
-				// ERROR
-				System.exit(1);
-			}
-		}
-		else
-		{
-			System.exit(1);
-		}
-	}
+    public void execute()
+    {
+        if(null == cfg)
+        {
+            return;
+        }
+        report = ProgressReportFactory.getReportFor(cfg);
+        // open Project file
+        Project pro = new Project(report);
+        pro.setConfiguration(cfg);
+        if(false == pro.getFromFiles())
+        {
+            report.close();
+            return;
+        }
+
+        // Find environment
+        Environment e = new Environment(report);
+        e.setConfiguration(cfg);
+        if(false == e.getFromProject(pro))
+        {
+            report.close();
+            return;
+        }
+
+        // find solution
+        Solution s = new Solution(report);
+        s.setConfiguration(cfg);
+        if(false == s.getFromProject(pro))
+        {
+            report.close();
+            return;
+        }
+
+        // check if solution refers to undefined entities
+        // test that all environment References are meet by the environment.
+        if(false == s.checkAndTestAgainst(e))
+        {
+            report.close();
+            return;
+        }
+
+        // create "code creator" back end (creates the C Source Code)
+        Generator gen = new C_CodeGenerator(report);
+        gen.setConfiguration(cfg);
+        // give solution to code creator to create code project
+        FileGroup files = gen.generateFor(s, e);
+        if(null == files)
+        {
+            report.close();
+            return;
+        }
+        // check tool chain to create makefile
+        BuildSystem make = new MakeBuildSystem(report);
+        make.setConfiguration(cfg);
+        files = make.createBuildFor(files, e);
+        if(null == files)
+        {
+            report.close();
+            return;
+        }
+
+        if(false ==files.saveToFolder(cfg.getString(Configuration.OUTPUT_PATH_CFG), report))
+        {
+            report.close();
+            return;
+        }
+        // success !
+        report.setSucessful();
+        report.close();
+        successful = true;
+    }
+
+    public static void main(String[] args)
+    {
+        PuzzlerMain m = new PuzzlerMain();
+        m.startLogging(args);
+        if(true == m.parseCommandLineParameters(args))
+        {
+            m.execute();
+            if(true == m.successful)
+            {
+                // OK
+                System.exit(0);
+            }
+            else
+            {
+                // ERROR
+                System.exit(1);
+            }
+        }
+        else
+        {
+            System.exit(1);
+        }
+    }
 
 }

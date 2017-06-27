@@ -1,0 +1,47 @@
+Folder structure Specification
+==============================
+:toc:
+:numbered:
+:showcomments:
+
+== Summary
+This document defines the folder structure. It defines all the folders used and defines where the files need to be located.
+
+
+== library folder
+The library folder contains all non project and non architecture specific algorithms and API.
+
+=== api folder
+contains non project and non architecture specific API definitions.
+
+=== algorithm folder
+contains non project and non architecture specific algorithm specifications.
+
+== environment folder
+The environment folder contains sub directories for all supported cpu architectures.
+each architecture folder has the name of the architecture.
+
+=== architecture folder
+each architecture folder can have sub folders for families. in the architecture folder as well as in the family folder files staring with "common_" may exist. If these files exist then the content of those common files will be read additionally to the device specific file that has been requested.
+The architecture folder or the family folder contains the device configuration files. The name of the files start with the device name followed by a underscore ("_"). Device files may only be positioned directly in the architecture folder if they do not belong to a family.
+The architecture folder also contains all architecture specific algorithms and API.
+
+=== api folder
+contains architecture specific API definitions.
+
+=== algorithm folder
+contains architecture specific algorithm specifications.
+
+== output directory
+all created files will be put into this directory
+
+== work directory
+files that are only relevant for the currently processed project can be located here.
+The work folder also contains all project specific algorithms and API.
+TIP: APIs and algorithms need a good reason to be project specific.
+
+=== api folder
+contains project specific API definitions.
+
+=== algorithm folder
+contains project specific algorithm specifications.

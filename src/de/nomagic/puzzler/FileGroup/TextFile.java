@@ -1,82 +1,83 @@
 
 package de.nomagic.puzzler.FileGroup;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.nomagic.puzzler.Tool;
-import de.nomagic.puzzler.progress.ProgressReport;
-
-public class TextFile 
+public class TextFile extends AbstractFile
 {
-	private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-	
-	private HashMap<String, Vector<String>> sectionData = new HashMap<String,Vector<String>>();
-	private Vector<String> sections = new Vector<String>();
-	private String fileName;
+    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
-	public TextFile(String filename) 
-	{
-		this.fileName = filename;
-	}
-	
-	public String getFileName() 
-	{
-		return fileName;
-	}
+    private HashMap<String, Vector<String>> sectionData = new HashMap<String,Vector<String>>();
+    private Vector<String> sections = new Vector<String>();
+    private boolean addSeperation = false;
 
-	public void createSections(String[] newSections) 
-	{
-		for(int i = 0; i < newSections.length; i++)
-		{
-			sections.add(newSections[i]);
-			sectionData.put(newSections[i], new Vector<String>());
-		}
-	}
+    public TextFile(String filename)
+    {
+        super(filename);
+    }
 
-	public void addLines(String sectionName, String[] lines) 
-	{
-		Vector<String> curSection = sectionData.get(sectionName);
-		for(int i = 0; i < lines.length; i++)
-		{
-			curSection.add(lines[i]);
-		}
-	}
+    public void createSection(String newSection)
+    {
+        sections.add(newSection);
+        sectionData.put(newSection, new Vector<String>());
+    }
 
-	public boolean saveToFolder(String folder, ProgressReport report)
-	{
-		FileOutputStream fout;
-		try 
-		{
-			fout = new FileOutputStream(folder + fileName);
-			for(int sec = 0; sec < sections.size(); sec++)
-			{
-				String curSection = sections.get(sec);
-				Vector<String> curData = sectionData.get(curSection);
-				for(int i = 0; i < curData.size(); i++)
-				{
-					fout.write((curData.get(i) + "\n").getBytes());
-				}
-			}
-			fout.close();
-			return true;
-		}
-		catch (FileNotFoundException e) 
-		{
-			report.addError("TextFile(" + fileName + ")", e.getMessage());
-			log.trace(Tool.fromExceptionToString(e));
-		} 
-		catch (IOException e) 
-		{
-			report.addError("TextFile(" + fileName + ")", e.getMessage());
-			log.trace(Tool.fromExceptionToString(e));
-		}
-		return false;
-	}
+    public void createSections(String[] newSections)
+    {
+        for(int i = 0; i < newSections.length; i++)
+        {
+            createSection(newSections[i]);
+        }
+    }
+
+    public void addLine(String sectionName, String line)
+    {
+        String[] arr = {line};
+        addLines(sectionName, arr);
+    }
+
+    public void addLines(String sectionName, String[] lines)
+    {
+        Vector<String> curSection = sectionData.get(sectionName);
+        if(null == curSection)
+        {
+            log.error("Tried to add lines to the invalid section (" + sectionName + ")!");
+        }
+        else
+        {
+            for(int i = 0; i < lines.length; i++)
+            {
+                curSection.add(lines[i]);
+            }
+        }
+    }
+
+    protected void writeToStream(OutputStream out) throws IOException
+    {
+        for(int sec = 0; sec < sections.size(); sec++)
+        {
+            String curSection = sections.get(sec);
+            Vector<String> curData = sectionData.get(curSection);
+            for(int i = 0; i < curData.size(); i++)
+            {
+                out.write((curData.get(i) + "\n").getBytes());
+            }
+            if((true == addSeperation) && (0 < curData.size()))
+            {
+                out.write("\n".getBytes());
+            }
+        }
+    }
+
+    public void separateSectionWithEmptyLine(boolean b)
+    {
+        addSeperation = b;
+    }
+
 }

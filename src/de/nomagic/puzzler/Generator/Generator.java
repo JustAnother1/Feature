@@ -1,24 +1,19 @@
 
 package de.nomagic.puzzler.Generator;
 
+import de.nomagic.puzzler.Base;
+import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.FileGroup;
-import de.nomagic.puzzler.configuration.Configuration;
+import de.nomagic.puzzler.progress.ProgressReport;
 import de.nomagic.puzzler.solution.Solution;
 
-public abstract class Generator 
+public abstract class Generator extends Base
 {
-	protected Configuration cfg;
+    public Generator(ProgressReport report)
+    {
+        super(report);
+    }
 
-	public Generator() 
-	{
-		// TODO Auto-generated constructor stub
-	}
-	
-	public void setConfiguration(Configuration cfg) 
-	{
-		this.cfg = cfg;
-	}
-	
-	public abstract FileGroup generateFor(Solution s);
+    public abstract FileGroup generateFor(Solution s, Environment e);
 
 }

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<algorithm name="gpio" api="binaryOut,binaryIn">
-	<configurationAttribute name="Port" type="character"/>
-	<configurationAttribute name="Pin" type="unsigned integer"/>
-	<required>
-		<parameter ref="Port" />
-		<parameter ref="Pin" />
-	</required>
-</algorithm>

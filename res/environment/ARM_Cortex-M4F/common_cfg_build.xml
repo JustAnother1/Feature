@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<build_cfg>
+  <required>
+    <variables>
+      <CC>arm-none-eabi-gcc</CC>
+      <LD>arm-none-eabi-ld</LD>
+      <LKR_SCRIPT>stm32_minimal.ld</LKR_SCRIPT>
+      <CFLAGS>-c -fno-common -O0 -g -mcpu=cortex-m3 -mthumb</CFLAGS>
+      <LFLAGS>-nostartfiles -T$(LKR_SCRIPT)</LFLAGS>
+      <CPFLAGS>-Obinary</CPFLAGS>
+    </variables>
+    <targets>
+      <target>
+        <source>$(OBJS)</source>
+        <output>$(project).elf</output>
+        <rule>$(LD) $(LFLAGS) -o main.elf main.o</rule>
+      </target>
+    </targets>
+  </required>
+  <variables>
+    <CP>arm-none-eabi-objcopy</CP>
+  </variables>
+</build_cfg>
