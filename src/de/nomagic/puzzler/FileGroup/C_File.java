@@ -1,5 +1,9 @@
 package de.nomagic.puzzler.FileGroup;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Vector;
+
 import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
 import de.nomagic.puzzler.BuildSystem.Target;
 
@@ -43,6 +47,47 @@ public class C_File extends TextFile
         BuildSystem.extendListVariable("C_SRC", fileName);
         String objName = fileName.substring(0, fileName.length() - ".c".length()) + ".o";
         BuildSystem.extendListVariable("OBJS", objName);
+    }
+
+    protected Vector<String> prepareSectionData(String sectionName, Vector<String> sectionData)
+    {
+        if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
+        {
+            if(sectionData.isEmpty())
+            {
+                return sectionData;
+            }
+            // remove duplicates
+            Collections.sort(sectionData);
+            Iterator<String> it = sectionData.iterator();
+            String first = it.next(); // we just checked that it is not empty, so this should work.
+            while(it.hasNext())
+            {
+                String next = it.next();
+                if(first.equals(next))
+                {
+                    it.remove();
+                }
+                else
+                {
+                    first = next;
+                }
+            }
+            Vector<String> res = new Vector<String>();
+            // expand to valid include statement
+            for(int i = 0; i < sectionData.size(); i++)
+            {
+                String line = sectionData.get(i);
+                line = "#include <" + line + ">";
+                res.add(line);
+            }
+            return res;
+        }
+        else
+        {
+            // Nothing to do here
+            return sectionData;
+        }
     }
 
 }

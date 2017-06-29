@@ -8,9 +8,9 @@
   </required>
   <if cond="is(singleTask)">
     <c_code>
-      <additonal>
+      <additional>
         <include>util/delay.h</include>
-      </additonal>
+      </additional>
       <function  name="initialize">
         <![CDATA[$$$initialize$$$]]>
       </function>

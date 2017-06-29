@@ -33,6 +33,7 @@ public class Algorithm extends Base
     private final Logger log = LoggerFactory.getLogger("Algorithm");
 
     private Element root = null;
+    private Element cCode = null;
 
     public Algorithm(Element root, ProgressReport report)
     {
@@ -89,19 +90,18 @@ public class Algorithm extends Base
         return false;
     }
 
-    public String getFunctionCcode(String functionName)
+    private void findImplementation()
     {
-        Element cCode = root.getChild(ALGORITHM_C_CODE_CHILD_NAME);
+        cCode = root.getChild(ALGORITHM_C_CODE_CHILD_NAME);
         if(null == cCode)
         {
             // the algorithm might have the functions wrapped into if condition tags.
             Element ifCond = root.getChild(ALGORITHM_IF_CHILD_NAME); // TODO check condition
             if(null == ifCond)
             {
-                report.addError("Algorithm.getFunctionCcode",
-                        "Function call to missing code! (" + this.toString()
-                        + ", function name : " + functionName + " )");
-                return null;
+                report.addError("Algorithm.findImplementation",
+                        "No Implementation found!");
+                return;
             }
             else
             {
@@ -109,11 +109,23 @@ public class Algorithm extends Base
                 if(null == cCode)
                 {
                     report.addError("Algorithm.getFunctionCcode",
-                            "Function call to missing code in conditional ! (" + this.toString()
-                            + " , function name : " + functionName
-                            + " , condition: " + ifCond.toString() + " )");
-                    return null;
+                            "Valid condition(" + ifCond.toString() + ") did not have an Implementation!");
+                    return;
                 }
+            }
+        }
+    }
+
+    public String getFunctionCcode(String functionName)
+    {
+        if(null == cCode)
+        {
+            findImplementation();
+            if(null == cCode)
+            {
+                report.addError("Algorithm.getFunctionCcode",
+                        "No implementation available !");
+                return null;
             }
         }
         List<Element> funcs = cCode.getChildren(ALGORITHM_FUNCTION_CHILD_NAME);
@@ -175,14 +187,20 @@ public class Algorithm extends Base
 
     public void addAdditionalsTo(C_File codeFile)
     {
-        Element cCode = root.getChild(ALGORITHM_C_CODE_CHILD_NAME);
         if(null == cCode)
         {
-            return;
+            findImplementation();
+            if(null == cCode)
+            {
+                report.addError("Algorithm.addAdditionalsTo",
+                        "No implementation available !");
+                return;
+            }
         }
         Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME);
         if(null == additional)
         {
+            log.trace("no addionals for algorithm" + this.toString());
             return;
         }
         List<Element> addlist = additional.getChildren();

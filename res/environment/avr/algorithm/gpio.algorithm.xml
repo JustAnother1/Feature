@@ -8,6 +8,9 @@
   </required>
 
   <c_code>
+    <additional>
+      <include>avr/io.h</include>
+    </additional>
     <function  name="initialize">
       <![CDATA[DDRB |= (1<<DDB5); //Set the 6th bit on PORTB (i.e. PB5) to 1 => output]]>
     </function>

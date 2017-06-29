@@ -64,6 +64,7 @@ public class TextFile extends AbstractFile
         {
             String curSection = sections.get(sec);
             Vector<String> curData = sectionData.get(curSection);
+            curData = prepareSectionData(curSection, curData);
             for(int i = 0; i < curData.size(); i++)
             {
                 out.write((curData.get(i) + "\n").getBytes());
@@ -73,6 +74,12 @@ public class TextFile extends AbstractFile
                 out.write("\n".getBytes());
             }
         }
+    }
+
+    protected Vector<String>  prepareSectionData(String sectionName, Vector<String> sectionData)
+    {
+        // Nothing to do here
+        return sectionData;
     }
 
     public void separateSectionWithEmptyLine(boolean b)
