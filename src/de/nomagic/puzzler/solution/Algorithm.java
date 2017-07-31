@@ -1,6 +1,7 @@
 
 package de.nomagic.puzzler.solution;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.jdom2.Attribute;
@@ -35,10 +36,17 @@ public class Algorithm extends Base
     private Element root = null;
     private Element cCode = null;
 
+    private ConditionEvaluator condiEval;
+    private HashMap<String, String> properties = new  HashMap<String, String>();  // TODO
+    private HashMap<String, String> parameters = new  HashMap<String, String>(); // TODO
+
+
+
     public Algorithm(Element root, ProgressReport report)
     {
         super(report);
         this.root = root;
+        condiEval = new ConditionEvaluator(properties, report, parameters);
     }
 
     @Override
@@ -96,8 +104,8 @@ public class Algorithm extends Base
         if(null == cCode)
         {
             // the algorithm might have the functions wrapped into if condition tags.
-            Element ifCond = root.getChild(ALGORITHM_IF_CHILD_NAME); // TODO check condition
-            if(null == ifCond)
+            List<Element> conditions = root.getChildren(ALGORITHM_IF_CHILD_NAME);
+            if(null == conditions)
             {
                 report.addError("Algorithm.findImplementation",
                         "No Implementation found!");
@@ -105,11 +113,18 @@ public class Algorithm extends Base
             }
             else
             {
-                cCode = ifCond.getChild(ALGORITHM_C_CODE_CHILD_NAME);
+                Element best = condiEval.getBest(conditions);  // TODO
+                if(null == best)
+                {
+                    report.addError("Algorithm.getFunctionCcode",
+                            "no valid condition!");
+                    return;
+                }
+                cCode = best.getChild(ALGORITHM_C_CODE_CHILD_NAME);
                 if(null == cCode)
                 {
                     report.addError("Algorithm.getFunctionCcode",
-                            "Valid condition(" + ifCond.toString() + ") did not have an Implementation!");
+                            "Valid condition(" + best.toString() + ") did not have an Implementation!");
                     return;
                 }
             }
@@ -159,22 +174,23 @@ public class Algorithm extends Base
             String name = curElement.getAttributeValue(ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME);
             if(true == searchedFunctionName.equals(name))
             {
-                if(false == hasParameter)
+                 List<Element> cond = curElement.getChildren(ALGORITHM_IF_CHILD_NAME);
+                if((null == cond) || (true == cond.isEmpty()))
                 {
+                    // TODO handle parameter in function
                     return curElement.getText();
                 }
                 else
                 {
-                    Element cond = curElement.getChild("if"); // TODO evaluate condition
-                    if(null == cond)
+                    Element best = condiEval.getBest(cond); // TODO
+                    if(null == best)
                     {
-                        // TODO handle parameter in function
-                        return curElement.getText();
+                        // function not found
+                        report.addError("Algorithm.getFunctionCcode",
+                                "no valid condition found!");
+                        return null;
                     }
-                    else
-                    {
-                        return cond.getText();
-                    }
+                    return best.getText();
                 }
             }
         }

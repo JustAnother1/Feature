@@ -16,10 +16,10 @@
     </function>
 
     <function  name="setValue"  param0_type="bool" param0_name="on">
-      <if cond="true == param(on)">
+      <if cond="true equals param(on)">
         <![CDATA[PORTB |= (1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 1 => on]]>
       </if>
-      <if cond="false == param(on)">
+      <if cond="false equals param(on)">
         <![CDATA[PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off]]>
       </if>
     </function>
