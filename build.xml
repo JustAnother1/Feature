@@ -12,17 +12,31 @@
   You should have received a copy of the GNU General Public License along
   with this program; if not, see <http://www.gnu.org/licenses/>
  -->
-<project default="all">
+<project default="all" basedir="." xmlns:cs="antlib:com.puppycrawl.tools.checkstyle.ant">
     <property name="mainJar" value="Puzzler.jar" />
     <property name="destDir" value="bin" />
-    <property name="javadoc" value="doc/javadoc" />
+    <property name="javadoc" value="res/doc/javadoc" />
     <property name="srcDir" value="src" />
+    <property name="testsDir" value="tests" />
+    <property name="testResDir" value="results" />
 
     <path id="project.class.path">
         <pathelement location="lib/slf4j-1.7.5/slf4j-api-1.7.5.jar"/>
         <pathelement path="lib/logback-1.0.13/logback-core-1.0.13.jar"/>
         <pathelement path="lib/logback-1.0.13/logback-classic-1.0.13.jar"/>
         <pathelement path="lib/jdom-2.0.6/jdom-2.0.6.jar"/>
+    </path>
+
+    <path id="junit.class.path">
+        <pathelement location="lib/slf4j-1.7.5/slf4j-api-1.7.5.jar"/>
+        <pathelement path="lib/logback-1.0.13/logback-core-1.0.13.jar"/>
+        <pathelement path="lib/logback-1.0.13/logback-classic-1.0.13.jar"/>
+        <pathelement path="lib/jdom-2.0.6/jdom-2.0.6.jar"/>
+        <!-- for JUnit : -->
+        <pathelement path="lib/junit4-4.12.jar"/>
+        <pathelement path="lib/hamcrest-core-1.3.jar"/>
+        <pathelement path="lib/system-rules-1.16.0/system-rules-1.16.0.jar"/>
+        <pathelement path="${destDir}"/>
     </path>
 
     <manifestclasspath property="pm.cp" jarfile="${mainJar}">
@@ -85,6 +99,46 @@
             <classpath refid="project.class.path"/>
         </javadoc>
     </target>
+
+    <target name="stylecheck">
+        <taskdef resource="checkstyletask.properties">
+            <classpath refid="project.class.path"/>
+        </taskdef>
+        <cs:checkstyle config="checkstyle-rules.xml" failOnViolation="false">
+            <classpath refid="project.class.path"/>
+            <fileset dir="${srcDir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <formatter type="plain"/>
+            <formatter type="xml" toFile="checkstyle-result.xml"/>
+        </cs:checkstyle>
+    </target>
+
+  <target name="unittest" depends="prepare" >
+        <delete dir="${testResDir}"/>
+      <mkdir dir="${testResDir}"/>
+
+        <javac srcdir="${srcDir}" destdir="${destDir}" includeantruntime="false"
+          source="1.8" target="1.8" debug="true" debuglevel="lines,vars,source" >
+            <classpath refid="project.class.path"/>
+        </javac>
+
+        <javac srcdir="${testsDir}" destdir="${destDir}" includeantruntime="false"
+             source="1.8" target="1.8" debug="true" debuglevel="lines,vars,source" >
+            <classpath refid="junit.class.path"/>
+        </javac>
+
+      <junit printsummary="yes" haltonfailure="no">
+        <classpath refid="junit.class.path"/>
+        <formatter type="plain"/>
+        <formatter type="xml"/>
+        <batchtest fork="yes" todir="${testResDir}">
+            <fileset dir="${testsDir}">
+                <include name="**/*Test*.java"/>
+            </fileset>
+        </batchtest>
+      </junit>
+  </target>
 
     <target name="all" depends="jar">
     </target>
