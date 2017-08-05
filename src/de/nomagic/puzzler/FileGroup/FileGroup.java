@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.progress.ProgressReport;
 
 public class FileGroup
@@ -24,14 +25,14 @@ public class FileGroup
         }
     }
 
-    public boolean saveToFolder(String folder, ProgressReport report)
+    public boolean saveToFolder(String folder, Context ctx)
     {
         File f = new File(folder);
         if(false == f.exists())
         {
             if(false == f.mkdirs())
             {
-                report.addError(this, "could not create the output folder (" + folder + ")");
+                ctx.addError(this, "could not create the output folder (" + folder + ")");
                 return false;
             }
             // else ok
@@ -41,7 +42,7 @@ public class FileGroup
         while (it.hasNext())
         {
             Entry<String, AbstractFile> pair = it.next();
-            if(false == pair.getValue().saveToFolder(folder, report))
+            if(false == pair.getValue().saveToFolder(folder, ctx))
             {
                 return false;
             }

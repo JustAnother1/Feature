@@ -6,10 +6,8 @@ import java.util.Vector;
 import org.jdom2.Element;
 
 import de.nomagic.puzzler.Base;
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGetter;
-import de.nomagic.puzzler.Environment.Environment;
-import de.nomagic.puzzler.configuration.Configuration;
-import de.nomagic.puzzler.progress.ProgressReport;
 
 public class Api extends Base
 {
@@ -18,21 +16,17 @@ public class Api extends Base
 
     private Element root = null;
 
-    public Api(Element root, ProgressReport report)
+    public Api(Element root, Context ctx)
     {
-        super(report);
+        super(ctx);
         this.root = root;
     }
 
 
-    public static Api getFromFile(String name,
-                                  Environment e,
-                                  Configuration cfg,
-                                  ProgressReport report)
+    public static Api getFromFile(String name, Context ctx)
     {
-        Element root = FileGetter.getFromFile(name, "api", API_ROOT_ELEMENT_NAME, e, cfg, report);
-        Api res = new Api(root, report);
-        res.setConfiguration(cfg);
+        Element root = FileGetter.getFromFile(name, "api", API_ROOT_ELEMENT_NAME, ctx);
+        Api res = new Api(root, ctx);
         return res;
     }
 

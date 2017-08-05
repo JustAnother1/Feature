@@ -2,18 +2,16 @@
 package de.nomagic.puzzler.Generator;
 
 import de.nomagic.puzzler.Base;
-import de.nomagic.puzzler.Environment.Environment;
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGroup.FileGroup;
-import de.nomagic.puzzler.progress.ProgressReport;
-import de.nomagic.puzzler.solution.Solution;
 
 public abstract class Generator extends Base
 {
-    public Generator(ProgressReport report)
+    public Generator(Context ctx)
     {
-        super(report);
+        super(ctx);
     }
 
-    public abstract FileGroup generateFor(Solution s, Environment e);
+    public abstract FileGroup generateFor();
 
 }

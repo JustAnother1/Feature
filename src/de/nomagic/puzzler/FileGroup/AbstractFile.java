@@ -9,9 +9,9 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
-import de.nomagic.puzzler.progress.ProgressReport;
 
 public abstract class AbstractFile
 {
@@ -29,7 +29,7 @@ public abstract class AbstractFile
         return fileName;
     }
 
-    public boolean saveToFolder(String folder, ProgressReport report)
+    public boolean saveToFolder(String folder, Context ctx)
     {
         FileOutputStream fout;
         try
@@ -41,12 +41,12 @@ public abstract class AbstractFile
         }
         catch (FileNotFoundException e)
         {
-            report.addError("TextFile(" + fileName + ")", e.getMessage());
+            ctx.addError("TextFile(" + fileName + ")", e.getMessage());
             log.trace(Tool.fromExceptionToString(e));
         }
         catch (IOException e)
         {
-            report.addError("TextFile(" + fileName + ")", e.getMessage());
+            ctx.addError("TextFile(" + fileName + ")", e.getMessage());
             log.trace(Tool.fromExceptionToString(e));
         }
         return false;

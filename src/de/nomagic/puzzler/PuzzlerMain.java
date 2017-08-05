@@ -37,8 +37,6 @@ import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.Generator.C_CodeGenerator;
 import de.nomagic.puzzler.Generator.Generator;
 import de.nomagic.puzzler.configuration.Configuration;
-import de.nomagic.puzzler.progress.ProgressReport;
-import de.nomagic.puzzler.progress.ProgressReportFactory;
 import de.nomagic.puzzler.solution.Solution;
 
 /**
@@ -48,10 +46,8 @@ import de.nomagic.puzzler.solution.Solution;
  */
 public class PuzzlerMain
 {
-
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
     private Configuration cfg = null;
-    private ProgressReport report = null;
     private boolean successful = false;
 
     public PuzzlerMain()
@@ -289,70 +285,67 @@ public class PuzzlerMain
         {
             return;
         }
-        report = ProgressReportFactory.getReportFor(cfg);
+        Context ctx = new Context(cfg);
         // open Project file
-        Project pro = new Project(report);
-        pro.setConfiguration(cfg);
+        Project pro = new Project(ctx);
         if(false == pro.getFromFiles())
         {
-            report.close();
+            ctx.close();
             return;
         }
 
         // Find environment
-        Environment e = new Environment(report);
-        e.setConfiguration(cfg);
+        Environment e = new Environment(ctx);
         if(false == e.getFromProject(pro))
         {
-            report.close();
+            ctx.close();
             return;
         }
+        ctx.addEnvironment(e);
 
         // find solution
-        Solution s = new Solution(report);
-        s.setConfiguration(cfg);
+        Solution s = new Solution(ctx);
         if(false == s.getFromProject(pro))
         {
-            report.close();
+            ctx.close();
             return;
         }
 
         // check if solution refers to undefined entities
         // test that all environment References are meet by the environment.
-        if(false == s.checkAndTestAgainst(e))
+        if(false == s.checkAndTestAgainstEnvironment())
         {
-            report.close();
+            ctx.close();
             return;
         }
+        ctx.addSolution(s);
 
         // create "code creator" back end (creates the C Source Code)
-        Generator gen = new C_CodeGenerator(report);
-        gen.setConfiguration(cfg);
+        Generator gen = new C_CodeGenerator(ctx);
         // give solution to code creator to create code project
-        FileGroup files = gen.generateFor(s, e);
+        FileGroup files = gen.generateFor();
         if(null == files)
         {
-            report.close();
+            ctx.close();
             return;
         }
         // check tool chain to create makefile
-        BuildSystem make = new MakeBuildSystem(report);
-        make.setConfiguration(cfg);
-        files = make.createBuildFor(files, e);
+        BuildSystem make = new MakeBuildSystem(ctx);
+        files = make.createBuildFor(files);
         if(null == files)
         {
-            report.close();
+            ctx.close();
             return;
         }
 
-        if(false ==files.saveToFolder(cfg.getString(Configuration.OUTPUT_PATH_CFG), report))
+        if(false ==files.saveToFolder(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
         {
-            report.close();
+            ctx.close();
             return;
         }
         // success !
-        report.setSucessful();
-        report.close();
+        ctx.setSucessful();
+        ctx.close();
         successful = true;
     }
 

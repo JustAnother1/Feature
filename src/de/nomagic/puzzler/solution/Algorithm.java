@@ -10,11 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGetter;
-import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.C_File;
-import de.nomagic.puzzler.configuration.Configuration;
-import de.nomagic.puzzler.progress.ProgressReport;
 
 public class Algorithm extends Base
 {
@@ -42,11 +40,11 @@ public class Algorithm extends Base
 
 
 
-    public Algorithm(Element root, ProgressReport report)
+    public Algorithm(Element root, Context ctx)
     {
-        super(report);
+        super(ctx);
         this.root = root;
-        condiEval = new ConditionEvaluator(properties, report, parameters);
+        condiEval = new ConditionEvaluator(properties, ctx, parameters);
     }
 
     @Override
@@ -55,20 +53,14 @@ public class Algorithm extends Base
         return "Algorithm " + root.getAttributeValue(ALGORITHM_NAME_ATTRIBUTE_NAME) + ")";
     }
 
-    public static Algorithm getFromFile(Element curElement,
-                                        Environment e,
-                                        Configuration cfg,
-                                        ProgressReport report)
+    public static Algorithm getFromFile(Element curElement, Context ctx)
     {
         Attribute algoAttr = curElement.getAttribute(ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         Element root = FileGetter.getFromFile(algoAttr.getValue(),
                                               "algorithm",
                                               ALGORITHM_ROOT_ELEMENT_NAME,
-                                              e,
-                                              cfg,
-                                              report);
-        Algorithm res = new Algorithm(root, report);
-        res.setConfiguration(cfg);
+                                              ctx);
+        Algorithm res = new Algorithm(root, ctx);
 
         // TODO check required configuration
         // TOD check and load the referenced API
@@ -107,7 +99,7 @@ public class Algorithm extends Base
             List<Element> conditions = root.getChildren(ALGORITHM_IF_CHILD_NAME);
             if(null == conditions)
             {
-                report.addError("Algorithm.findImplementation",
+                ctx.addError("Algorithm.findImplementation",
                         "No Implementation found!");
                 return;
             }
@@ -116,14 +108,14 @@ public class Algorithm extends Base
                 Element best = condiEval.getBest(conditions);  // TODO
                 if(null == best)
                 {
-                    report.addError("Algorithm.getFunctionCcode",
+                    ctx.addError("Algorithm.getFunctionCcode",
                             "no valid condition!");
                     return;
                 }
                 cCode = best.getChild(ALGORITHM_C_CODE_CHILD_NAME);
                 if(null == cCode)
                 {
-                    report.addError("Algorithm.getFunctionCcode",
+                    ctx.addError("Algorithm.getFunctionCcode",
                             "Valid condition(" + best.toString() + ") did not have an Implementation!");
                     return;
                 }
@@ -138,7 +130,7 @@ public class Algorithm extends Base
             findImplementation();
             if(null == cCode)
             {
-                report.addError("Algorithm.getFunctionCcode",
+                ctx.addError("Algorithm.getFunctionCcode",
                         "No implementation available !");
                 return null;
             }
@@ -158,13 +150,13 @@ public class Algorithm extends Base
         }
         if(null == searchedFunctionName)
         {
-            report.addError("Algorithm.getFunctionCcode",
+            ctx.addError("Algorithm.getFunctionCcode",
                     "Function call to unknown function!");
             return null;
         }
         if(1 > searchedFunctionName.length())
         {
-            report.addError("Algorithm.getFunctionCcode",
+            ctx.addError("Algorithm.getFunctionCcode",
                     "Function call to unnamed function!");
             return null;
         }
@@ -186,7 +178,7 @@ public class Algorithm extends Base
                     if(null == best)
                     {
                         // function not found
-                        report.addError("Algorithm.getFunctionCcode",
+                        ctx.addError("Algorithm.getFunctionCcode",
                                 "no valid condition found!");
                         return null;
                     }
@@ -195,7 +187,7 @@ public class Algorithm extends Base
             }
         }
         // function not found
-        report.addError("Algorithm.getFunctionCcode",
+        ctx.addError("Algorithm.getFunctionCcode",
                 "Function call to missing function! (" + this.toString()
                         + ", function name : " + functionName + " )");
         return null;
@@ -208,7 +200,7 @@ public class Algorithm extends Base
             findImplementation();
             if(null == cCode)
             {
-                report.addError("Algorithm.addAdditionalsTo",
+                ctx.addError("Algorithm.addAdditionalsTo",
                         "No implementation available !");
                 return;
             }

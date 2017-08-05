@@ -9,26 +9,42 @@ import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.nomagic.puzzler.progress.ProgressReport;
+import de.nomagic.puzzler.Base;
+import de.nomagic.puzzler.Context;
 
-public class ConditionEvaluator
+public class ConditionEvaluator extends Base
 {
     public final static String CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME = "cond";
 
+    // constants
+    public final static String KEY_TRUE = "true";
+    public final static String KEY_FALSE = "false";
+    // logic
+    public final static String KEY_AND = "and";
+    public final static String KEY_OR = "or";
+    public final static String KEY_IS_NOT_EQUAL_TO = "isNotEqualTo";
+    public final static String KEY_EQUALS = "equals";
+    public final static String KEY_SMALLER_THAN = "smallerThan";
+    public final static String KEY_GREATER_THAN = "greaterThan";
+    // functions
+    public final static String KEY_HAS = "has";
+    public final static String KEY_IS = "is";
+    public final static String KEY_PARAM = "param";
+
+
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-    private ProgressReport report;
     private HashMap<String, String> properties;
     private HashMap<String, String> parameters;
     private boolean valid;
 
 
     public ConditionEvaluator(HashMap<String, String> properties,
-                              ProgressReport report,
+                              Context ctx,
                               HashMap<String, String> parameters)
     {
+        super(ctx);
         this.parameters = parameters;
         this.properties = properties;
-        this.report = report;
     }
 
     public Element getBest(List<Element> conditions)
@@ -50,9 +66,14 @@ public class ConditionEvaluator
         {
             Element curE = it.next();
             String conditionText = curE.getAttributeValue(CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME);
+            log.trace("evaluating condition {}", conditionText);
             if(true == KEY_TRUE.equals(evaluateConditionParenthesis(conditionText)))
             {
                 valids.add(curE);
+            }
+            else
+            {
+                log.trace("condition not met");
             }
         }
         if(false == valid)
@@ -93,21 +114,6 @@ public class ConditionEvaluator
      * @param conditionText
      * @return
      */
-    // constants
-    public final static String KEY_TRUE = "true";
-    public final static String KEY_FALSE = "false";
-    // logic
-    public final static String KEY_AND = "and";
-    public final static String KEY_OR = "or";
-    public final static String KEY_IS_NOT_EQUAL_TO = "isNotEqualTo";
-    public final static String KEY_EQUALS = "equals";
-    public final static String KEY_SMALLER_THAN = "smallerThan";
-    public final static String KEY_GREATER_THAN = "greaterThan";
-    // functions
-    public final static String KEY_HAS = "has";
-    public final static String KEY_IS = "is";
-    public final static String KEY_PARAM = "param";
-
     private String evaluate_Word(String Word)
     {
         // constants
@@ -174,7 +180,7 @@ public class ConditionEvaluator
                 {
                     // there is something wrong here
                     valid = false;
-                    report.addError("ConditionEvaluation",
+                    ctx.addError("ConditionEvaluation",
                             "unknown property : " + parameter);
                     return KEY_FALSE;
                 }
@@ -206,7 +212,7 @@ public class ConditionEvaluator
                 {
                     // there is something wrong here
                     valid = false;
-                    report.addError("ConditionEvaluation",
+                    ctx.addError("ConditionEvaluation",
                             "unknown parameter : " + parameter);
                     return KEY_FALSE;
                 }
@@ -218,7 +224,7 @@ public class ConditionEvaluator
             default:
                 // there is something wrong here
                 valid = false;
-                report.addError("ConditionEvaluation",
+                ctx.addError("ConditionEvaluation",
                         "unknown function : '" + functionName  + "' in '" + Word + "'");
                 return KEY_FALSE;
             }
@@ -293,7 +299,7 @@ public class ConditionEvaluator
                 {
                     // last word missing
                     valid = false;
-                    report.addError("ConditionEvaluation",
+                    ctx.addError("ConditionEvaluation",
                             "last word missing in : " + conditionText);
                     return KEY_FALSE;
                 }
@@ -308,7 +314,7 @@ public class ConditionEvaluator
                 {
                     // there is something wrong here
                     valid = false;
-                    report.addError("ConditionEvaluation",
+                    ctx.addError("ConditionEvaluation",
                             "two non function words in : " + conditionText);
                     return KEY_FALSE;
                 }
@@ -382,7 +388,7 @@ public class ConditionEvaluator
             catch(NumberFormatException e)
             {
                 valid = false;
-                report.addError("ConditionEvaluation",
+                ctx.addError("ConditionEvaluation",
                         "one invalid number : either '" + valOne + "' or '" + valTwo + "'");
                 return KEY_FALSE;
             }
@@ -404,14 +410,14 @@ public class ConditionEvaluator
             catch(NumberFormatException e)
             {
                 valid = false;
-                report.addError("ConditionEvaluation",
+                ctx.addError("ConditionEvaluation",
                         "invalid number : " + valOne + " or " + valTwo);
                 return KEY_FALSE;
             }
 
         default:
             valid = false;
-            report.addError("ConditionEvaluation",
+            ctx.addError("ConditionEvaluation",
                     "invalid function : " + function);
             return KEY_FALSE;
         }
@@ -461,7 +467,7 @@ public class ConditionEvaluator
                     if(0 == num_openP)
                     {
                         valid = false;
-                        report.addError("ConditionEvaluation",
+                        ctx.addError("ConditionEvaluation",
                                 "Parenthesis mismatch in condition : " + condition);
                         return KEY_FALSE;
                     }
@@ -484,14 +490,14 @@ public class ConditionEvaluator
             if(0 != num_openP)
             {
                 valid = false;
-                report.addError("ConditionEvaluation",
+                ctx.addError("ConditionEvaluation",
                         "Parenthesis mismatch at end of condition : " + condition);
                 return KEY_FALSE;
             }
             if(1 != sections.size())
             {
                 valid = false;
-                report.addError("ConditionEvaluation",
+                ctx.addError("ConditionEvaluation",
                         "Parenthesis Section mismatch at end of condition : " + condition);
                 return KEY_FALSE;
             }

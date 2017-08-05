@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Project;
 import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
@@ -43,9 +44,9 @@ public class Environment extends Base
     private String FamilyName = "";
     private String DeviceName = "";
 
-    public Environment(ProgressReport report)
+    public Environment(Context ctx)
     {
-        super(report);
+        super(ctx);
     }
 
     public String getArchitectureName()
@@ -62,14 +63,14 @@ public class Environment extends Base
     {
         if(null == pro)
         {
-            report.addError(this, "No Project provided !");
+            ctx.addError(this, "No Project provided !");
             return false;
         }
 
         EnvironmentRoot = pro.getEnvironmentElement();
         if(null == EnvironmentRoot)
         {
-            report.addError(this, "No Environment Tag in Project !");
+            ctx.addError(this, "No Environment Tag in Project !");
             return false;
         }
 
@@ -81,27 +82,29 @@ public class Environment extends Base
                 String externalReferenceFileName = attr.getValue();
                 if(null == externalReferenceFileName)
                 {
-                    report.addError(this, "Invalid external reference !");
+                    ctx.addError(this, "Invalid external reference !");
                     return false;
                 }
                 // read external Reference
-                externalReferenceDocument = FileGetter.getXmlFile(cfg.getString(Configuration.ROOT_PATH_CFG), externalReferenceFileName, report);
+                externalReferenceDocument = FileGetter.getXmlFile(ctx.cfg().getString(Configuration.ROOT_PATH_CFG),
+                                                                  externalReferenceFileName,
+                                                                  ctx);
                 if(null == externalReferenceDocument)
                 {
-                    report.addError(this, "Could not read referenced File " + externalReferenceFileName);
+                    ctx.addError(this, "Could not read referenced File " + externalReferenceFileName);
                     return false;
                 }
 
                 Element extRefEleemnt  = externalReferenceDocument.getRootElement();
                 if(null == extRefEleemnt)
                 {
-                    report.addError(this, "Could not read Root Element from " + externalReferenceFileName);
+                    ctx.addError(this, "Could not read Root Element from " + externalReferenceFileName);
                     return false;
                 }
 
                 if(false == ROOT_ELEMENT_NAME.equals(extRefEleemnt.getName()))
                 {
-                    report.addError(this, "Environment File " + externalReferenceFileName
+                    ctx.addError(this, "Environment File " + externalReferenceFileName
                             + " has an invalid root tag (" + extRefEleemnt.getName() + ") !");
                     return false;
                 }
@@ -126,13 +129,13 @@ public class Environment extends Base
         Element cpu = XmlTreeRoot.getChild(CPU_ELEMENT_NAME);
         if(null == cpu)
         {
-            report.addError(this, "Environment did not specify the cpu used.");
+            ctx.addError(this, "Environment did not specify the cpu used.");
             return false;
         }
         Element architecture = cpu.getChild(ARCHITECTURE_ELEMENT_NAME);
         if(null == architecture)
         {
-            report.addError(this, "Environment did not specify the cpu architecture used.");
+            ctx.addError(this, "Environment did not specify the cpu architecture used.");
             return false;
         }
         ArchitectureName = architecture.getAttributeValue(ARCHITECTURE_TYPE_ATTRIBUTE_NAME);
@@ -147,7 +150,7 @@ public class Environment extends Base
         log.trace("Device name : {}", DeviceName);
         if((null == ArchitectureName) || (null == DeviceName))
         {
-            report.addError(this, "Environment did not specify the cpu Device/architecture name.");
+            ctx.addError(this, "Environment did not specify the cpu Device/architecture name.");
             return false;
         }
         return true;
@@ -177,7 +180,7 @@ public class Environment extends Base
         // maybe more ???
 
         // the searched thing is not in the environment,..
-        report.addError(this, "The device " + name + " could not be found in the environment !");
+        ctx.addError(this, "The device " + name + " could not be found in the environment !");
         return false;
     }
 
@@ -207,20 +210,20 @@ public class Environment extends Base
 
     private Element getConfigurationElementFrom(String Path, String FileName)
     {
-        Document comCfgDoc = FileGetter.getXmlFile(Path, FileName, report);
+        Document comCfgDoc = FileGetter.getXmlFile(Path, FileName, ctx);
         if(null != comCfgDoc)
         {
             Element root = comCfgDoc.getRootElement();
             if(null == root)
             {
-                report.addError(this, "No root tag "
+                ctx.addError(this, "No root tag "
                         + "in the configuration file " + Path + FileName);
                 return null;
             }
 
             if(false == BUILD_CFG_ROOT_ELEMENT_NAME.equals(root.getName()))
             {
-                report.addError(this, "Invalid root tag(" + root.getName() + ")  "
+                ctx.addError(this, "Invalid root tag(" + root.getName() + ")  "
                         + "in the configuration file " + Path + FileName);
                 return null;
             }
@@ -313,23 +316,23 @@ public class Environment extends Base
     {
         // Find configuration file for architecture
         String commonCfgFolder;
-        String envPath = cfg.getString(Configuration.ENVIRONMENT_PATH_CFG);
+        String envPath = ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG);
         if(1 > envPath.length())
         {
-            report.addError(this, "Environment path not configured !");
+            ctx.addError(this, "Environment path not configured !");
             return false;
         }
         if(0 < FamilyName.length())
         {
             // family provided -> common configuration is in family folder
-            commonCfgFolder = cfg.getString(Configuration.ENVIRONMENT_PATH_CFG) // Path is guaranteed to end with File.separator !
+            commonCfgFolder = ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) // Path is guaranteed to end with File.separator !
                     + ArchitectureName + File.separator
                     + FamilyName;
         }
         else
         {
             // no family provided -> common configuration is in architecture folder
-            commonCfgFolder = cfg.getString(Configuration.ENVIRONMENT_PATH_CFG) // Path is guaranteed to end with File.separator !
+            commonCfgFolder = ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) // Path is guaranteed to end with File.separator !
                     + ArchitectureName;
         }
 
@@ -338,7 +341,7 @@ public class Environment extends Base
 
         if((null == commonElement) && (null == deviceElement))
         {
-            report.addError(this, "No Build system configuration file found!");
+            ctx.addError(this, "No Build system configuration file found!");
             return false;
         }
 

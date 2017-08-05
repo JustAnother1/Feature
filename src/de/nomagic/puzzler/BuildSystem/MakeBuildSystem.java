@@ -4,6 +4,7 @@ package de.nomagic.puzzler.BuildSystem;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
@@ -23,18 +24,13 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
     private FileGroup buildFiles;
 
 
-    public MakeBuildSystem(ProgressReport report)
+    public MakeBuildSystem(Context ctx)
     {
-        super(report);
+        super(ctx);
     }
 
-    public FileGroup createBuildFor(FileGroup files, Environment e)
+    public FileGroup createBuildFor(FileGroup files)
     {
-        if(null == cfg)
-        {
-            report.addError(this, "No Configuration provided !");
-            return null;
-        }
         buildFiles = new FileGroup();
 
         //create the Makefile
@@ -49,12 +45,12 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         makeFile.addLines(MAKEFILE_FILE_COMMENT_SECTION_NAME,
                        new String[] {"# automatically created makefile",
                                      "# created at: " + Tool.curentDateTime(),
-                                     "# created from " + cfg.getString(Configuration.SOLUTION_FILE_CFG) });
+                                     "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
 
         Iterator<String> fileIt = files.getFileIterator();
         if(null == fileIt)
         {
-            report.addError(this, "No source files provided !");
+            ctx.addError(this, "No source files provided !");
             return null;
         }
         while(fileIt.hasNext())
@@ -67,13 +63,13 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         }
 
         // add generic stuff:
-        listVariables.put("project", cfg.getString(Configuration.PROJECT_FILE_CFG));
+        listVariables.put("project", ctx.cfg().getString(Configuration.PROJECT_FILE_CFG));
 
         // get hardware configuration
         // add the stuff required by the hardware (targets, variables, files)
-        if(false == e.configureBuild(this, requiredEnvironmentVariables))
+        if(false == ctx.getEnvironment().configureBuild(this, requiredEnvironmentVariables))
         {
-            report.addError(this, "Could not get configuration from environment !");
+            ctx.addError(this, "Could not get configuration from environment !");
             return null;
         }
 

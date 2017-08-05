@@ -1,4 +1,3 @@
-
 package de.nomagic.puzzler.solution;
 
 import java.util.HashMap;
@@ -11,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Project;
 import de.nomagic.puzzler.Environment.Environment;
@@ -27,9 +27,9 @@ public class Solution extends Base
 
     private Element SolutionRoot = null;
 
-    public Solution(ProgressReport report)
+    public Solution(Context ctx)
     {
-        super(report);
+        super(ctx);
     }
 
     public Element getRootElement()
@@ -46,14 +46,14 @@ public class Solution extends Base
     {
         if(null == pro)
         {
-            report.addError(this, "No Project provided !");
+            ctx.addError(this, "No Project provided !");
             return false;
         }
 
         SolutionRoot = pro.getSolutionElement();
         if(null == SolutionRoot)
         {
-            report.addError(this, "No Solution Tag in Project !");
+            ctx.addError(this, "No Solution Tag in Project !");
             return false;
         }
 
@@ -65,44 +65,44 @@ public class Solution extends Base
                 String externalReferenceFileName = attr.getValue();
                 if(null == externalReferenceFileName)
                 {
-                    report.addError(this, "Invalid external reference !");
+                    ctx.addError(this, "Invalid external reference !");
                     return false;
                 }
                 // read external Reference
-                Document externalReferenceDocument = FileGetter.getXmlFile(cfg.getString(Configuration.ROOT_PATH_CFG),
-                                                                  externalReferenceFileName, report);
+                Document externalReferenceDocument = FileGetter.getXmlFile(ctx.cfg().getString(Configuration.ROOT_PATH_CFG),
+                                                                  externalReferenceFileName, ctx);
                 if(null == externalReferenceDocument)
                 {
-                    report.addError(this, "Could not read referenced File " + externalReferenceFileName);
+                    ctx.addError(this, "Could not read referenced File " + externalReferenceFileName);
                     return false;
                 }
 
                 Element extRefEleemnt  = externalReferenceDocument.getRootElement();
                 if(null == extRefEleemnt)
                 {
-                    report.addError(this, "Could not read Root Element from " + externalReferenceFileName);
+                    ctx.addError(this, "Could not read Root Element from " + externalReferenceFileName);
                     return false;
                 }
 
                 if(false == Project.SOLUTION_ELEMENT_NAME.equals(extRefEleemnt.getName()))
                 {
-                    report.addError(this, "Solution File " + externalReferenceFileName
+                    ctx.addError(this, "Solution File " + externalReferenceFileName
                             + " has an invalid root tag (" + extRefEleemnt.getName() + ") !");
                     return false;
                 }
                 SolutionRoot = extRefEleemnt;
-                cfg.setString(Configuration.SOLUTION_FILE_CFG, externalReferenceFileName);
+                ctx.cfg().setString(Configuration.SOLUTION_FILE_CFG, externalReferenceFileName);
             }
             else
             {
                 // no external Reference - all data in this node
-                cfg.setString(Configuration.SOLUTION_FILE_CFG, cfg.getString(Configuration.PROJECT_FILE_CFG));
+                ctx.cfg().setString(Configuration.SOLUTION_FILE_CFG, ctx.cfg().getString(Configuration.PROJECT_FILE_CFG));
             }
         }
         return true;
     }
 
-    private boolean getAlgorithmForElement(Element cfgElement, Environment e)
+    private boolean getAlgorithmForElement(Element cfgElement)
     {
         Attribute algoAttr = cfgElement.getAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         if(null == algoAttr)
@@ -114,7 +114,7 @@ public class Solution extends Base
         else
         {
             // load Algorithm
-            Algorithm algo = Algorithm.getFromFile(cfgElement, e, cfg, report);
+            Algorithm algo = Algorithm.getFromFile(cfgElement, ctx);
 
             if(null == algo)
             {
@@ -128,11 +128,11 @@ public class Solution extends Base
         return true;
     }
 
-    private boolean checkAndTestElement(Element curElement, Environment e)
+    private boolean checkAndTestElement(Element curElement)
     {
         if(true == curElement.hasAttributes())
         {
-            if(false == getAlgorithmForElement(curElement, e))
+            if(false == getAlgorithmForElement(curElement))
             {
                 return false;
             }
@@ -140,15 +140,15 @@ public class Solution extends Base
         else
         {
             // this needs to be supplied by the environment
-            if(false == e.provides(curElement.getName()))
+            if(false == ctx.getEnvironment().provides(curElement.getName()))
             {
-                report.addError(this, "The environment does not have the device " + curElement.getName());
+                ctx.addError(this, "The environment does not have the device " + curElement.getName());
                 return false;
             }
             else
             {
-                Element envCfg = e.getAlgorithmCfg(curElement.getName());
-                if(false == getAlgorithmForElement(envCfg, e))
+                Element envCfg = ctx.getEnvironment().getAlgorithmCfg(curElement.getName());
+                if(false == getAlgorithmForElement(envCfg))
                 {
                     return false;
                 }
@@ -165,7 +165,7 @@ public class Solution extends Base
             for(int i = 0; i < children.size(); i++)
             {
                 Element curChildElement = children.get(i);
-                if(false == checkAndTestElement(curChildElement, e))
+                if(false == checkAndTestElement(curChildElement))
                 {
                     return false;
                 }
@@ -174,30 +174,30 @@ public class Solution extends Base
         return true;
     }
 
-    public boolean checkAndTestAgainst(Environment e)
+    public boolean checkAndTestAgainstEnvironment()
     {
-        if(null == e)
+        if(null == ctx.getEnvironment())
         {
-            report.addError(this, "No Environment provided !");
+            ctx.addError(this, "No Environment provided !");
             return false;
         }
         if(null == SolutionRoot)
         {
-            report.addError(this, "No Solution Tag in Project !");
+            ctx.addError(this, "No Solution Tag in Project !");
             return false;
         }
 
         List<Element> children = SolutionRoot.getChildren();
         if((null == children) || (true == children.isEmpty()))
         {
-            report.addError(this, "No external Reference in empty solution tag");
+            ctx.addError(this, "No external Reference in empty solution tag");
             return false;
         }
 
         for(int i = 0; i < children.size(); i++)
         {
             Element curElement = children.get(i);
-            if(false == checkAndTestElement(curElement, e))
+            if(false == checkAndTestElement(curElement))
             {
                 return false;
             }

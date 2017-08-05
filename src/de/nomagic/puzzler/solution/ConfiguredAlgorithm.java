@@ -9,6 +9,8 @@ import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.nomagic.puzzler.Base;
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Project;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.Environment.Environment;
@@ -18,7 +20,7 @@ import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.progress.ProgressReport;
 
-public class ConfiguredAlgorithm
+public class ConfiguredAlgorithm extends Base
 {
     public final static String REQUIRED_CFG_NAME = "parameter";
     public final static String REQUIRED_CFG_ATTRIBUTE_NAME = "ref";
@@ -31,24 +33,17 @@ public class ConfiguredAlgorithm
 
     private final String Name;
     private final Algorithm AlgorithmDefinition;
-    private final Environment e;
-    private final Configuration cfg;
-    private final ProgressReport report;
     private final HashMap<String, Attribute> cfgAttributes = new HashMap<String, Attribute>();
     private final HashMap<String, ConfiguredAlgorithm> cfgAlgorithms = new HashMap<String, ConfiguredAlgorithm>();
     private FileGroup libFiles = null;
 
     public ConfiguredAlgorithm(String Name,
                                Algorithm AlgorithmDefinition,
-                               Environment e,
-                               Configuration cfg,
-                               ProgressReport report )
+                               Context ctx )
     {
+        super(ctx);
         this.Name = Name;
         this.AlgorithmDefinition = AlgorithmDefinition;
-        this.e = e;
-        this.cfg = cfg;
-        this.report = report;
     }
 
     public String getName()
@@ -56,28 +51,26 @@ public class ConfiguredAlgorithm
         return Name;
     }
 
-    public static ConfiguredAlgorithm getTreeFrom(Solution s,
-                                                  Environment e,
-                                                  Configuration cfg,
-                                                  ProgressReport report )
+    public static ConfiguredAlgorithm getTreeFrom(Context ctx)
     {
+        Solution s = ctx.getSolution();
         Element root = s.getRootElement();
         if(null == root)
         {
-            report.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTree",
                             "No root element in the provided solution !");
             return null;
         }
         if(false == Project.SOLUTION_ELEMENT_NAME.equals(root.getName()))
         {
-            report.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTree",
                             "invalid root tag (" + root.getName() + ") !");
             return null;
         }
         root = root.getChildren().get(0);
         if(null == root)
         {
-            report.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTree",
                             "No algorithm elements in the provided solution !");
             return null;
         }
@@ -86,7 +79,7 @@ public class ConfiguredAlgorithm
         Algorithm algo = s.getAlgorithm(algoName);
         if(null == algo)
         {
-            report.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTree",
                             "Failed to get Algorithm for " + algoName + " !");
             return null;
         }
@@ -94,25 +87,21 @@ public class ConfiguredAlgorithm
         {
             LOG.trace("algo: {}", algo);
             LOG.trace("root: {}", root);
-            report.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTree",
                             "Root element of the solution is not an program entry point !");
             return null;
         }
 
-        return getTreeFor(root, s, e, cfg, report);
+        return getTreeFor(root, ctx);
     }
 
-    private static ConfiguredAlgorithm getTreeFromEnvironment(Element cfgElement,
-                                                              Solution s,
-                                                              Environment e,
-                                                              Configuration cfg,
-                                                              ProgressReport report)
+    private static ConfiguredAlgorithm getTreeFromEnvironment(Element cfgElement, Context ctx)
     {
         String tagName = cfgElement.getName();
-        Element evnElement = e.getAlgorithmCfg(tagName);
+        Element evnElement = ctx.getEnvironment().getAlgorithmCfg(tagName);
         if(null == evnElement)
         {
-            report.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTree",
                             "Failed to get Configuration for " + tagName + " from the environment !");
             return null;
         }
@@ -120,22 +109,22 @@ public class ConfiguredAlgorithm
         String algoName = evnElement.getAttributeValue(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         if(null == algoName)
         {
-            report.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTree",
                             "Failed to get the algorithm for " + tagName
                             + " from the environment (" + evnElement + ")!");
             return null;
         }
 
-        Algorithm algo = s.getAlgorithm(algoName);
+        Algorithm algo = ctx.getSolution().getAlgorithm(algoName);
         if(null == algo)
         {
-            report.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTree",
                             "Failed to get Algorithm for " + algoName + " !");
             return null;
         }
         // else OK
 
-        ConfiguredAlgorithm res = new ConfiguredAlgorithm(cfgElement.getName(), algo, e, cfg, report);
+        ConfiguredAlgorithm res = new ConfiguredAlgorithm(cfgElement.getName(), algo, ctx);
 
         List<Attribute> attribs = evnElement.getAttributes();
         for(int i = 0; i < attribs.size(); i++)
@@ -148,7 +137,7 @@ public class ConfiguredAlgorithm
 
         if(false == res.allRequiredDataAvailable())
         {
-            report.addError("ConfiguredAlgorithm.getTree.Env",
+            ctx.addError("ConfiguredAlgorithm.getTree.Env",
                             "Data missing for " + res.toString() + " !");
             return null;
         }
@@ -158,31 +147,27 @@ public class ConfiguredAlgorithm
         }
     }
 
-    private static ConfiguredAlgorithm getTreeFor(Element cfgElement,
-                                                  Solution s,
-                                                  Environment e,
-                                                  Configuration cfg,
-                                                  ProgressReport report)
+    private static ConfiguredAlgorithm getTreeFor(Element cfgElement, Context ctx)
     {
         String algoName = cfgElement.getAttributeValue(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         if(null == algoName)
         {
             // this child is not an Algorithm, but something provided by the Environment!
             // -> So get configuration from the Environment
-            return getTreeFromEnvironment(cfgElement, s, e, cfg, report);
+            return getTreeFromEnvironment(cfgElement, ctx);
         }
         // else get tree from this element
 
-        Algorithm algo = s.getAlgorithm(algoName);
+        Algorithm algo = ctx.getSolution().getAlgorithm(algoName);
         if(null == algo)
         {
-            report.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTree",
                             "Failed to get Algorithm for " + algoName + " !");
             return null;
         }
         // else OK
 
-        ConfiguredAlgorithm res = new ConfiguredAlgorithm(cfgElement.getName(), algo, e, cfg, report);
+        ConfiguredAlgorithm res = new ConfiguredAlgorithm(cfgElement.getName(), algo, ctx);
 
         List<Attribute> attribs = cfgElement.getAttributes();
         for(int i = 0; i < attribs.size(); i++)
@@ -196,10 +181,10 @@ public class ConfiguredAlgorithm
         {
             Element nextAlgo = children.get(i);
             // !!! recursion !!!
-            ConfiguredAlgorithm nextCfgAlgo = getTreeFor(nextAlgo, s, e, cfg, report);
+            ConfiguredAlgorithm nextCfgAlgo = getTreeFor(nextAlgo, ctx);
             if(null == nextCfgAlgo)
             {
-                report.addError("ConfiguredAlgorithm.getTree",
+                ctx.addError("ConfiguredAlgorithm.getTree",
                                 "Failed Tree resolve for " + nextAlgo.getName() + " !");
                 return null;
             }
@@ -208,7 +193,7 @@ public class ConfiguredAlgorithm
 
         if(false == res.allRequiredDataAvailable())
         {
-            report.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTree",
                             "Data missing for " + res.toString() + " !");
             return null;
         }
@@ -236,7 +221,7 @@ public class ConfiguredAlgorithm
             String attrName = curE.getAttributeValue(REQUIRED_CFG_ATTRIBUTE_NAME);
             if(null == attrName)
             {
-                report.addError("ConfiguredAlgorithm.Requirements",
+                ctx.addError("ConfiguredAlgorithm.Requirements",
                                 "Attribute " + REQUIRED_CFG_ATTRIBUTE_NAME
                                 + " missing for required configuration !");
                 return false;
@@ -244,7 +229,7 @@ public class ConfiguredAlgorithm
             Attribute at = cfgAttributes.get(attrName);
             if(null == at)
             {
-                report.addError("ConfiguredAlgorithm.Requirements",
+                ctx.addError("ConfiguredAlgorithm.Requirements",
                                 "required attribute " + attrName + " has not been given !");
                 StringBuffer sb = new StringBuffer();
                 Iterator<String> it = cfgAttributes.keySet().iterator();
@@ -255,7 +240,7 @@ public class ConfiguredAlgorithm
                     sb.append(" ");
                 }
                 sb.append("!");
-                report.addError("ConfiguredAlgorithm.Requirements",
+                ctx.addError("ConfiguredAlgorithm.Requirements",
                                 sb.toString());
                 return false;
             }
@@ -269,7 +254,7 @@ public class ConfiguredAlgorithm
             String reqApi = curE.getAttributeValue(REQUIRED_ALGORITHM_ATTRIBUTE_NAME);
             if(null == reqApi)
             {
-                report.addError("ConfiguredAlgorithm.Requirements",
+                ctx.addError("ConfiguredAlgorithm.Requirements",
                                 "Attribute " + REQUIRED_ALGORITHM_ATTRIBUTE_NAME
                                 + " missing for required child element !");
                 return false;
@@ -287,7 +272,7 @@ public class ConfiguredAlgorithm
             }
             if(false == found)
             {
-                report.addError("ConfiguredAlgorithm.Requirements",
+                ctx.addError("ConfiguredAlgorithm.Requirements",
                                 "required child element of type " + reqApi + " not present !");
                 return false;
             }
@@ -327,10 +312,10 @@ public class ConfiguredAlgorithm
                        new String[] {"/*",
                                      "  automatically created main.c",
                                      "  created at: " + Tool.curentDateTime(),
-                                     "  created from " + cfg.getString(Configuration.SOLUTION_FILE_CFG),
+                                     "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
                                      "*/"});
 
-        Api api = Api.getFromFile("program_entry_point", e, cfg, report);
+        Api api = Api.getFromFile("program_entry_point", ctx);
         addCodeToFile(mainC, api);
         FileGroup newCodeFiles = getAdditionalFiles();
         if(null != newCodeFiles)
@@ -378,7 +363,7 @@ public class ConfiguredAlgorithm
                 if(false == it.hasNext())
                 {
                     // We need a child to call the funtion !
-                    report.addError("ConfiguredAlgorithm.replacePlaceholders",
+                    ctx.addError("ConfiguredAlgorithm.replacePlaceholders",
                             "Function call to missing child!");
                     return null;
                 }

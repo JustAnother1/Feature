@@ -15,18 +15,20 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.configuration.Configuration;
-import de.nomagic.puzzler.progress.ProgressReport;
 
 public class FileGetter
 {
     private static final Logger log = LoggerFactory.getLogger("FileGetter");
 
-    public static Document getXmlFile(String path, String name, ProgressReport report)
+    public static Document getXmlFile(String path, String name, Context ctx)
     {
-        return tryToGetXmlFile(path, name, true, report);
+        return tryToGetXmlFile(path, name, true, ctx);
     }
 
-    public static Document tryToGetXmlFile(String path, String name,  boolean failureIsError, ProgressReport report)
+    public static Document tryToGetXmlFile(String path,
+                                           String name,
+                                           boolean failureIsError,
+                                           Context ctx)
     {
         String xmlSource;
         if(null == path)
@@ -47,7 +49,7 @@ public class FileGetter
         {
             if(true == failureIsError)
             {
-                report.addError("FileGetter", "File not found: " + xmlSource);
+                ctx.addError("FileGetter", "File not found: " + xmlSource);
             }
             jdomDocument = null;
         }
@@ -55,7 +57,7 @@ public class FileGetter
         {
             if(true == failureIsError)
             {
-                report.addError("FileGetter", "JDOM Exception");
+                ctx.addError("FileGetter", "JDOM Exception");
             }
             log.trace(Tool.fromExceptionToString(e));
         }
@@ -63,26 +65,29 @@ public class FileGetter
         {
             if(true == failureIsError)
             {
-                report.addError("FileGetter", "IOException for file " + xmlSource);
-                report.addError("FileGetter", e.getMessage());
+                ctx.addError("FileGetter", "IOException for file " + xmlSource);
+                ctx.addError("FileGetter", e.getMessage());
             }
             log.trace(Tool.fromExceptionToString(e));
         }
         return jdomDocument;
     }
 
-    public static Document getXmlFile(String[] paths, String name, ProgressReport report)
+    public static Document getXmlFile(String[] paths, String name, Context ctx)
     {
-        return tryToGetXmlFile(paths, name, true, report);
+        return tryToGetXmlFile(paths, name, true, ctx);
     }
 
-    public static Document tryToGetXmlFile(String[] paths, String name, boolean failureIsError, ProgressReport report)
+    public static Document tryToGetXmlFile(String[] paths,
+                                      String name,
+                                      boolean failureIsError,
+                                      Context ctx)
     {
         if(null == paths)
         {
             if(true == failureIsError)
             {
-                report.addError("FileGetter", "no paths supplied");
+                ctx.addError("FileGetter", "no paths supplied");
             }
             return null;
         }
@@ -100,7 +105,7 @@ public class FileGetter
             File f = new File(xmlSource);
             if(true == f.exists())
             {
-                Document res = getXmlFile(paths[i], name, report);
+                Document res = getXmlFile(paths[i], name, ctx);
                 if(null != res)
                 {
                     return res;
@@ -112,7 +117,7 @@ public class FileGetter
         return null;
     }
 
-    public static Element getFromFile(String[] paths, String fileName, ProgressReport report)
+    public static Element getFromFile(String[] paths, String fileName, Context ctx)
     {
         if(null == paths)
         {
@@ -122,7 +127,7 @@ public class FileGetter
         Element res = null;
         for (int i = 0; i < paths.length; i++)
         {
-            res = getFromFile(paths[i], fileName, report);
+            res = getFromFile(paths[i], fileName, ctx);
             if(null != res)
             {
                 return res;
@@ -131,12 +136,12 @@ public class FileGetter
         return res;
     }
 
-    public static Element getFromFile(String path, String fileName, ProgressReport report)
+    public static Element getFromFile(String path, String fileName, Context ctx)
     {
         Document algo = FileGetter.tryToGetXmlFile(path,
                 fileName,
                 false,
-                report);
+                ctx);
         if(null == algo)
         {
             log.trace("Could not load the Element from the file {}",
@@ -158,9 +163,7 @@ public class FileGetter
     public static Element getFromFile(String Name,
                                         String type,
                                         String rootElementName,
-                                        Environment e,
-                                        Configuration cfg,
-                                        ProgressReport report)
+                                        Context ctx)
     {
         if((null == Name)|| (null == type) || (null == rootElementName))
         {
@@ -173,17 +176,17 @@ public class FileGetter
 
         // Get project specific
         String fileName = type + File.separator + Name + "." + type + ".xml";
-        Element root = getFromFile(cfg.getStringsOf(Configuration.PROJECT_PATH_CFG), fileName, report);
+        Element root = getFromFile(ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG), fileName, ctx);
         if(null == root)
         {
             // if that failed then the architecture specific
-            String[] paths = cfg.getStringsOf(Configuration.ENVIRONMENT_PATH_CFG);
-            String Architecture = e.getArchitectureName();
+            String[] paths = ctx.cfg().getStringsOf(Configuration.ENVIRONMENT_PATH_CFG);
+            String Architecture = ctx.getEnvironment().getArchitectureName();
             for(int i = 0; i < paths.length; i++)
             {
                 paths[i] = paths[i] + Architecture + File.separator;
             }
-            String FamilyName = e.getFamilyName();
+            String FamilyName = ctx.getEnvironment().getFamilyName();
             if(0 < FamilyName.length())
             {
                 // if a family is given then the family has additional folders that are preferred to the general directories.
@@ -199,14 +202,14 @@ public class FileGetter
                 }
                 paths = (String[]) famPaths.toArray();
             }
-            root = getFromFile(paths, fileName, report);
+            root = getFromFile(paths, fileName, ctx);
             if(null == root)
             {
                 // if that also failed then the common one from the library
-                root = getFromFile(cfg.getStringsOf(Configuration.LIB_PATH_CFG), fileName, report);
+                root = getFromFile(ctx.cfg().getStringsOf(Configuration.LIB_PATH_CFG), fileName, ctx);
                 if(null == root)
                 {
-                    report.addError("static:Algorithm", "Could not find the " + type + " " + Name);
+                    ctx.addError("static:Algorithm", "Could not find the " + type + " " + Name);
                     return null;
                 }
             }
