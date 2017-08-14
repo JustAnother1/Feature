@@ -13,12 +13,10 @@ import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Project;
 import de.nomagic.puzzler.Tool;
-import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.C_File;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
-import de.nomagic.puzzler.progress.ProgressReport;
 
 public class ConfiguredAlgorithm extends Base
 {

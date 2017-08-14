@@ -13,7 +13,6 @@ import org.jdom2.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.configuration.Configuration;
 
 public class FileGetter

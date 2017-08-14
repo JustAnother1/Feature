@@ -39,7 +39,8 @@ import de.nomagic.puzzler.Generator.Generator;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.Solution;
 
-/**
+/** Main function of puzzler.
+ *
  * @author Lars P&ouml;tter
  * (<a href=mailto:Lars_Poetter@gmx.de>Lars_Poetter@gmx.de</a>)
  *

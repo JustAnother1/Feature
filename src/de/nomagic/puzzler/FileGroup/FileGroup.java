@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.progress.ProgressReport;
 
 public class FileGroup
 {

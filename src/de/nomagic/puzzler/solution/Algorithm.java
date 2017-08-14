@@ -63,7 +63,7 @@ public class Algorithm extends Base
         Algorithm res = new Algorithm(root, ctx);
 
         // TODO check required configuration
-        // TOD check and load the referenced API
+        // TODO check and load the referenced API
 
         return res;
     }
@@ -137,16 +137,13 @@ public class Algorithm extends Base
         }
         List<Element> funcs = cCode.getChildren(ALGORITHM_FUNCTION_CHILD_NAME);
         String searchedFunctionName = null;
-        boolean hasParameter;
         if(true == functionName.contains("("))
         {
             searchedFunctionName = functionName.substring(0, functionName.indexOf('('));
-            hasParameter = true;
         }
         else
         {
             searchedFunctionName = functionName;
-            hasParameter = false;
         }
         if(null == searchedFunctionName)
         {

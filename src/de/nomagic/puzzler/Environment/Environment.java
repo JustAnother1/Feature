@@ -21,7 +21,6 @@ import de.nomagic.puzzler.BuildSystem.Target;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.FileFactory;
 import de.nomagic.puzzler.configuration.Configuration;
-import de.nomagic.puzzler.progress.ProgressReport;
 
 public class Environment extends Base
 {

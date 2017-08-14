@@ -1,21 +1,12 @@
 
 package de.nomagic.puzzler.Generator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.FileGroup;
-import de.nomagic.puzzler.progress.ProgressReport;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
-import de.nomagic.puzzler.solution.Solution;
 
 public class C_CodeGenerator extends Generator
 {
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-
     public C_CodeGenerator(Context ctx)
     {
         super(ctx);
