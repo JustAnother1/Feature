@@ -24,8 +24,20 @@ public class ConfiguredAlgorithm extends Base
     public final static String REQUIRED_CFG_ATTRIBUTE_NAME = "ref";
     public final static String REQUIRED_ALGORITHM_NAME = "childElement";
     public final static String REQUIRED_ALGORITHM_ATTRIBUTE_NAME = "type";
+    public final static String REQUIRED_ROOT_API = "program_entry_point";
 
     public final static String IMPLEMENTATION_PLACEHOLDER_REGEX = "\\$\\$\\$";
+
+    public final static String ALGORITHM_C_CODE_CHILD_NAME = "c_code";
+    public final static String ALGORITHM_IF_CHILD_NAME = "if";
+    public final static String ALGORITHM_FUNCTION_CHILD_NAME = "function";
+    public final static String ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME = "name";
+    public final static String ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME = "additional";
+    public final static String ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME = "include";
+    public final static String ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME = "function";
+    public final static String ALGORITHM_REQUIREMENTS_CHILD_NAME = "required";
+    public final static String ALGORITHM_PROVIDES_CHILD_NAME = "provides";
+    public final static String ALGORITHM_PROVIDES_PROPERTY_VALUE = "value";
 
     private final static Logger LOG = LoggerFactory.getLogger("ConfiguredAlgorithm");
 
@@ -35,6 +47,11 @@ public class ConfiguredAlgorithm extends Base
     private final HashMap<String, ConfiguredAlgorithm> cfgAlgorithms = new HashMap<String, ConfiguredAlgorithm>();
     private FileGroup libFiles = null;
 
+    private ConditionEvaluator condiEval;
+    private HashMap<String, String> properties = new  HashMap<String, String>();  // TODO
+    private HashMap<String, String> parameters = new  HashMap<String, String>(); // TODO
+    private Element cCode = null; // TODO
+
     public ConfiguredAlgorithm(String Name,
                                Algorithm AlgorithmDefinition,
                                Context ctx )
@@ -42,6 +59,7 @@ public class ConfiguredAlgorithm extends Base
         super(ctx);
         this.Name = Name;
         this.AlgorithmDefinition = AlgorithmDefinition;
+        condiEval = new ConditionEvaluator(ctx);
     }
 
     public String getName()
@@ -81,7 +99,7 @@ public class ConfiguredAlgorithm extends Base
                             "Failed to get Algorithm for " + algoName + " !");
             return null;
         }
-        if(false == algo.hasApi("program_entry_point"))
+        if(false == algo.hasApi(REQUIRED_ROOT_API))
         {
             LOG.trace("algo: {}", algo);
             LOG.trace("root: {}", root);
@@ -203,7 +221,9 @@ public class ConfiguredAlgorithm extends Base
 
     private boolean allRequiredDataAvailable()
     {
-        Element Requirements = AlgorithmDefinition.getRequirements();
+        addProvidedData();
+
+        Element Requirements = AlgorithmDefinition.getChild(ALGORITHM_REQUIREMENTS_CHILD_NAME);
         if(null == Requirements)
         {
             LOG.trace("{} has no requirements!", AlgorithmDefinition);
@@ -279,6 +299,26 @@ public class ConfiguredAlgorithm extends Base
         return true;
     }
 
+    private void addProvidedData()
+    {
+        Element provides = AlgorithmDefinition.getChild(ALGORITHM_PROVIDES_CHILD_NAME);
+        if(null != provides)
+        {
+            // this algorithm provides some informations
+            List<Element> data = provides.getChildren();
+            for(int i = 0; i < data.size(); i++)
+            {
+                Element curE = data.get(i);
+                String propertyName = curE.getName();
+                String propertyValue = curE.getAttributeValue(ALGORITHM_PROVIDES_PROPERTY_VALUE);
+                LOG.trace("Property {} : {}", propertyName, propertyValue);
+                // TODO evaluate PropertyValue
+                properties.put(propertyName, propertyValue);
+            }
+        }
+        // else this algorithm provides nothing and that might be OK.
+    }
+
     private boolean hasApi(String Api)
     {
         return AlgorithmDefinition.hasApi(Api);
@@ -313,7 +353,7 @@ public class ConfiguredAlgorithm extends Base
                                      "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
                                      "*/"});
 
-        Api api = Api.getFromFile("program_entry_point", ctx);
+        Api api = Api.getFromFile(REQUIRED_ROOT_API, ctx);
         addCodeToFile(mainC, api);
         FileGroup newCodeFiles = getAdditionalFiles();
         if(null != newCodeFiles)
@@ -379,14 +419,14 @@ public class ConfiguredAlgorithm extends Base
 
     protected String getCImplementationOf(String functionName, C_File codeFile)
     {
-        String implementation = AlgorithmDefinition.getFunctionCcode(functionName);
+        String implementation = getFunctionCcode(functionName);
         if(null == implementation)
         {
             return null;
         }
         implementation = implementation.trim();
         // add additional Stuff
-        AlgorithmDefinition.addAdditionalsTo(codeFile);
+        addAdditionalsTo(codeFile);
         // TODO replace all place holders with configuration values
         // TODO add code from configuredAlgorithms into place holders.
         implementation = replacePlaceholders(implementation, codeFile);
@@ -405,6 +445,164 @@ public class ConfiguredAlgorithm extends Base
             libFiles = new FileGroup();
         }
         libFiles.add(additionalFile);
+    }
+
+    private void findImplementation()
+    {
+        cCode = AlgorithmDefinition.getChild(ALGORITHM_C_CODE_CHILD_NAME);
+        if(null == cCode)
+        {
+            // the algorithm might have the functions wrapped into if condition tags.
+            List<Element> conditions = AlgorithmDefinition.getChildren(ALGORITHM_IF_CHILD_NAME);
+            if(null == conditions)
+            {
+                ctx.addError("Algorithm.findImplementation",
+                        "No Implementation found!");
+                return;
+            }
+            else
+            {
+                Element best = condiEval.getBest(conditions, this);  // TODO
+                if(null == best)
+                {
+                    ctx.addError("Algorithm.getFunctionCcode",
+                            "no valid condition!");
+                    return;
+                }
+                cCode = best.getChild(ALGORITHM_C_CODE_CHILD_NAME);
+                if(null == cCode)
+                {
+                    ctx.addError("Algorithm.getFunctionCcode",
+                            "Valid condition(" + best.toString() + ") did not have an Implementation!");
+                    return;
+                }
+            }
+        }
+    }
+
+    public String getFunctionCcode(String functionName)
+    {
+        if(null == cCode)
+        {
+            findImplementation();
+            if(null == cCode)
+            {
+                ctx.addError("Algorithm.getFunctionCcode",
+                        "No implementation available !");
+                return null;
+            }
+        }
+        List<Element> funcs = cCode.getChildren(ALGORITHM_FUNCTION_CHILD_NAME);
+        String searchedFunctionName = null;
+        if(true == functionName.contains("("))
+        {
+            searchedFunctionName = functionName.substring(0, functionName.indexOf('('));
+        }
+        else
+        {
+            searchedFunctionName = functionName;
+        }
+        if(null == searchedFunctionName)
+        {
+            ctx.addError("Algorithm.getFunctionCcode",
+                    "Function call to unknown function!");
+            return null;
+        }
+        if(1 > searchedFunctionName.length())
+        {
+            ctx.addError("Algorithm.getFunctionCcode",
+                    "Function call to unnamed function!");
+            return null;
+        }
+        for(int i = 0; i < funcs.size(); i++)
+        {
+            Element curElement = funcs.get(i);
+            String name = curElement.getAttributeValue(ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME);
+            if(true == searchedFunctionName.equals(name))
+            {
+                 List<Element> cond = curElement.getChildren(ALGORITHM_IF_CHILD_NAME);
+                if((null == cond) || (true == cond.isEmpty()))
+                {
+                    // TODO handle parameter in function
+                    return curElement.getText();
+                }
+                else
+                {
+                    Element best = condiEval.getBest(cond, this); // TODO
+                    if(null == best)
+                    {
+                        // function not found
+                        ctx.addError("Algorithm.getFunctionCcode",
+                                "no valid condition found!");
+                        return null;
+                    }
+                    return best.getText();
+                }
+            }
+        }
+        // function not found
+        ctx.addError("Algorithm.getFunctionCcode",
+                "Function call to missing function! (" + this.toString()
+                        + ", function name : " + functionName + " )");
+        return null;
+    }
+
+    public void addAdditionalsTo(C_File codeFile)
+    {
+        if(null == cCode)
+        {
+            findImplementation();
+            if(null == cCode)
+            {
+                ctx.addError("Algorithm.addAdditionalsTo",
+                        "No implementation available !");
+                return;
+            }
+        }
+        Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME);
+        if(null == additional)
+        {
+            LOG.trace("no addionals for algorithm" + this.toString());
+            return;
+        }
+        List<Element> addlist = additional.getChildren();
+        if(null == addlist)
+        {
+            return;
+        }
+        for(int i = 0; i < addlist.size(); i++)
+        {
+            Element curElement = addlist.get(i);
+            String type = curElement.getName();
+            switch(type)
+            {
+            case ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME:
+                codeFile.addLine(C_File.C_FILE_INCLUDE_SECTION_NAME, curElement.getText());
+                break;
+
+            case ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME:
+                Function func = new Function(curElement);
+                String declaration = func.getDeclaration();
+                codeFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
+                                 declaration + ";");
+                codeFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
+                                 declaration + "\n" + curElement.getText());
+                break;
+
+            default: // ignore
+                break;
+            }
+        }
+    }
+
+    public String getProperty(String name)
+    {
+        return properties.get(name);
+    }
+
+    public String getParameter(String name)
+    {
+        return parameters.get(name);
     }
 
 }

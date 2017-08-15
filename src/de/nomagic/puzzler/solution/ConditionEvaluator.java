@@ -1,6 +1,5 @@
 package de.nomagic.puzzler.solution;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -33,23 +32,17 @@ public class ConditionEvaluator extends Base
 
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-    private HashMap<String, String> properties;
-    private HashMap<String, String> parameters;
     private boolean valid;
 
 
-    public ConditionEvaluator(HashMap<String, String> properties,
-                              Context ctx,
-                              HashMap<String, String> parameters)
+    public ConditionEvaluator(Context ctx)
     {
         super(ctx);
-        this.parameters = parameters;
-        this.properties = properties;
     }
 
-    public Element getBest(List<Element> conditions)
+    public Element getBest(List<Element> conditions, ConfiguredAlgorithm algo)
     {
-        if(null == conditions)
+        if( (null == conditions) || (null == algo) )
         {
             return null;
         }
@@ -67,7 +60,7 @@ public class ConditionEvaluator extends Base
             Element curE = it.next();
             String conditionText = curE.getAttributeValue(CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME);
             log.trace("evaluating condition {}", conditionText);
-            if(true == KEY_TRUE.equals(evaluateConditionParenthesis(conditionText)))
+            if(true == KEY_TRUE.equals(evaluateConditionParenthesis(conditionText, algo)))
             {
                 valids.add(curE);
             }
@@ -114,7 +107,7 @@ public class ConditionEvaluator extends Base
      * @param conditionText
      * @return
      */
-    private String evaluate_Word(String Word)
+    private String evaluate_Word(String Word, ConfiguredAlgorithm algo)
     {
         // constants
         if(KEY_TRUE.equals(Word))
@@ -135,7 +128,7 @@ public class ConditionEvaluator extends Base
             if(1 > functionName.length())
             {
                 // just additional braces -> remove those and evaluate the rest
-                return  evaluate_Word(parameter);  // Caution : Recursion! So don't over do it with the unneeded braces!
+                return  evaluate_Word(parameter, algo);  // Caution : Recursion! So don't over do it with the unneeded braces!
             }
             switch(functionName)
             {
@@ -154,7 +147,7 @@ public class ConditionEvaluator extends Base
                 {
                     parameter = parameter.substring(parameter.indexOf("'") + 1, parameter.lastIndexOf("'"));
                 }
-                String test = properties.get(parameter);
+                String test = algo.getProperty(parameter);
                 if(null == test)
                 {
                     return KEY_FALSE;
@@ -175,7 +168,7 @@ public class ConditionEvaluator extends Base
                     return KEY_FALSE;
                 }
                 // If not then evaluate now
-                String res = properties.get(parameter);
+                String res = algo.getProperty(parameter);
                 if(null == res)
                 {
                     // there is something wrong here
@@ -207,7 +200,7 @@ public class ConditionEvaluator extends Base
                     return KEY_FALSE;
                 }
                 // If not then evaluate now
-                String paramValue = parameters.get(parameter);
+                String paramValue = algo.getParameter(parameter);
                 if(null == paramValue)
                 {
                     // there is something wrong here
@@ -230,7 +223,7 @@ public class ConditionEvaluator extends Base
             }
         }
         //configuration Attributes
-        String val = properties.get(Word);
+        String val = algo.getProperty(Word);
         if(null == val)
         {
             // This happens if we try to evaluate a parameter to a function defined heer (e.g: "has(bla)" )
@@ -271,7 +264,7 @@ public class ConditionEvaluator extends Base
         return false;
     }
 
-    private String evaluateConditionText(String conditionText)
+    private String evaluateConditionText(String conditionText, ConfiguredAlgorithm algo)
     {
         // parse condition
         String[] parts = conditionText.split("\\s"); // all whitespace splits
@@ -292,7 +285,7 @@ public class ConditionEvaluator extends Base
             {
                 if(i+1 < parts.length)
                 {
-                    first = evaluateFunction(curPart, first, parts[i+1]);
+                    first = evaluateFunction(curPart, first, parts[i+1], algo);
                     i++;
                 }
                 else
@@ -321,14 +314,14 @@ public class ConditionEvaluator extends Base
             }
         }
         // finish up
-        String result = evaluate_Word(first);
+        String result = evaluate_Word(first, algo);
         return result;
     }
 
-    private String evaluateFunction(String function, String first, String second)
+    private String evaluateFunction(String function, String first, String second, ConfiguredAlgorithm algo)
     {
-        String valOne = evaluate_Word(first);
-        String valTwo = evaluate_Word(second);
+        String valOne = evaluate_Word(first, algo);
+        String valTwo = evaluate_Word(second, algo);
         switch(function)
         {
         case KEY_AND:
@@ -423,15 +416,15 @@ public class ConditionEvaluator extends Base
         }
     }
 
-    public String evaluateConditionParenthesis(String condition)
+    public String evaluateConditionParenthesis(String condition, ConfiguredAlgorithm algo)
     {
-        if(null == condition)
+        if( (null == condition) || (null == algo) )
         {
             return KEY_FALSE;
         }
         if(false == condition.contains("("))
         {
-            return evaluateConditionText(condition);
+            return evaluateConditionText(condition, algo);
         }
         else
         {
@@ -472,7 +465,7 @@ public class ConditionEvaluator extends Base
                         return KEY_FALSE;
                     }
                     // else:
-                    String sectionResult = evaluateConditionText(curSection.toString());
+                    String sectionResult = evaluateConditionText(curSection.toString(), algo);
                     sections.remove(num_openP);
                     num_openP--;
                     curSection = sections.get(num_openP);
@@ -502,7 +495,7 @@ public class ConditionEvaluator extends Base
                 return KEY_FALSE;
             }
             StringBuffer ResultSection = sections.get(0);
-            return evaluateConditionText(ResultSection.toString());
+            return evaluateConditionText(ResultSection.toString(), algo);
         }
     }
 
