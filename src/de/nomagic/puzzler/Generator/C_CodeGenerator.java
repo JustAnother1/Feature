@@ -17,7 +17,7 @@ public class C_CodeGenerator extends Generator
         FileGroup codeGroup = new FileGroup();
 
         // create configured Algorithm Tree
-        ConfiguredAlgorithm logic = ConfiguredAlgorithm.getTreeFrom(ctx);
+        ConfiguredAlgorithm logic = ConfiguredAlgorithm.getTreeFrom(ctx, null);
 
         if(null == logic)
         {
