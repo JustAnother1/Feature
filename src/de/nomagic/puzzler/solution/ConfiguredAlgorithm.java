@@ -51,14 +51,17 @@ public class ConfiguredAlgorithm extends Base
     private HashMap<String, String> properties = new  HashMap<String, String>();  // TODO
     private HashMap<String, String> parameters = new  HashMap<String, String>(); // TODO
     private Element cCode = null; // TODO
+    private ConfiguredAlgorithm parent;
 
     public ConfiguredAlgorithm(String Name,
                                Algorithm AlgorithmDefinition,
-                               Context ctx )
+                               Context ctx,
+                               ConfiguredAlgorithm parent)
     {
         super(ctx);
         this.Name = Name;
         this.AlgorithmDefinition = AlgorithmDefinition;
+        this.parent = parent;
         condiEval = new ConditionEvaluator(ctx);
     }
 
@@ -67,7 +70,7 @@ public class ConfiguredAlgorithm extends Base
         return Name;
     }
 
-    public static ConfiguredAlgorithm getTreeFrom(Context ctx)
+    public static ConfiguredAlgorithm getTreeFrom(Context ctx, ConfiguredAlgorithm parent)
     {
         Solution s = ctx.getSolution();
         Element root = s.getRootElement();
@@ -108,10 +111,10 @@ public class ConfiguredAlgorithm extends Base
             return null;
         }
 
-        return getTreeFor(root, ctx);
+        return getTreeFor(root, ctx, parent);
     }
 
-    private static ConfiguredAlgorithm getTreeFromEnvironment(Element cfgElement, Context ctx)
+    private static ConfiguredAlgorithm getTreeFromEnvironment(Element cfgElement, Context ctx, ConfiguredAlgorithm parent)
     {
         String tagName = cfgElement.getName();
         Element evnElement = ctx.getEnvironment().getAlgorithmCfg(tagName);
@@ -140,7 +143,7 @@ public class ConfiguredAlgorithm extends Base
         }
         // else OK
 
-        ConfiguredAlgorithm res = new ConfiguredAlgorithm(cfgElement.getName(), algo, ctx);
+        ConfiguredAlgorithm res = new ConfiguredAlgorithm(cfgElement.getName(), algo, ctx, parent);
 
         List<Attribute> attribs = evnElement.getAttributes();
         for(int i = 0; i < attribs.size(); i++)
@@ -163,27 +166,27 @@ public class ConfiguredAlgorithm extends Base
         }
     }
 
-    private static ConfiguredAlgorithm getTreeFor(Element cfgElement, Context ctx)
+    private static ConfiguredAlgorithm getTreeFor(Element cfgElement, Context ctx, ConfiguredAlgorithm parent)
     {
         String algoName = cfgElement.getAttributeValue(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         if(null == algoName)
         {
             // this child is not an Algorithm, but something provided by the Environment!
             // -> So get configuration from the Environment
-            return getTreeFromEnvironment(cfgElement, ctx);
+            return getTreeFromEnvironment(cfgElement, ctx, parent);
         }
         // else get tree from this element
 
         Algorithm algo = ctx.getSolution().getAlgorithm(algoName);
         if(null == algo)
         {
-            ctx.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTreeFor",
                             "Failed to get Algorithm for " + algoName + " !");
             return null;
         }
         // else OK
 
-        ConfiguredAlgorithm res = new ConfiguredAlgorithm(cfgElement.getName(), algo, ctx);
+        ConfiguredAlgorithm res = new ConfiguredAlgorithm(cfgElement.getName(), algo, ctx, parent);
 
         List<Attribute> attribs = cfgElement.getAttributes();
         for(int i = 0; i < attribs.size(); i++)
@@ -197,10 +200,10 @@ public class ConfiguredAlgorithm extends Base
         {
             Element nextAlgo = children.get(i);
             // !!! recursion !!!
-            ConfiguredAlgorithm nextCfgAlgo = getTreeFor(nextAlgo, ctx);
+            ConfiguredAlgorithm nextCfgAlgo = getTreeFor(nextAlgo, ctx, res);
             if(null == nextCfgAlgo)
             {
-                ctx.addError("ConfiguredAlgorithm.getTree",
+                ctx.addError("ConfiguredAlgorithm.getTreeFor",
                                 "Failed Tree resolve for " + nextAlgo.getName() + " !");
                 return null;
             }
@@ -209,7 +212,7 @@ public class ConfiguredAlgorithm extends Base
 
         if(false == res.allRequiredDataAvailable())
         {
-            ctx.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTreeFor",
                             "Data missing for " + res.toString() + " !");
             return null;
         }
@@ -233,13 +236,14 @@ public class ConfiguredAlgorithm extends Base
 
         // required configuration parameters
         List<Element> cfgReq = Requirements.getChildren(REQUIRED_CFG_NAME);
+        LOG.trace("{} required parameters.", cfgReq.size());
         for(int i = 0; i < cfgReq.size(); i++)
         {
             Element curE = cfgReq.get(i);
             String attrName = curE.getAttributeValue(REQUIRED_CFG_ATTRIBUTE_NAME);
             if(null == attrName)
             {
-                ctx.addError("ConfiguredAlgorithm.Requirements",
+                ctx.addError("ConfiguredAlgorithm.allRequiredDataAvailable",
                                 "Attribute " + REQUIRED_CFG_ATTRIBUTE_NAME
                                 + " missing for required configuration !");
                 return false;
@@ -247,7 +251,7 @@ public class ConfiguredAlgorithm extends Base
             Attribute at = cfgAttributes.get(attrName);
             if(null == at)
             {
-                ctx.addError("ConfiguredAlgorithm.Requirements",
+                ctx.addError("ConfiguredAlgorithm.allRequiredDataAvailable",
                                 "required attribute " + attrName + " has not been given !");
                 StringBuffer sb = new StringBuffer();
                 Iterator<String> it = cfgAttributes.keySet().iterator();
@@ -258,21 +262,26 @@ public class ConfiguredAlgorithm extends Base
                     sb.append(" ");
                 }
                 sb.append("!");
-                ctx.addError("ConfiguredAlgorithm.Requirements",
+                ctx.addError("ConfiguredAlgorithm.allRequiredDataAvailable",
                                 sb.toString());
                 return false;
+            }
+            else
+            {
+            	parameters.put(attrName, at.getValue());
             }
         }
 
         // required children(algorithms)
         List<Element> algoReq = Requirements.getChildren(REQUIRED_ALGORITHM_NAME);
+        LOG.trace("{} required children.", algoReq.size());
         for(int i = 0; i < algoReq.size(); i++)
         {
             Element curE = algoReq.get(i);
             String reqApi = curE.getAttributeValue(REQUIRED_ALGORITHM_ATTRIBUTE_NAME);
             if(null == reqApi)
             {
-                ctx.addError("ConfiguredAlgorithm.Requirements",
+                ctx.addError("ConfiguredAlgorithm.allRequiredDataAvailable",
                                 "Attribute " + REQUIRED_ALGORITHM_ATTRIBUTE_NAME
                                 + " missing for required child element !");
                 return false;
@@ -290,7 +299,7 @@ public class ConfiguredAlgorithm extends Base
             }
             if(false == found)
             {
-                ctx.addError("ConfiguredAlgorithm.Requirements",
+                ctx.addError("ConfiguredAlgorithm.allRequiredDataAvailable",
                                 "required child element of type " + reqApi + " not present !");
                 return false;
             }
@@ -456,7 +465,7 @@ public class ConfiguredAlgorithm extends Base
             List<Element> conditions = AlgorithmDefinition.getChildren(ALGORITHM_IF_CHILD_NAME);
             if(null == conditions)
             {
-                ctx.addError("Algorithm.findImplementation",
+                ctx.addError("ConfiguredAlgorithm.findImplementation",
                         "No Implementation found!");
                 return;
             }
@@ -465,14 +474,17 @@ public class ConfiguredAlgorithm extends Base
                 Element best = condiEval.getBest(conditions, this);  // TODO
                 if(null == best)
                 {
-                    ctx.addError("Algorithm.getFunctionCcode",
+                    ctx.addError("ConfiguredAlgorithm.findImplementation",
                             "no valid condition!");
+                    ctx.addError("ConditionEvaluation", this.toString());
+                    ctx.addError("ConditionEvaluation", this.dumpParameter());
+                    ctx.addError("ConditionEvaluation", this.dumpProperty());
                     return;
                 }
                 cCode = best.getChild(ALGORITHM_C_CODE_CHILD_NAME);
                 if(null == cCode)
                 {
-                    ctx.addError("Algorithm.getFunctionCcode",
+                    ctx.addError("ConfiguredAlgorithm.findImplementation",
                             "Valid condition(" + best.toString() + ") did not have an Implementation!");
                     return;
                 }
@@ -487,7 +499,7 @@ public class ConfiguredAlgorithm extends Base
             findImplementation();
             if(null == cCode)
             {
-                ctx.addError("Algorithm.getFunctionCcode",
+                ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
                         "No implementation available !");
                 return null;
             }
@@ -504,13 +516,13 @@ public class ConfiguredAlgorithm extends Base
         }
         if(null == searchedFunctionName)
         {
-            ctx.addError("Algorithm.getFunctionCcode",
+            ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
                     "Function call to unknown function!");
             return null;
         }
         if(1 > searchedFunctionName.length())
         {
-            ctx.addError("Algorithm.getFunctionCcode",
+            ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
                     "Function call to unnamed function!");
             return null;
         }
@@ -532,7 +544,7 @@ public class ConfiguredAlgorithm extends Base
                     if(null == best)
                     {
                         // function not found
-                        ctx.addError("Algorithm.getFunctionCcode",
+                        ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
                                 "no valid condition found!");
                         return null;
                     }
@@ -541,7 +553,7 @@ public class ConfiguredAlgorithm extends Base
             }
         }
         // function not found
-        ctx.addError("Algorithm.getFunctionCcode",
+        ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
                 "Function call to missing function! (" + this.toString()
                         + ", function name : " + functionName + " )");
         return null;
@@ -554,7 +566,7 @@ public class ConfiguredAlgorithm extends Base
             findImplementation();
             if(null == cCode)
             {
-                ctx.addError("Algorithm.addAdditionalsTo",
+                ctx.addError("ConfiguredAlgorithm.addAdditionalsTo",
                         "No implementation available !");
                 return;
             }
@@ -597,12 +609,59 @@ public class ConfiguredAlgorithm extends Base
 
     public String getProperty(String name)
     {
-        return properties.get(name);
+        String res = properties.get(name);
+        if(null == res)
+        {
+        	if(null != parent)
+        	{
+        		res = parent.getProperty(name);
+        	}
+        }
+        return res;
     }
+    
+	public String dumpProperty() 
+	{
+		StringBuffer sb = new StringBuffer();
+		sb.append("Properties:\n");
+		Iterator<String> keys = properties.keySet().iterator();
+		while(keys.hasNext())
+		{
+			String key = keys.next();
+			sb.append(key + " : " + properties.get(key) + "\n");
+		}
+    	if(null != parent)
+    	{
+    		sb.append("Parent: " + parent.toString());
+    		sb.append(parent.dumpProperty());
+    	}
+		return sb.toString();
+	}
 
     public String getParameter(String name)
     {
-        return parameters.get(name);
+        String res = parameters.get(name);
+        if(null == res)
+        {
+        	if(null != parent)
+        	{
+        		res = parent.getParameter(name);
+        	}
+        }
+        return res;
     }
+
+	public String dumpParameter() 
+	{
+		StringBuffer sb = new StringBuffer();
+		sb.append("Parameter:\n");
+		Iterator<String> keys = parameters.keySet().iterator();
+		while(keys.hasNext())
+		{
+			String key = keys.next();
+			sb.append(key + " : " + parameters.get(key) + "\n");
+		}
+		return sb.toString();
+	}
 
 }

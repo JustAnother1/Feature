@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <algorithm name="pwm_task" api="run">
-  <configurationAttribute name="frequency" type="UnitValue"/>
-  <configurationAttribute name="dutyCycle" type="percent"/>
+  <configurationAttribute name="frequency_Hz"/>
+  <configurationAttribute name="dutyCycle_percent"/>
   <required>
-    <parameter ref="dutyCycle" as="dutycycle" />
-    <childElement type="binaryOut" as="out"/>
+    <parameter ref="dutyCycle_percent" />
+    <parameter ref="frequency_Hz" />
+    <childElement type="binaryOut"/>
   </required>
     <c_code>
       <additional>
@@ -22,6 +23,4 @@
 ]]>
       </function>
     </c_code>
-
-
 </algorithm>

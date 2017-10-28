@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <solution>
   <os algorithm="super_loop">
-    <blink algorithm="pwm_task" frequency="1Hz" dutyCycle="50%" >
+    <blink algorithm="pwm_task" frequency_Hz="1" dutyCycle_percent="50" >
       <greenLed />
     </blink>
   </os>

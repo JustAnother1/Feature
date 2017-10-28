@@ -85,6 +85,110 @@ public class ConditionEvaluator extends Base
         // score the solutions TODO
         return conditions.get(0);
     }
+    
+    private String evaluateFunction(String Word, ConfiguredAlgorithm algo)
+    {
+        int index_opening_brace = Word.indexOf('(');
+        int index_closing_brace = Word.indexOf(')');
+        String functionName = Word.substring(0, index_opening_brace);
+        String parameter = Word.substring(index_opening_brace + 1, index_closing_brace);
+        if(1 > functionName.length())
+        {
+            // just additional braces -> remove those and evaluate the rest
+            return  evaluate_Word(parameter, algo);  // Caution : Recursion! So don't over do it with the unneeded braces!
+        }
+        switch(functionName)
+        {
+        case KEY_HAS:
+            // Parameter may already be evaluated
+            if(KEY_TRUE.equals(parameter))
+            {
+                return KEY_TRUE;
+            }
+            if(KEY_FALSE.equals(parameter))
+            {
+                return KEY_FALSE;
+            }
+            // If not then evaluate now
+            if(true == parameter.contains("'"))
+            {
+                parameter = parameter.substring(parameter.indexOf("'") + 1, parameter.lastIndexOf("'"));
+            }
+            String test = algo.getProperty(parameter);
+            if(null == test)
+            {
+                return KEY_FALSE;
+            }
+            else
+            {
+                return KEY_TRUE;
+            }
+
+        case KEY_IS:
+            // Parameter may already be evaluated
+            if(KEY_TRUE.equals(parameter))
+            {
+                return KEY_TRUE;
+            }
+            if(KEY_FALSE.equals(parameter))
+            {
+                return KEY_FALSE;
+            }
+            // If not then evaluate now
+            String res = algo.getProperty(parameter);
+            if(null == res)
+            {
+                // there is something wrong here
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "unknown property : " + parameter);
+                return KEY_FALSE;
+            }
+            else
+            {
+                if(KEY_TRUE.equals(res))
+                {
+                    return KEY_TRUE;
+                }
+                else
+                {
+                    return KEY_FALSE;
+                }
+            }
+
+        case KEY_PARAM:
+            // Parameter may already be evaluated
+            if(KEY_TRUE.equals(parameter))
+            {
+                return KEY_TRUE;
+            }
+            if(KEY_FALSE.equals(parameter))
+            {
+                return KEY_FALSE;
+            }
+            // If not then evaluate now
+            String paramValue = algo.getParameter(parameter);
+            if(null == paramValue)
+            {
+                // there is something wrong here
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "unknown parameter : " + parameter);
+                return KEY_FALSE;
+            }
+            else
+            {
+                return paramValue;
+            }
+
+        default:
+            // there is something wrong here
+            valid = false;
+            ctx.addError("ConditionEvaluation",
+                    "unknown function : '" + functionName  + "' in '" + Word + "'");
+            return KEY_FALSE;
+        }
+    }
 
     /**
      *
@@ -118,120 +222,30 @@ public class ConditionEvaluator extends Base
         {
             return KEY_FALSE;
         }
+        
         // functions
         if((true == Word.contains("(")) && (true == Word.contains(")")))
         {
-            int index_opening_brace = Word.indexOf('(');
-            int index_closing_brace = Word.indexOf(')');
-            String functionName = Word.substring(0, index_opening_brace);
-            String parameter = Word.substring(index_opening_brace + 1, index_closing_brace);
-            if(1 > functionName.length())
-            {
-                // just additional braces -> remove those and evaluate the rest
-                return  evaluate_Word(parameter, algo);  // Caution : Recursion! So don't over do it with the unneeded braces!
-            }
-            switch(functionName)
-            {
-            case KEY_HAS:
-                // Parameter may already be evaluated
-                if(KEY_TRUE.equals(parameter))
-                {
-                    return KEY_TRUE;
-                }
-                if(KEY_FALSE.equals(parameter))
-                {
-                    return KEY_FALSE;
-                }
-                // If not then evaluate now
-                if(true == parameter.contains("'"))
-                {
-                    parameter = parameter.substring(parameter.indexOf("'") + 1, parameter.lastIndexOf("'"));
-                }
-                String test = algo.getProperty(parameter);
-                if(null == test)
-                {
-                    return KEY_FALSE;
-                }
-                else
-                {
-                    return KEY_TRUE;
-                }
-
-            case KEY_IS:
-                // Parameter may already be evaluated
-                if(KEY_TRUE.equals(parameter))
-                {
-                    return KEY_TRUE;
-                }
-                if(KEY_FALSE.equals(parameter))
-                {
-                    return KEY_FALSE;
-                }
-                // If not then evaluate now
-                String res = algo.getProperty(parameter);
-                if(null == res)
-                {
-                    // there is something wrong here
-                    valid = false;
-                    ctx.addError("ConditionEvaluation",
-                            "unknown property : " + parameter);
-                    return KEY_FALSE;
-                }
-                else
-                {
-                    if(KEY_TRUE.equals(res))
-                    {
-                        return KEY_TRUE;
-                    }
-                    else
-                    {
-                        return KEY_FALSE;
-                    }
-                }
-
-            case KEY_PARAM:
-                // Parameter may already be evaluated
-                if(KEY_TRUE.equals(parameter))
-                {
-                    return KEY_TRUE;
-                }
-                if(KEY_FALSE.equals(parameter))
-                {
-                    return KEY_FALSE;
-                }
-                // If not then evaluate now
-                String paramValue = algo.getParameter(parameter);
-                if(null == paramValue)
-                {
-                    // there is something wrong here
-                    valid = false;
-                    ctx.addError("ConditionEvaluation",
-                            "unknown parameter : " + parameter);
-                    return KEY_FALSE;
-                }
-                else
-                {
-                    return paramValue;
-                }
-
-            default:
-                // there is something wrong here
-                valid = false;
-                ctx.addError("ConditionEvaluation",
-                        "unknown function : '" + functionName  + "' in '" + Word + "'");
-                return KEY_FALSE;
-            }
+        	return evaluateFunction(Word, algo);
         }
+        
         //configuration Attributes
         String val = algo.getProperty(Word);
-        if(null == val)
+        if(null != val)
+        {            
+            return val;
+        }
+        
+        // This happens if we try to evaluate a parameter to a function defined here (e.g: "has(bla)" )
+        val = algo.getParameter(Word);
+        if(null != val)
         {
-            // This happens if we try to evaluate a parameter to a function defined heer (e.g: "has(bla)" )
-            return Word;
+            return val;
         }
         else
         {
-            return val;
+        	// we give up. Returning the word for better error messages.
+        	return Word;
         }
     }
 
@@ -320,6 +334,8 @@ public class ConditionEvaluator extends Base
 
     private String evaluateFunction(String function, String first, String second, ConfiguredAlgorithm algo)
     {
+    	int one;
+    	int two;
         String valOne = evaluate_Word(first, algo);
         String valTwo = evaluate_Word(second, algo);
         switch(function)
@@ -367,46 +383,70 @@ public class ConditionEvaluator extends Base
         case KEY_SMALLER_THAN:
             try
             {
-                int one = Integer.parseInt(valOne);
-                int two = Integer.parseInt(valTwo);
-                if(one < two)
-                {
-                    return KEY_TRUE;
-                }
-                else
-                {
-                    return KEY_FALSE;
-                }
+                one = Integer.parseInt(valOne);
             }
             catch(NumberFormatException e)
             {
                 valid = false;
                 ctx.addError("ConditionEvaluation",
-                        "one invalid number : either '" + valOne + "' or '" + valTwo + "'");
+                        "one invalid number : '" + valOne + "'");
+                ctx.addError("ConditionEvaluation", algo.toString());
+                ctx.addError("ConditionEvaluation", algo.dumpParameter());
+                ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                return KEY_FALSE;
+            }
+            try
+            {
+                two = Integer.parseInt(valTwo);
+            }
+            catch(NumberFormatException e)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "invalid number : '" + valTwo + "'");
+                return KEY_FALSE;
+            }
+            if(one < two)
+            {
+                return KEY_TRUE;
+            }
+            else
+            {
                 return KEY_FALSE;
             }
 
         case KEY_GREATER_THAN:
             try
             {
-                int one = Integer.parseInt(valOne);
-                int two = Integer.parseInt(valTwo);
-                if(one > two)
-                {
-                    return KEY_TRUE;
-                }
-                else
-                {
-                    return KEY_FALSE;
-                }
+                one = Integer.parseInt(valOne);
             }
             catch(NumberFormatException e)
             {
                 valid = false;
                 ctx.addError("ConditionEvaluation",
-                        "invalid number : " + valOne + " or " + valTwo);
+                        "invalid number : '" + valOne + "'");
                 return KEY_FALSE;
             }
+            try
+            {
+                two = Integer.parseInt(valTwo);
+	        }
+	        catch(NumberFormatException e)
+	        {
+	            valid = false;
+	            ctx.addError("ConditionEvaluation",
+	                    "invalid number : '" + valTwo + "'");
+	            return KEY_FALSE;
+	        }
+            if(one > two)
+            {
+                return KEY_TRUE;
+            }
+            else
+            {
+                return KEY_FALSE;
+            }
+
 
         default:
             valid = false;
