@@ -3,13 +3,9 @@
   <required>
     <files>
       <unstructured>
-        <filename>stm32_minimal.ld</filename>
+        <filename>stm32.ld</filename>
         <content><![CDATA[
-/*****************************************
- * stm32 minimal example stm32_minimal.ld
- *****************************************/
-
-/* memory layout for an STM32F103RB */
+/* memory layout */
 MEMORY
 {
     FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 128K

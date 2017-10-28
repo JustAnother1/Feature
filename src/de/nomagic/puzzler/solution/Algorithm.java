@@ -52,29 +52,50 @@ public class Algorithm extends Base
 
     public boolean hasApi(String api)
     {
-        String apis = root.getAttributeValue(ALGORITHM_API_ATTRIBUTE_NAME);
-        String[] apiArr = apis.split(",");
-        for(int i = 0; i < apiArr.length; i++)
+        if(null != root)
         {
-            apiArr[i] = apiArr[i].trim();
-            if(apiArr[i].equals(api))
+            String apis = root.getAttributeValue(ALGORITHM_API_ATTRIBUTE_NAME);
+            String[] apiArr = apis.split(",");
+            for(int i = 0; i < apiArr.length; i++)
             {
-                return true;
+                apiArr[i] = apiArr[i].trim();
+                if(apiArr[i].equals(api))
+                {
+                    return true;
+                }
             }
+            // TODO check if one of the apis implement the searched API
+            log.warn("Recursive API search not implemented!");
+            return false;
         }
-        // TODO check if one of the apis implement the searched API
-        log.warn("Recursive API search not implemented!");
-        return false;
+        else
+        {
+            return false;
+        }
     }
 
     public Element getChild(String theChildsName)
     {
-        return root.getChild(theChildsName);
+        if(null != root)
+        {
+            return root.getChild(theChildsName);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public List<Element> getChildren(String theChildrensNames)
     {
-        return root.getChildren(theChildrensNames);
+        if(null != root)
+        {
+            return root.getChildren(theChildrensNames);
+        }
+        else
+        {
+            return null;
+        }
     }
 
 }

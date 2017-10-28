@@ -26,8 +26,15 @@ public class Api extends Base
     public static Api getFromFile(String name, Context ctx)
     {
         Element root = FileGetter.getFromFile(name, "api", API_ROOT_ELEMENT_NAME, ctx);
-        Api res = new Api(root, ctx);
-        return res;
+        if(null != root)
+        {
+            Api res = new Api(root, ctx);
+            return res;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public Function[] getRequiredFunctions()

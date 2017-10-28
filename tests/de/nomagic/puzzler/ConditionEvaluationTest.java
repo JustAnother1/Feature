@@ -7,6 +7,7 @@ import java.util.HashMap;
 import org.jdom2.Element;
 import org.junit.Test;
 
+import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.progress.ProgressReport;
 import de.nomagic.puzzler.solution.ConditionEvaluator;
 
@@ -25,9 +26,11 @@ public class ConditionEvaluationTest {
     {
         HashMap<String, String> properties = new HashMap<String, String>();
         HashMap<String, String> parameters = new HashMap<String, String>();
+        Configuration cfg = new Configuration();
         ProgressReport report = new ProgressReport();
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        Element result = dut.getBest(null);
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        Element result = dut.getBest(null, null);
         assertEquals(null, result);
     }
 
@@ -36,9 +39,11 @@ public class ConditionEvaluationTest {
     {
         HashMap<String, String> properties = new HashMap<String, String>();
         HashMap<String, String> parameters = new HashMap<String, String>();
+        Configuration cfg = new Configuration();
         ProgressReport report = new ProgressReport();
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("true");
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        String result = dut.evaluateConditionParenthesis("true", null);
         assertEquals("true", result);
     }
 
@@ -47,9 +52,11 @@ public class ConditionEvaluationTest {
     {
         HashMap<String, String> properties = new HashMap<String, String>();
         HashMap<String, String> parameters = new HashMap<String, String>();
+        Configuration cfg = new Configuration();
         ProgressReport report = new ProgressReport();
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("false");
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        String result = dut.evaluateConditionParenthesis("false", null);
         assertEquals("false", result);
     }
 
@@ -58,10 +65,12 @@ public class ConditionEvaluationTest {
     {
         HashMap<String, String> properties = new HashMap<String, String>();
         HashMap<String, String> parameters = new HashMap<String, String>();
+        Configuration cfg = new Configuration();
         ProgressReport report = new ProgressReport();
+        Context ctx = new Context(cfg);
         properties.put("singleTask", "true");
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("is(singleTask)");
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        String result = dut.evaluateConditionParenthesis("is(singleTask)", null);
         assertEquals("true", result);
     }
 
@@ -70,11 +79,13 @@ public class ConditionEvaluationTest {
     {
         HashMap<String, String> properties = new HashMap<String, String>();
         HashMap<String, String> parameters = new HashMap<String, String>();
+        Configuration cfg = new Configuration();
         ProgressReport report = new ProgressReport();
+        Context ctx = new Context(cfg);
         properties.put("frequency", "1000");
         properties.put("msTimer", "available");
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("(frequency smallerThan 1001) and has('msTimer')");
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        String result = dut.evaluateConditionParenthesis("(frequency smallerThan 1001) and has('msTimer')", null);
         assertEquals("true", result);
     }
 
@@ -83,10 +94,12 @@ public class ConditionEvaluationTest {
     {
         HashMap<String, String> properties = new HashMap<String, String>();
         HashMap<String, String> parameters = new HashMap<String, String>();
+        Configuration cfg = new Configuration();
         ProgressReport report = new ProgressReport();
+        Context ctx = new Context(cfg);
         parameters.put("on", "true");
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("true equals param(on)");
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        String result = dut.evaluateConditionParenthesis("true equals param(on)", null);
         assertEquals("true", result);
     }
 
@@ -95,10 +108,12 @@ public class ConditionEvaluationTest {
     {
         HashMap<String, String> properties = new HashMap<String, String>();
         HashMap<String, String> parameters = new HashMap<String, String>();
+        Configuration cfg = new Configuration();
         ProgressReport report = new ProgressReport();
+        Context ctx = new Context(cfg);
         parameters.put("on", "false");
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("true equals param(on)");
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        String result = dut.evaluateConditionParenthesis("true equals param(on)", null);
         assertEquals("false", result);
     }
 

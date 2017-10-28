@@ -59,6 +59,7 @@ public class FileGetter
                 ctx.addError("FileGetter", "JDOM Exception");
             }
             log.trace(Tool.fromExceptionToString(e));
+            jdomDocument = null;
         }
         catch (IOException e)
         {
@@ -68,7 +69,9 @@ public class FileGetter
                 ctx.addError("FileGetter", e.getMessage());
             }
             log.trace(Tool.fromExceptionToString(e));
+            jdomDocument = null;
         }
+
         return jdomDocument;
     }
 
