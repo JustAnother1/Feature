@@ -2,13 +2,10 @@ package de.nomagic.puzzler;
 
 import static org.junit.Assert.*;
 
-import java.util.HashMap;
-
 import org.jdom2.Element;
 import org.junit.Test;
 
 import de.nomagic.puzzler.configuration.Configuration;
-import de.nomagic.puzzler.progress.ProgressReport;
 import de.nomagic.puzzler.solution.ConditionEvaluator;
 
 public class ConditionEvaluationTest {
@@ -24,96 +21,102 @@ public class ConditionEvaluationTest {
     @Test
     public void testGetBest()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
         Configuration cfg = new Configuration();
-        ProgressReport report = new ProgressReport();
         Context ctx = new Context(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         Element result = dut.getBest(null, null);
         assertEquals(null, result);
     }
+    
+    @Test
+    public void testevaluateConditionParenthesis_empty_string()
+    {
+        Configuration cfg = new Configuration();
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        String result = dut.evaluateConditionParenthesis("", caStub);
+        assertEquals("", result);
+    }
 
     @Test
-    public void testevaluateConditionParenthesis_true()
+    public void testevaluateConditionParenthesis_null()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
         Configuration cfg = new Configuration();
-        ProgressReport report = new ProgressReport();
         Context ctx = new Context(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         String result = dut.evaluateConditionParenthesis("true", null);
+        assertEquals("false", result);
+    }
+    
+    @Test
+    public void testevaluateConditionParenthesis_true()
+    {
+        Configuration cfg = new Configuration();
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        String result = dut.evaluateConditionParenthesis("true", caStub);
         assertEquals("true", result);
     }
 
     @Test
     public void testevaluateConditionParenthesis_fasle()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
         Configuration cfg = new Configuration();
-        ProgressReport report = new ProgressReport();
         Context ctx = new Context(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
-        String result = dut.evaluateConditionParenthesis("false", null);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        String result = dut.evaluateConditionParenthesis("false", caStub);
         assertEquals("false", result);
     }
 
     @Test
     public void testevaluateConditionParenthesis_is()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
         Configuration cfg = new Configuration();
-        ProgressReport report = new ProgressReport();
         Context ctx = new Context(cfg);
-        properties.put("singleTask", "true");
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
-        String result = dut.evaluateConditionParenthesis("is(singleTask)", null);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        caStub.addPropertie("singleTask", "true");
+        String result = dut.evaluateConditionParenthesis("is(singleTask)", caStub);
         assertEquals("true", result);
     }
 
     @Test
     public void testevaluateConditionParenthesis_complex()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
         Configuration cfg = new Configuration();
-        ProgressReport report = new ProgressReport();
         Context ctx = new Context(cfg);
-        properties.put("frequency", "1000");
-        properties.put("msTimer", "available");
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
-        String result = dut.evaluateConditionParenthesis("(frequency smallerThan 1001) and has('msTimer')", null);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        caStub.addPropertie("frequency", "1000");
+        caStub.addPropertie("msTimer", "available");
+        String result = dut.evaluateConditionParenthesis("(frequency smallerThan 1001) and has('msTimer')", caStub);
         assertEquals("true", result);
     }
 
     @Test
     public void testevaluateConditionParenthesis_param_true()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
         Configuration cfg = new Configuration();
-        ProgressReport report = new ProgressReport();
         Context ctx = new Context(cfg);
-        parameters.put("on", "true");
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
-        String result = dut.evaluateConditionParenthesis("true equals param(on)", null);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        caStub.addParameter("on", "true");
+        String result = dut.evaluateConditionParenthesis("true equals param(on)", caStub);
         assertEquals("true", result);
     }
 
     @Test
     public void testevaluateConditionParenthesis_param_false()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
         Configuration cfg = new Configuration();
-        ProgressReport report = new ProgressReport();
         Context ctx = new Context(cfg);
-        parameters.put("on", "false");
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
-        String result = dut.evaluateConditionParenthesis("true equals param(on)", null);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        caStub.addParameter("on", "false");
+        String result = dut.evaluateConditionParenthesis("true equals param(on)", caStub);
         assertEquals("false", result);
     }
 
