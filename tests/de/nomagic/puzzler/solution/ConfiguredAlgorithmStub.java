@@ -1,4 +1,4 @@
-package de.nomagic.puzzler;
+package de.nomagic.puzzler.solution;
 
 import java.util.HashMap;
 

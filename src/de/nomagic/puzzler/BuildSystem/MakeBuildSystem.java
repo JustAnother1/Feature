@@ -19,7 +19,7 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
     private HashMap<String, Target> targets = new HashMap<String, Target>();
     private HashMap<String, String> requiredEnvironmentVariables = new HashMap<String, String>();
     private HashMap<String, String> listVariables = new HashMap<String, String>();
-    private FileGroup buildFiles;
+    private FileGroup buildFiles = new FileGroup();
 
 
     public MakeBuildSystem(Context ctx)
@@ -29,7 +29,10 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
 
     public FileGroup createBuildFor(FileGroup files)
     {
-        buildFiles = new FileGroup();
+    	if(null == files)
+    	{
+    		return null;
+    	}
 
         //create the Makefile
         TextFile makeFile = new TextFile("Makefile");
@@ -47,6 +50,11 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
 
         Iterator<String> fileIt = files.getFileIterator();
         if(null == fileIt)
+        {
+            ctx.addError(this, "No source files provided !");
+            return null;
+        }
+        if(false == fileIt.hasNext())
         {
             ctx.addError(this, "No source files provided !");
             return null;
@@ -106,8 +114,7 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
                 new String[] {"clean:",
                               "\trm " + sb.toString() });
 
-        buildFiles.add(makeFile);
-
+        files.add(makeFile);
         files.addAll(buildFiles);
         return files;
     }

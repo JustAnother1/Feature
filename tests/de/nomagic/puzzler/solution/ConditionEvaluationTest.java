@@ -1,10 +1,11 @@
-package de.nomagic.puzzler;
+package de.nomagic.puzzler.solution;
 
 import static org.junit.Assert.*;
 
 import org.jdom2.Element;
 import org.junit.Test;
 
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.ConditionEvaluator;
 
