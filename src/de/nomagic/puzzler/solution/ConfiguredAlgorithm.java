@@ -18,7 +18,7 @@ import de.nomagic.puzzler.FileGroup.C_File;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
 
-public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface
+public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface, AlgorithmInformaton
 {
     public final static String REQUIRED_CFG_NAME = "parameter";
     public final static String REQUIRED_CFG_ATTRIBUTE_NAME = "ref";

@@ -40,7 +40,7 @@ public class ConditionEvaluator extends Base
         super(ctx);
     }
 
-    public Element getBest(List<Element> conditions, AlgorithmInstanceInterface algo)
+    public Element getBest(List<Element> conditions, AlgorithmInformaton algo)
     {
         if( (null == conditions) || (null == algo) )
         {
@@ -86,7 +86,7 @@ public class ConditionEvaluator extends Base
         return conditions.get(0);
     }
     
-    private String evaluateFunction(String Word, AlgorithmInstanceInterface algo)
+    private String evaluateFunction(String Word, AlgorithmInformaton algo)
     {
         int index_opening_brace = Word.indexOf('(');
         int index_closing_brace = Word.indexOf(')');
@@ -103,12 +103,10 @@ public class ConditionEvaluator extends Base
             // Parameter may already be evaluated
             if(KEY_TRUE.equals(parameter))
             {
-            	log.trace("TRUE");
                 return KEY_TRUE;
             }
             if(KEY_FALSE.equals(parameter))
             {
-            	log.trace("FALSE");
                 return KEY_FALSE;
             }
             // If not then evaluate now
@@ -119,12 +117,10 @@ public class ConditionEvaluator extends Base
             String test = algo.getProperty(parameter);
             if(null == test)
             {
-            	log.trace("FALSE");
                 return KEY_FALSE;
             }
             else
             {
-            	log.trace("TRUE");
                 return KEY_TRUE;
             }
 
@@ -132,12 +128,10 @@ public class ConditionEvaluator extends Base
             // Parameter may already be evaluated
             if(KEY_TRUE.equals(parameter))
             {
-            	log.trace("TRUE");
                 return KEY_TRUE;
             }
             if(KEY_FALSE.equals(parameter))
             {
-            	log.trace("FALSE");
                 return KEY_FALSE;
             }
             // If not then evaluate now
@@ -154,12 +148,10 @@ public class ConditionEvaluator extends Base
             {
                 if(KEY_TRUE.equals(res))
                 {
-                	log.trace("TRUE");
                     return KEY_TRUE;
                 }
                 else
                 {
-                	log.trace("FALSE");
                     return KEY_FALSE;
                 }
             }
@@ -168,12 +160,10 @@ public class ConditionEvaluator extends Base
             // Parameter may already be evaluated
             if(KEY_TRUE.equals(parameter))
             {
-            	log.trace("TRUE");
                 return KEY_TRUE;
             }
             if(KEY_FALSE.equals(parameter))
             {
-            	log.trace("FALSE");
                 return KEY_FALSE;
             }
             // If not then evaluate now
@@ -188,7 +178,6 @@ public class ConditionEvaluator extends Base
             }
             else
             {
-            	log.trace("not parsed: {}", paramValue);
                 return paramValue;
             }
 
@@ -222,24 +211,21 @@ public class ConditionEvaluator extends Base
      * @param conditionText
      * @return
      */
-    private String evaluate_Word(String Word, AlgorithmInstanceInterface algo)
+    private String evaluate_Word(String Word, AlgorithmInformaton algo)
     {
         // constants
         if(KEY_TRUE.equals(Word))
         {
-        	log.trace("TRUE");
             return KEY_TRUE;
         }
         if(KEY_FALSE.equals(Word))
         {
-        	log.trace("FALSE");
             return KEY_FALSE;
         }
         
         // functions
         if((true == Word.contains("(")) && (true == Word.contains(")")))
         {
-        	log.trace("Function:");
         	return evaluateFunction(Word, algo);
         }
         
@@ -247,7 +233,6 @@ public class ConditionEvaluator extends Base
         String val = algo.getProperty(Word);
         if(null != val)
         {            
-        	log.trace("Property:");
             return val;
         }
         
@@ -255,21 +240,11 @@ public class ConditionEvaluator extends Base
         val = algo.getParameter(Word);
         if(null != val)
         {
-        	log.trace("Parameter:");
-            return val;
-        }
-        
-        // Build-in Macros of the algorithm (e.g: numOfChilds)
-        val = algo.getBuildIn(Word);
-        if(null != val)
-        {
-        	log.trace("BuildIn:");
             return val;
         }
         else
         {
         	// we give up. Returning the word for better error messages.
-        	log.trace("ERROR? could not parse:'{}'!", Word);
         	return Word;
         }
     }
@@ -303,18 +278,16 @@ public class ConditionEvaluator extends Base
         return false;
     }
 
-    private String evaluateConditionText(String conditionText, AlgorithmInstanceInterface algo)
+    private String evaluateConditionText(String conditionText, AlgorithmInformaton algo)
     {
         // parse condition
         String[] parts = conditionText.split("\\s"); // all whitespace splits
         if(null == parts)
         {
-        	log.trace("FALSE: null");
             return KEY_FALSE;
         }
         if(1 > parts.length)
         {
-        	log.trace("FALSE: no parts");
             return KEY_FALSE;
         }
         // evaluate condition
@@ -359,7 +332,7 @@ public class ConditionEvaluator extends Base
         return result;
     }
 
-    private String evaluateFunction(String function, String first, String second, AlgorithmInstanceInterface algo)
+    private String evaluateFunction(String function, String first, String second, AlgorithmInformaton algo)
     {
     	int one;
     	int two;
@@ -370,48 +343,40 @@ public class ConditionEvaluator extends Base
         case KEY_AND:
             if((KEY_TRUE.equals(valOne)) & (KEY_TRUE.equalsIgnoreCase(valTwo)))
             {
-            	log.trace("and yields TRUE");
                 return KEY_TRUE;
             }
             else
             {
-            	log.trace("and yields FALSE");
                 return KEY_FALSE;
             }
 
         case KEY_OR:
             if((KEY_TRUE.equals(valOne)) | (KEY_TRUE.equalsIgnoreCase(valTwo)))
             {
-            	log.trace("or yields TRUE");
                 return KEY_TRUE;
             }
             else
             {
-            	log.trace("or yields FALSE");
                 return KEY_FALSE;
             }
 
         case KEY_IS_NOT_EQUAL_TO:
             if(valOne.equals(valTwo))
             {
-            	log.trace("is not equal yields FALSE");
                 return KEY_FALSE;
             }
             else
             {
-            	log.trace("is not equal yieds TRUE");
                 return KEY_TRUE;
             }
 
         case KEY_EQUALS:
             if(valOne.equals(valTwo))
             {
-            	log.trace("equals yields TRUE");
                 return KEY_TRUE;
             }
             else
             {
-            	log.trace("equals yields FALSE");
                 return KEY_FALSE;
             }
 
@@ -443,12 +408,10 @@ public class ConditionEvaluator extends Base
             }
             if(one < two)
             {
-            	log.trace("smaller than yields TRUE");
                 return KEY_TRUE;
             }
             else
             {
-            	log.trace("smller than yields FALSE");
                 return KEY_FALSE;
             }
 
@@ -477,12 +440,10 @@ public class ConditionEvaluator extends Base
 	        }
             if(one > two)
             {
-            	log.trace("greater than yields TRUE");
                 return KEY_TRUE;
             }
             else
             {
-            	log.trace("greater than yields FALSE");
                 return KEY_FALSE;
             }
 
@@ -495,11 +456,10 @@ public class ConditionEvaluator extends Base
         }
     }
 
-    public String evaluateConditionParenthesis(String condition, AlgorithmInstanceInterface algo)
+    public String evaluateConditionParenthesis(String condition, AlgorithmInformaton algo)
     {
         if( (null == condition) || (null == algo) )
         {
-        	log.trace("FALSE: no condition or no Algorithm");
             return KEY_FALSE;
         }
         if(false == condition.contains("("))

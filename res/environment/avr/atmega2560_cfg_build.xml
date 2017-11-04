@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <build_cfg>
   <required>
+      <variables>
+      <CFLAGS> -DF_CPU=16000000UL </CFLAGS>
+    </variables>
   </required>
 </build_cfg>

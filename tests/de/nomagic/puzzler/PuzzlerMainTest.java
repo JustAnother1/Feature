@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 
-public class CommandLineInterface 
+public class PuzzlerMainTest 
 {
 	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 	private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
@@ -60,19 +60,6 @@ public class CommandLineInterface
 		System.out.println(help);
 		assertTrue(5 < help.length());
 		assertEquals("", errContent.toString());
-	}
-	
-	/**
-	 * Test method for {@link de.nomagic.puzzler.PuzzlerMain#main(java.lang.String[])}.
-	 */
-	@Test
-	public void testSimpleProject() 
-	{
-		String[] args = {"-w tests/data/", "simpleProject.xml"};
-		exit.expectSystemExitWithStatus(0);
-		PuzzlerMain.main(args);
-		assertEquals("", errContent.toString());
-		assertEquals("", outContent.toString());
 	}
 
 }

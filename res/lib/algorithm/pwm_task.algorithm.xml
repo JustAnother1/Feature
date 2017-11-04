@@ -7,7 +7,6 @@
     <parameter ref="frequency_Hz" />
     <childElement type="binaryOut"/>
   </required>
-  <if cond="is(singleTask)">
     <c_code>
       <additional>
         <include>util/delay.h</include>
@@ -22,33 +21,6 @@
     $$$setValue(false)$$$
     _delay_ms(1000);        //Delay for 1000ms => 1 sec
 ]]>
-
       </function>
     </c_code>
-  </if>
-  <if cond="(frequency_Hz smallerThan 1001) and has(msTimer)">
-   <c_code>
-    <function  name="initialize">
-        <![CDATA[{
-  $$$initialize$$$
-  for(;;)
-  {
-    $$$execute$$$
-  }
-}]]>
-    </function>
-    <function name="execute">
-      <![CDATA[{
-
-}]]>
-    </function>
-    <additonal>
-      <function name="">
-        <![CDATA[{
-
-}]]>
-      </function>
-    </additonal>
-   </c_code>
-  </if>
 </algorithm>

@@ -4,7 +4,7 @@
     <variables>
       <CC>avr-gcc</CC>
       <LD>avr-ld</LD>
-      <CFLAGS> -c -fno-common -O0 -g </CFLAGS>
+      <CFLAGS> -c -fno-common -O3 -g </CFLAGS>
       <LFLAGS>-nostartfiles -T$(LKR_SCRIPT)</LFLAGS>
       <CPFLAGS>-Obinary</CPFLAGS>
     </variables>
