@@ -7,6 +7,10 @@
     <parameter ref="pin" />
   </required>
   <c_code>
+    <function  name="initialize">
+      <![CDATA[/*init code for gpio TODO*/]]>
+    </function>
+    
     <function  name="setValue"  param="bool">
       <![CDATA[{
   $$$initialize$$$

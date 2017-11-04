@@ -18,7 +18,7 @@ import de.nomagic.puzzler.FileGroup.C_File;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
 
-public class ConfiguredAlgorithm extends Base
+public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface
 {
     public final static String REQUIRED_CFG_NAME = "parameter";
     public final static String REQUIRED_CFG_ATTRIBUTE_NAME = "ref";
@@ -38,6 +38,8 @@ public class ConfiguredAlgorithm extends Base
     public final static String ALGORITHM_REQUIREMENTS_CHILD_NAME = "required";
     public final static String ALGORITHM_PROVIDES_CHILD_NAME = "provides";
     public final static String ALGORITHM_PROVIDES_PROPERTY_VALUE = "value";
+    
+    public final static String BUILD_IN_NUM_OF_CHILDS = "numOfChilds";
 
     private final static Logger LOG = LoggerFactory.getLogger("ConfiguredAlgorithm");
 
@@ -321,7 +323,8 @@ public class ConfiguredAlgorithm extends Base
                 String propertyName = curE.getName();
                 String propertyValue = curE.getAttributeValue(ALGORITHM_PROVIDES_PROPERTY_VALUE);
                 LOG.trace("Property {} : {}", propertyName, propertyValue);
-                // TODO evaluate PropertyValue
+                // evaluate PropertyValue
+                propertyValue = condiEval.evaluateConditionParenthesis(propertyValue, this);
                 properties.put(propertyName, propertyValue);
             }
         }
@@ -662,6 +665,16 @@ public class ConfiguredAlgorithm extends Base
 			sb.append(key + " : " + parameters.get(key) + "\n");
 		}
 		return sb.toString();
+	}
+
+	public String getBuildIn(String word) 
+	{
+		// numOfChilds
+		if(true == BUILD_IN_NUM_OF_CHILDS.equals(word))
+		{
+			return "" + cfgAlgorithms.size();
+		}
+		return null;
 	}
 
 }

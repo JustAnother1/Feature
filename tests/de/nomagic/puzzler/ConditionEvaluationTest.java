@@ -2,15 +2,14 @@ package de.nomagic.puzzler;
 
 import static org.junit.Assert.*;
 
-import java.util.HashMap;
-
 import org.jdom2.Element;
 import org.junit.Test;
 
-import de.nomagic.puzzler.progress.ProgressReport;
+import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.ConditionEvaluator;
 
-public class ConditionEvaluationTest {
+public class ConditionEvaluationTest 
+{
 
     /*
      * valid:
@@ -19,86 +18,94 @@ public class ConditionEvaluationTest {
      * "true equals param(on)"
      */
 
-
     @Test
     public void testGetBest()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
-        ProgressReport report = new ProgressReport();
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        Element result = dut.getBest(null);
+        Configuration cfg = new Configuration();
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        Element result = dut.getBest(null, null);
         assertEquals(null, result);
     }
 
     @Test
+    public void testevaluateConditionParenthesis_null()
+    {
+        Configuration cfg = new Configuration();
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        String result = dut.evaluateConditionParenthesis("true", null);
+        assertEquals("false", result);
+    }
+    
+    @Test
     public void testevaluateConditionParenthesis_true()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
-        ProgressReport report = new ProgressReport();
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("true");
+        Configuration cfg = new Configuration();
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        AlgoInstanceStub instance = new AlgoInstanceStub();
+        String result = dut.evaluateConditionParenthesis("true", instance);
         assertEquals("true", result);
     }
 
     @Test
     public void testevaluateConditionParenthesis_fasle()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
-        ProgressReport report = new ProgressReport();
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("false");
+        Configuration cfg = new Configuration();
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        AlgoInstanceStub instance = new AlgoInstanceStub();
+        String result = dut.evaluateConditionParenthesis("false", instance);
         assertEquals("false", result);
     }
 
     @Test
     public void testevaluateConditionParenthesis_is()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
-        ProgressReport report = new ProgressReport();
-        properties.put("singleTask", "true");
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("is(singleTask)");
+        Configuration cfg = new Configuration();
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        AlgoInstanceStub instance = new AlgoInstanceStub();
+        instance.addProperty("singleTask", "true");
+        String result = dut.evaluateConditionParenthesis("is(singleTask)", instance);
         assertEquals("true", result);
     }
 
     @Test
     public void testevaluateConditionParenthesis_complex()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
-        ProgressReport report = new ProgressReport();
-        properties.put("frequency", "1000");
-        properties.put("msTimer", "available");
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("(frequency smallerThan 1001) and has('msTimer')");
+        Configuration cfg = new Configuration();
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        AlgoInstanceStub instance = new AlgoInstanceStub();
+        instance.addProperty("frequency", "1000");
+        instance.addProperty("msTimer", "available");
+        String result = dut.evaluateConditionParenthesis("(frequency smallerThan 1001) and has('msTimer')", instance);
         assertEquals("true", result);
     }
 
     @Test
     public void testevaluateConditionParenthesis_param_true()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
-        ProgressReport report = new ProgressReport();
-        parameters.put("on", "true");
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("true equals param(on)");
+        Configuration cfg = new Configuration();
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        AlgoInstanceStub instance = new AlgoInstanceStub();
+        instance.addParameter("on", "true");
+        String result = dut.evaluateConditionParenthesis("true equals param(on)", instance);
         assertEquals("true", result);
     }
 
     @Test
     public void testevaluateConditionParenthesis_param_false()
     {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        HashMap<String, String> parameters = new HashMap<String, String>();
-        ProgressReport report = new ProgressReport();
-        parameters.put("on", "false");
-        ConditionEvaluator dut = new ConditionEvaluator(properties, report, parameters);
-        String result = dut.evaluateConditionParenthesis("true equals param(on)");
+        Configuration cfg = new Configuration();
+        Context ctx = new Context(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        AlgoInstanceStub instance = new AlgoInstanceStub();
+        instance.addParameter("on", "false");
+        String result = dut.evaluateConditionParenthesis("true equals param(on)", instance);
         assertEquals("false", result);
     }
 

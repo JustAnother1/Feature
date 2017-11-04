@@ -4,7 +4,7 @@
     <childElement type="run" />
   </required>
   <provides>
-    <singleTask value="numOfChild equals 1"/>
+    <singleTask value="numOfChilds equals 1"/>
   </provides>
   <c_code>
     <function name="main">
