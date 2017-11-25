@@ -32,7 +32,14 @@ public class Algorithm extends Base
     @Override
     public String toString()
     {
-        return "Algorithm " + root.getAttributeValue(ALGORITHM_NAME_ATTRIBUTE_NAME) + ")";
+    	if(null == root)
+    	{
+    		return "ERROR: unconfigured Algorithm";
+    	}
+    	else
+    	{
+    		return "Algorithm " + root.getAttributeValue(ALGORITHM_NAME_ATTRIBUTE_NAME) + ")";
+    	}
     }
 
     public static Algorithm getFromFile(Element curElement, Context ctx)

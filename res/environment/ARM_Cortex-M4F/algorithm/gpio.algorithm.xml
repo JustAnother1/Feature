@@ -20,6 +20,7 @@
     $$$execute$$$
   }
 }]]>
+    </function>
     <additional>
       <![CDATA[
 #define PERIPH_BASE           ((uint32_t)0x40000000) /* Peripheral base address in the alias region */
