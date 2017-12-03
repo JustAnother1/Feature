@@ -75,7 +75,15 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     public static ConfiguredAlgorithm getTreeFrom(Context ctx, ConfiguredAlgorithm parent)
     {
+    	if(null == ctx)
+    	{
+    		return null;
+    	}
         Solution s = ctx.getSolution();
+        if(null == s)
+        {
+        	return null;
+        }
         Element root = s.getRootElement();
         if(null == root)
         {
