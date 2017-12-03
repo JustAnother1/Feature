@@ -8,10 +8,10 @@ import org.jdom2.Element;
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGetter;
+import de.nomagic.puzzler.Library;
 
 public class Api extends Base
 {
-    public final static String API_ROOT_ELEMENT_NAME = "api";
     public final static String API_FUNCTION_ELEMENT_NAME = "function";
 
     private Element root = null;
@@ -23,9 +23,9 @@ public class Api extends Base
     }
 
 
-    public static Api getFromFile(String name, Context ctx)
+    public static Api getFromFile(String name, Library lib, Context ctx)
     {
-        Element root = FileGetter.getFromFile(name, "api", API_ROOT_ELEMENT_NAME, ctx);
+        Element root = lib.getApiElement(name, ctx);
         if(null != root)
         {
             Api res = new Api(root, ctx);

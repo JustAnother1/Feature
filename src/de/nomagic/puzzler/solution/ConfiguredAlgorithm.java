@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
+import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Project;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
@@ -365,7 +366,8 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                                      "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
                                      "*/"});
 
-        Api api = Api.getFromFile(REQUIRED_ROOT_API, ctx);
+        FileGetter fg = new FileGetter();  // TODO
+        Api api = Api.getFromFile(REQUIRED_ROOT_API, fg, ctx);
         addCodeToFile(mainC, api);
         FileGroup newCodeFiles = getAdditionalFiles();
         if(null != newCodeFiles)

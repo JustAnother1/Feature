@@ -10,12 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.FileGetter;
+import de.nomagic.puzzler.Library;
 
 public class Algorithm extends Base
 {
     public final static String ALGORITHM_REFFERENCE_ATTRIBUTE_NAME = "algorithm";
-    public final static String ALGORITHM_ROOT_ELEMENT_NAME = "algorithm";
     public final static String ALGORITHM_NAME_ATTRIBUTE_NAME = "name";
     public final static String ALGORITHM_API_ATTRIBUTE_NAME = "api";
 
@@ -38,21 +37,22 @@ public class Algorithm extends Base
     	}
     	else
     	{
-    		return "Algorithm " + root.getAttributeValue(ALGORITHM_NAME_ATTRIBUTE_NAME) + ")";
+    		return "Algorithm " + root.getAttributeValue(ALGORITHM_NAME_ATTRIBUTE_NAME);
     	}
     }
 
-    public static Algorithm getFromFile(Element curElement, Context ctx)
+    public static Algorithm getFromFile(Element curElement, Library lib, Context ctx)
     {
-    	if(null == curElement)
+    	if((null == curElement) || (null == lib))
     	{
     		return null;
     	}
         Attribute algoAttr = curElement.getAttribute(ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
-        Element root = FileGetter.getFromFile(algoAttr.getValue(),
-                                              "algorithm",
-                                              ALGORITHM_ROOT_ELEMENT_NAME,
-                                              ctx);
+        if(null == algoAttr)
+        {
+        	return null;
+        }
+        Element root = lib.getAlgorithmElement(algoAttr.getValue(), ctx);
         Algorithm res = new Algorithm(root, ctx);
 
         // TODO check required configuration

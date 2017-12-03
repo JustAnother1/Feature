@@ -112,7 +112,8 @@ public class Solution extends Base
         else
         {
             // load Algorithm
-            Algorithm algo = Algorithm.getFromFile(cfgElement, ctx);
+        	FileGetter fg = new FileGetter();
+            Algorithm algo = Algorithm.getFromFile(cfgElement, fg,  ctx);
 
             if(null == algo)
             {
