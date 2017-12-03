@@ -66,6 +66,10 @@ public class Algorithm extends Base
         if(null != root)
         {
             String apis = root.getAttributeValue(ALGORITHM_API_ATTRIBUTE_NAME);
+            if(null == apis)
+            {
+            	return false;
+            }
             String[] apiArr = apis.split(",");
             for(int i = 0; i < apiArr.length; i++)
             {
