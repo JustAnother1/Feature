@@ -44,6 +44,10 @@ public class Algorithm extends Base
 
     public static Algorithm getFromFile(Element curElement, Context ctx)
     {
+    	if(null == curElement)
+    	{
+    		return null;
+    	}
         Attribute algoAttr = curElement.getAttribute(ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         Element root = FileGetter.getFromFile(algoAttr.getValue(),
                                               "algorithm",

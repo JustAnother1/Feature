@@ -29,25 +29,9 @@ public class AlgorithmTest {
 	}
 
 	@Test
-	public void testGetFromFile() 
+	public void testGetFromFile_null() 
 	{
 		assertNull(Algorithm.getFromFile(null, null));
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testHasApi() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetChild() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetChildren() {
-		fail("Not yet implemented");
 	}
 
 }
