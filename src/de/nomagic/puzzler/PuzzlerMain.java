@@ -360,11 +360,13 @@ public class PuzzlerMain
             if(true == m.successful)
             {
                 // OK
+                System.out.println("Project created successfully!");
                 System.exit(0);
             }
             else
             {
                 // ERROR
+                System.out.println("ERROR: Something went wrong!");
                 System.exit(1);
             }
         }
