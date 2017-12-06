@@ -11,13 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Project;
-import de.nomagic.puzzler.Tool;
-import de.nomagic.puzzler.FileGroup.AbstractFile;
-import de.nomagic.puzzler.FileGroup.C_File;
-import de.nomagic.puzzler.FileGroup.FileGroup;
-import de.nomagic.puzzler.configuration.Configuration;
 
 public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface, AlgorithmInformaton
 {
@@ -25,21 +19,11 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     public final static String REQUIRED_CFG_ATTRIBUTE_NAME = "ref";
     public final static String REQUIRED_ALGORITHM_NAME = "childElement";
     public final static String REQUIRED_ALGORITHM_ATTRIBUTE_NAME = "type";
-    public final static String REQUIRED_ROOT_API = "program_entry_point";
 
-    public final static String IMPLEMENTATION_PLACEHOLDER_REGEX = "\\$\\$\\$";
-
-    public final static String ALGORITHM_C_CODE_CHILD_NAME = "c_code";
-    public final static String ALGORITHM_IF_CHILD_NAME = "if";
-    public final static String ALGORITHM_FUNCTION_CHILD_NAME = "function";
-    public final static String ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME = "name";
-    public final static String ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME = "additional";
-    public final static String ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME = "include";
-    public final static String ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME = "function";
     public final static String ALGORITHM_REQUIREMENTS_CHILD_NAME = "required";
     public final static String ALGORITHM_PROVIDES_CHILD_NAME = "provides";
     public final static String ALGORITHM_PROVIDES_PROPERTY_VALUE = "value";
-    
+
     public final static String BUILD_IN_NUM_OF_CHILDS = "numOfChilds";
 
     private final static Logger LOG = LoggerFactory.getLogger("ConfiguredAlgorithm");
@@ -48,12 +32,11 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     private final Algorithm AlgorithmDefinition;
     private final HashMap<String, Attribute> cfgAttributes = new HashMap<String, Attribute>();
     private final HashMap<String, ConfiguredAlgorithm> cfgAlgorithms = new HashMap<String, ConfiguredAlgorithm>();
-    private FileGroup libFiles = null;
+
 
     private ConditionEvaluator condiEval;
-    private HashMap<String, String> properties = new  HashMap<String, String>();  // TODO
-    private HashMap<String, String> parameters = new  HashMap<String, String>(); // TODO
-    private Element cCode = null; // TODO
+    private HashMap<String, String> properties = new  HashMap<String, String>();
+    private HashMap<String, String> parameters = new  HashMap<String, String>();
     private ConfiguredAlgorithm parent;
 
     public ConfiguredAlgorithm(String Name,
@@ -75,14 +58,14 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     public static ConfiguredAlgorithm getTreeFrom(Context ctx, ConfiguredAlgorithm parent)
     {
-    	if(null == ctx)
-    	{
-    		return null;
-    	}
+        if(null == ctx)
+        {
+            return null;
+        }
         Solution s = ctx.getSolution();
         if(null == s)
         {
-        	return null;
+            return null;
         }
         Element root = s.getRootElement();
         if(null == root)
@@ -113,15 +96,6 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                             "Failed to get Algorithm for " + algoName + " !");
             return null;
         }
-        if(false == algo.hasApi(REQUIRED_ROOT_API))
-        {
-            LOG.trace("algo: {}", algo);
-            LOG.trace("root: {}", root);
-            ctx.addError("ConfiguredAlgorithm.getTree",
-                            "Root element of the solution is not an program entry point !");
-            return null;
-        }
-
         return getTreeFor(root, ctx, parent);
     }
 
@@ -279,7 +253,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             }
             else
             {
-            	parameters.put(attrName, at.getValue());
+                parameters.put(attrName, at.getValue());
             }
         }
 
@@ -298,7 +272,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                 return false;
             }
             boolean found = false;
-            Iterator<String> it = cfgAlgorithms.keySet().iterator();
+            Iterator<String> it = getAllAlgorithms();
             while(it.hasNext())
             {
                 ConfiguredAlgorithm curAlgo = cfgAlgorithms.get(it.next());
@@ -340,7 +314,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         // else this algorithm provides nothing and that might be OK.
     }
 
-    private boolean hasApi(String Api)
+    public boolean hasApi(String Api)
     {
         return AlgorithmDefinition.hasApi(Api);
     }
@@ -361,263 +335,14 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         cfgAlgorithms.put(algo.getName(), algo);
     }
 
-    public FileGroup getCImplementationInto(FileGroup codeGroup)
+    public ConfiguredAlgorithm getAlgorithm(String Name)
     {
-        // we will need at least one *.c file. So create that now.
-        C_File mainC = new C_File("main.c");
-
-        // there should be a file comment explaining what this is
-        mainC.addLines(C_File.C_FILE_FILE_COMMENT_SECTION_NAME,
-                       new String[] {"/*",
-                                     "  automatically created main.c",
-                                     "  created at: " + Tool.curentDateTime(),
-                                     "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
-                                     "*/"});
-
-        FileGetter fg = new FileGetter();  // TODO
-        Api api = Api.getFromFile(REQUIRED_ROOT_API, fg, ctx);
-        addCodeToFile(mainC, api);
-        FileGroup newCodeFiles = getAdditionalFiles();
-        if(null != newCodeFiles)
-        {
-            codeGroup.addAll(newCodeFiles);
-        }
-        codeGroup.add(mainC);
-        return codeGroup;
+        return cfgAlgorithms.get(Name);
     }
 
-    private void addCodeToFile(C_File codeFile, Api api)
+    public Iterator<String> getAllAlgorithms()
     {
-        // TODO
-        // TODO parse provides
-        // TODO get Implementation from XML
-        Function[] funcs = api.getRequiredFunctions();
-        for(int i = 0; i < funcs.length; i++)
-        {
-            String declaration = funcs[i].getDeclaration();
-            declaration = declaration.trim();
-            String implementation = getCImplementationOf(funcs[i].getName(), codeFile);
-            if(null == implementation)
-            {
-                return;
-            }
-            codeFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME, declaration + ";");
-            codeFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME, declaration + "\n" + implementation);
-        }
-    }
-
-    private String replacePlaceholders(String implementation, C_File codeFile)
-    {
-        StringBuffer res = new StringBuffer();
-        String[] parts = implementation.split(IMPLEMENTATION_PLACEHOLDER_REGEX);
-        for(int i = 0; i < parts.length; i++)
-        {
-            if(0 == i%2)
-            {
-                res.append(parts[i]);
-            }
-            else
-            {
-                // parts[i] is function name of child to call
-                Iterator<String> it = cfgAlgorithms.keySet().iterator();
-                if(false == it.hasNext())
-                {
-                    // We need a child to call the funtion !
-                    ctx.addError("ConfiguredAlgorithm.replacePlaceholders",
-                            "Function call to missing child!");
-                    return null;
-                }
-                while(it.hasNext())
-                {
-                    String ChildName = it.next();
-                    ConfiguredAlgorithm childAlgo = cfgAlgorithms.get(ChildName);
-                    String impl = childAlgo.getCImplementationOf(parts[i], codeFile);
-                    res.append(impl);
-                }
-            }
-        }
-        return res.toString();
-    }
-
-    protected String getCImplementationOf(String functionName, C_File codeFile)
-    {
-        String implementation = getFunctionCcode(functionName);
-        if(null == implementation)
-        {
-            return null;
-        }
-        implementation = implementation.trim();
-        // add additional Stuff
-        addAdditionalsTo(codeFile);
-        // TODO replace all place holders with configuration values
-        // TODO add code from configuredAlgorithms into place holders.
-        implementation = replacePlaceholders(implementation, codeFile);
-        return implementation;
-    }
-
-    private FileGroup getAdditionalFiles()
-    {
-        return libFiles;
-    }
-
-    public void addCodeFile(AbstractFile additionalFile)
-    {
-        if(null == libFiles)
-        {
-            libFiles = new FileGroup();
-        }
-        libFiles.add(additionalFile);
-    }
-
-    private void findImplementation()
-    {
-        cCode = AlgorithmDefinition.getChild(ALGORITHM_C_CODE_CHILD_NAME);
-        if(null == cCode)
-        {
-            // the algorithm might have the functions wrapped into if condition tags.
-            List<Element> conditions = AlgorithmDefinition.getChildren(ALGORITHM_IF_CHILD_NAME);
-            if(null == conditions)
-            {
-                ctx.addError("ConfiguredAlgorithm.findImplementation",
-                        "No Implementation found!");
-                return;
-            }
-            else
-            {
-                Element best = condiEval.getBest(conditions, this);  // TODO
-                if(null == best)
-                {
-                    ctx.addError("ConfiguredAlgorithm.findImplementation",
-                            "no valid condition!");
-                    ctx.addError("ConditionEvaluation", this.toString());
-                    ctx.addError("ConditionEvaluation", this.dumpParameter());
-                    ctx.addError("ConditionEvaluation", this.dumpProperty());
-                    return;
-                }
-                cCode = best.getChild(ALGORITHM_C_CODE_CHILD_NAME);
-                if(null == cCode)
-                {
-                    ctx.addError("ConfiguredAlgorithm.findImplementation",
-                            "Valid condition(" + best.toString() + ") did not have an Implementation!");
-                    return;
-                }
-            }
-        }
-    }
-
-    public String getFunctionCcode(String functionName)
-    {
-        if(null == cCode)
-        {
-            findImplementation();
-            if(null == cCode)
-            {
-                ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
-                        "No implementation available !");
-                return null;
-            }
-        }
-        List<Element> funcs = cCode.getChildren(ALGORITHM_FUNCTION_CHILD_NAME);
-        String searchedFunctionName = null;
-        if(true == functionName.contains("("))
-        {
-            searchedFunctionName = functionName.substring(0, functionName.indexOf('('));
-        }
-        else
-        {
-            searchedFunctionName = functionName;
-        }
-        if(null == searchedFunctionName)
-        {
-            ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
-                    "Function call to unknown function!");
-            return null;
-        }
-        if(1 > searchedFunctionName.length())
-        {
-            ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
-                    "Function call to unnamed function!");
-            return null;
-        }
-        for(int i = 0; i < funcs.size(); i++)
-        {
-            Element curElement = funcs.get(i);
-            String name = curElement.getAttributeValue(ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME);
-            if(true == searchedFunctionName.equals(name))
-            {
-                 List<Element> cond = curElement.getChildren(ALGORITHM_IF_CHILD_NAME);
-                if((null == cond) || (true == cond.isEmpty()))
-                {
-                    // TODO handle parameter in function
-                    return curElement.getText();
-                }
-                else
-                {
-                    Element best = condiEval.getBest(cond, this); // TODO
-                    if(null == best)
-                    {
-                        // function not found
-                        ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
-                                "no valid condition found!");
-                        return null;
-                    }
-                    return best.getText();
-                }
-            }
-        }
-        // function not found
-        ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
-                "Function call to missing function! (" + this.toString()
-                        + ", function name : " + functionName + " )");
-        return null;
-    }
-
-    public void addAdditionalsTo(C_File codeFile)
-    {
-        if(null == cCode)
-        {
-            findImplementation();
-            if(null == cCode)
-            {
-                ctx.addError("ConfiguredAlgorithm.addAdditionalsTo",
-                        "No implementation available !");
-                return;
-            }
-        }
-        Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME);
-        if(null == additional)
-        {
-            LOG.trace("no addionals for algorithm" + this.toString());
-            return;
-        }
-        List<Element> addlist = additional.getChildren();
-        if(null == addlist)
-        {
-            return;
-        }
-        for(int i = 0; i < addlist.size(); i++)
-        {
-            Element curElement = addlist.get(i);
-            String type = curElement.getName();
-            switch(type)
-            {
-            case ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME:
-                codeFile.addLine(C_File.C_FILE_INCLUDE_SECTION_NAME, curElement.getText());
-                break;
-
-            case ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME:
-                Function func = new Function(curElement);
-                String declaration = func.getDeclaration();
-                codeFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
-                                 declaration + ";");
-                codeFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
-                                 declaration + "\n" + curElement.getText());
-                break;
-
-            default: // ignore
-                break;
-            }
-        }
+        return cfgAlgorithms.keySet().iterator();
     }
 
     public String getProperty(String name)
@@ -625,66 +350,76 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         String res = properties.get(name);
         if(null == res)
         {
-        	if(null != parent)
-        	{
-        		res = parent.getProperty(name);
-        	}
+            if(null != parent)
+            {
+                res = parent.getProperty(name);
+            }
         }
         return res;
     }
-    
-	public String dumpProperty() 
-	{
-		StringBuffer sb = new StringBuffer();
-		sb.append("Properties:\n");
-		Iterator<String> keys = properties.keySet().iterator();
-		while(keys.hasNext())
-		{
-			String key = keys.next();
-			sb.append(key + " : " + properties.get(key) + "\n");
-		}
-    	if(null != parent)
-    	{
-    		sb.append("Parent: " + parent.toString());
-    		sb.append(parent.dumpProperty());
-    	}
-		return sb.toString();
-	}
+
+    public String dumpProperty()
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Properties:\n");
+        Iterator<String> keys = properties.keySet().iterator();
+        while(keys.hasNext())
+        {
+            String key = keys.next();
+            sb.append(key + " : " + properties.get(key) + "\n");
+        }
+        if(null != parent)
+        {
+            sb.append("Parent: " + parent.toString());
+            sb.append(parent.dumpProperty());
+        }
+        return sb.toString();
+    }
 
     public String getParameter(String name)
     {
         String res = parameters.get(name);
         if(null == res)
         {
-        	if(null != parent)
-        	{
-        		res = parent.getParameter(name);
-        	}
+            if(null != parent)
+            {
+                res = parent.getParameter(name);
+            }
         }
         return res;
     }
 
-	public String dumpParameter() 
-	{
-		StringBuffer sb = new StringBuffer();
-		sb.append("Parameter:\n");
-		Iterator<String> keys = parameters.keySet().iterator();
-		while(keys.hasNext())
-		{
-			String key = keys.next();
-			sb.append(key + " : " + parameters.get(key) + "\n");
-		}
-		return sb.toString();
-	}
+    public String dumpParameter()
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Parameter:\n");
+        Iterator<String> keys = parameters.keySet().iterator();
+        while(keys.hasNext())
+        {
+            String key = keys.next();
+            sb.append(key + " : " + parameters.get(key) + "\n");
+        }
+        return sb.toString();
+    }
 
-	public String getBuildIn(String word) 
-	{
-		// numOfChilds
-		if(true == BUILD_IN_NUM_OF_CHILDS.equals(word))
-		{
-			return "" + cfgAlgorithms.size();
-		}
-		return null;
-	}
+    public String getBuildIn(String word)
+    {
+        // numOfChilds
+        if(true == BUILD_IN_NUM_OF_CHILDS.equals(word))
+        {
+            return "" + cfgAlgorithms.size();
+        }
+        return null;
+    }
+
+    public Element getAlgorithmElement(String ElementName)
+    {
+        return AlgorithmDefinition.getChild(ElementName);
+    }
+
+    public List<Element> getAlgorithmElements(String ElementName)
+    {
+        return AlgorithmDefinition.getChildren(ElementName);
+    }
 
 }

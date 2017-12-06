@@ -31,26 +31,27 @@ public class Algorithm extends Base
     @Override
     public String toString()
     {
-    	if(null == root)
-    	{
-    		return "ERROR: unconfigured Algorithm";
-    	}
-    	else
-    	{
-    		return "Algorithm " + root.getAttributeValue(ALGORITHM_NAME_ATTRIBUTE_NAME);
-    	}
+        if(null == root)
+        {
+            return "ERROR: unconfigured Algorithm";
+        }
+        else
+        {
+            return "Algorithm " + root.getAttributeValue(ALGORITHM_NAME_ATTRIBUTE_NAME)
+                + " implementing " +  root.getAttributeValue(ALGORITHM_API_ATTRIBUTE_NAME);
+        }
     }
 
     public static Algorithm getFromFile(Element curElement, Library lib, Context ctx)
     {
-    	if((null == curElement) || (null == lib))
-    	{
-    		return null;
-    	}
+        if((null == curElement) || (null == lib))
+        {
+            return null;
+        }
         Attribute algoAttr = curElement.getAttribute(ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         if(null == algoAttr)
         {
-        	return null;
+            return null;
         }
         Element root = lib.getAlgorithmElement(algoAttr.getValue(), ctx);
         Algorithm res = new Algorithm(root, ctx);
@@ -68,7 +69,7 @@ public class Algorithm extends Base
             String apis = root.getAttributeValue(ALGORITHM_API_ATTRIBUTE_NAME);
             if(null == apis)
             {
-            	return false;
+                return false;
             }
             String[] apiArr = apis.split(",");
             for(int i = 0; i < apiArr.length; i++)
