@@ -332,7 +332,10 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     public void addAlgorithm(ConfiguredAlgorithm algo)
     {
-        cfgAlgorithms.put(algo.getName(), algo);
+        if((null != cfgAlgorithms) && (null != algo))
+        {
+            cfgAlgorithms.put(algo.getName(), algo);
+        }
     }
 
     public ConfiguredAlgorithm getAlgorithm(String Name)
@@ -414,12 +417,26 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     public Element getAlgorithmElement(String ElementName)
     {
-        return AlgorithmDefinition.getChild(ElementName);
+        if(null == AlgorithmDefinition)
+        {
+            return null;
+        }
+        else
+        {
+            return AlgorithmDefinition.getChild(ElementName);
+        }
     }
 
     public List<Element> getAlgorithmElements(String ElementName)
     {
-        return AlgorithmDefinition.getChildren(ElementName);
+        if(null == AlgorithmDefinition)
+        {
+            return null;
+        }
+        else
+        {
+            return AlgorithmDefinition.getChildren(ElementName);
+        }
     }
 
 }
