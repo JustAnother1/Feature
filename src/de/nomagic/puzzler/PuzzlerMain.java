@@ -344,10 +344,9 @@ public class PuzzlerMain
             ctx.close();
             return;
         }
-        // success !
-        ctx.setSucessful();
+        // success ?
+        successful = ctx.wasSucessful();
         ctx.close();
-        successful = true;
     }
 
     public static void main(String[] args)

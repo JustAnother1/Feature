@@ -19,9 +19,9 @@ public class Context
         report = ProgressReportFactory.getReportFor(cfg);
     }
 
-    public void setSucessful()
+    public boolean wasSucessful()
     {
-        report.setSucessful();
+        return report.wasSucessful();
     }
 
     public void close()
