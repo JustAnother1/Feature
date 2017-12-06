@@ -80,15 +80,16 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                             "invalid root tag (" + root.getName() + ") !");
             return null;
         }
-        root = root.getChildren().get(0);
-        if(null == root)
+        List<Element> children = root.getChildren();
+        if(0 == children.size())
         {
             ctx.addError("ConfiguredAlgorithm.getTree",
-                            "No algorithm elements in the provided solution !");
+                    "No algorithm elements in the provided solution !");
             return null;
         }
-        // root is now the configElement -> get Algorithm to determine the API
-        String algoName = root.getAttributeValue(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
+        Element configElement = children.get(0);
+        // get Algorithm to determine the API
+        String algoName = configElement.getAttributeValue(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         Algorithm algo = s.getAlgorithm(algoName);
         if(null == algo)
         {
@@ -96,7 +97,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                             "Failed to get Algorithm for " + algoName + " !");
             return null;
         }
-        return getTreeFor(root, ctx, parent);
+        return getTreeFor(configElement, ctx, parent);
     }
 
     private static ConfiguredAlgorithm getTreeFromEnvironment(Element cfgElement, Context ctx, ConfiguredAlgorithm parent)

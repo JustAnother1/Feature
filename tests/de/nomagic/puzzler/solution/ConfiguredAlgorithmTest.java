@@ -8,9 +8,8 @@ import java.util.List;
 import org.jdom2.Element;
 import org.junit.Test;
 
-import de.nomagic.puzzler.ContextImpl;
+import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Project;
-import de.nomagic.puzzler.configuration.Configuration;
 
 public class ConfiguredAlgorithmTest
 {
@@ -30,31 +29,101 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetTreeFrom_noSolution()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
     }
 
     @Test
-    public void testGetTreeFrom_Solution()
+    public void testGetTreeFrom_noRoot()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
-        Solution s = new Solution(ctx);
+        ContextStub ctx = new ContextStub();
+        Solution s = new SolutionStub();
         ctx.addSolution(s);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
+        String[] err = ctx.getErrors();
+        assertEquals(1, err.length);
+        assertEquals("ConfiguredAlgorithm.getTree : No root element in the provided solution !", err[0]);
     }
 
     @Test
-    public void testGetTreeFrom_Project()
+    public void testGetTreeFrom_badRoot()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
-        Project pro = new Project(ctx);
-        Solution s = new Solution(ctx);
-        assertTrue(s.getFromProject(pro));
+        ContextStub ctx = new ContextStub();
+        SolutionStub s = new SolutionStub();
         ctx.addSolution(s);
+        Element badRoot = new Element("bad");
+        s.setRootElement(badRoot);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
+        String[] err = ctx.getErrors();
+        assertEquals(1, err.length);
+        assertEquals("ConfiguredAlgorithm.getTree : invalid root tag (bad) !", err[0]);
+    }
+
+    @Test
+    public void testGetTreeFrom_noChildren()
+    {
+        ContextStub ctx = new ContextStub();
+        SolutionStub s = new SolutionStub();
+        ctx.addSolution(s);
+        Element badRoot = new Element(Project.SOLUTION_ELEMENT_NAME);
+        s.setRootElement(badRoot);
+        assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
+        String[] err = ctx.getErrors();
+        assertEquals(1, err.length);
+        assertEquals("ConfiguredAlgorithm.getTree : No algorithm elements in the provided solution !", err[0]);
+    }
+
+    @Test
+    public void testGetTreeFrom_badChildren()
+    {
+        ContextStub ctx = new ContextStub();
+        SolutionStub s = new SolutionStub();
+        ctx.addSolution(s);
+        Element badRoot = new Element(Project.SOLUTION_ELEMENT_NAME);
+        Element badChild = new Element("bad");
+        badRoot.addContent(badChild);
+        s.setRootElement(badRoot);
+        assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
+        String[] err = ctx.getErrors();
+        assertEquals(1, err.length);
+        assertEquals("ConfiguredAlgorithm.getTree : Failed to get Algorithm for null !", err[0]);
+    }
+
+    @Test
+    public void testGetTreeFrom_badAlgo()
+    {
+        ContextStub ctx = new ContextStub();
+        SolutionStub s = new SolutionStub();
+        ctx.addSolution(s);
+        Element root = new Element(Project.SOLUTION_ELEMENT_NAME);
+        Element child = new Element("bad");
+        child.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, "algo");
+        root.addContent(child);
+        s.setRootElement(root);
+        assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
+        String[] err = ctx.getErrors();
+        assertEquals(1, err.length);
+        assertEquals("ConfiguredAlgorithm.getTree : Failed to get Algorithm for algo !", err[0]);
+    }
+
+    @Test
+    public void testGetTreeFrom_Algo()
+    {
+        ContextStub ctx = new ContextStub();
+        SolutionStub s = new SolutionStub();
+        ctx.addSolution(s);
+        Element root = new Element(Project.SOLUTION_ELEMENT_NAME);
+        Element child = new Element("bad");
+        child.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, "algo");
+        root.addContent(child);
+        s.setRootElement(root);
+        Algorithm algo = new Algorithm(child, ctx);
+        s.addAlgorithm("algo", algo);
+        ConfiguredAlgorithm res = ConfiguredAlgorithm.getTreeFrom(ctx, null);
+        assertNotNull(res);
+        // String[] err = ctx.getErrors();
+        // assertEquals(1, err.length);
+        // assertEquals("ConfiguredAlgorithm.getTree : Failed to get Algorithm for null !", err[0]);
     }
 
     @Test
@@ -68,8 +137,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testHasApi_noApi()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         Algorithm algo = new Algorithm(root, ctx);
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
@@ -80,8 +148,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testHasApi_wrongApi()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         root.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "foo");
         Algorithm algo = new Algorithm(root, ctx);
@@ -93,8 +160,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testHasApi_Api()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         root.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "bla");
         Algorithm algo = new Algorithm(root, ctx);
@@ -253,8 +319,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElement_noChild()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         Algorithm algo = new Algorithm(root, ctx);
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
@@ -264,8 +329,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElement_notThatChild()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -277,8 +341,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElement_oneChild()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -290,8 +353,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElement_twoChildren()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         Element child = new Element("foo");
         Element sibling = new Element("foo");
@@ -312,8 +374,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElements_noChild()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         Algorithm algo = new Algorithm(root, ctx);
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
@@ -325,8 +386,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElements_notThatChild()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -340,8 +400,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElements_oneChild()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -355,8 +414,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElements_twoChildren()
     {
-        Configuration cfg = new Configuration();
-        ContextImpl ctx = new ContextImpl(cfg);
+        Context ctx = new ContextStub();
         Element root = new Element("testElement");
         Element child = new Element("foo");
         Element sibling = new Element("foo");

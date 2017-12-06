@@ -38,6 +38,7 @@ import de.nomagic.puzzler.Generator.C_CodeGenerator;
 import de.nomagic.puzzler.Generator.Generator;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.Solution;
+import de.nomagic.puzzler.solution.SolutionImpl;
 
 /** Main function of puzzler.
  *
@@ -305,7 +306,7 @@ public class PuzzlerMain
         ctx.addEnvironment(e);
 
         // find solution
-        Solution s = new Solution(ctx);
+        Solution s = new SolutionImpl(ctx);
         if(false == s.getFromProject(pro))
         {
             ctx.close();
