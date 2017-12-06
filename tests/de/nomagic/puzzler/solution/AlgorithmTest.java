@@ -7,7 +7,7 @@ import java.util.List;
 import org.jdom2.Element;
 import org.junit.Test;
 
-import de.nomagic.puzzler.Context;
+import de.nomagic.puzzler.ContextImpl;
 import de.nomagic.puzzler.configuration.Configuration;
 
 public class AlgorithmTest {
@@ -16,7 +16,7 @@ public class AlgorithmTest {
     public void testAlgorithm()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Algorithm cut = new Algorithm(null, ctx);
         assertFalse(cut.hasApi("bla"));
     }
@@ -25,7 +25,7 @@ public class AlgorithmTest {
     public void testToString_null()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Algorithm cut = new Algorithm(null, ctx);
         assertSame("ERROR: unconfigured Algorithm", cut.toString());
     }
@@ -34,7 +34,7 @@ public class AlgorithmTest {
     public void testToString()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element root = new Element("testElement");
         root.setAttribute(Algorithm.ALGORITHM_NAME_ATTRIBUTE_NAME, "blablabla");
         Algorithm cut = new Algorithm(root, ctx);
@@ -45,7 +45,7 @@ public class AlgorithmTest {
     public void testToString_Api()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element root = new Element("testElement");
         root.setAttribute(Algorithm.ALGORITHM_NAME_ATTRIBUTE_NAME, "blablabla");
         root.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "foo");
@@ -99,7 +99,7 @@ public class AlgorithmTest {
     public void testHasApi_null()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Algorithm cut = new Algorithm(null, ctx);
         assertFalse(cut.hasApi("blupp"));
     }
@@ -108,7 +108,7 @@ public class AlgorithmTest {
     public void testHasApi_bad()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element ele = new Element("bad");
         Algorithm cut = new Algorithm(ele, ctx);
         assertFalse(cut.hasApi("blupp"));
@@ -118,7 +118,7 @@ public class AlgorithmTest {
     public void testHasApi_wrongApi()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element ele = new Element("good");
         ele.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "bla");
         Algorithm cut = new Algorithm(ele, ctx);
@@ -129,7 +129,7 @@ public class AlgorithmTest {
     public void testHasApi_hasApi()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element ele = new Element("good");
         ele.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "blupp");
         Algorithm cut = new Algorithm(ele, ctx);
@@ -140,7 +140,7 @@ public class AlgorithmTest {
     public void testGetChild_null()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Algorithm cut = new Algorithm(null, ctx);
         assertNull(cut.getChild("Alex"));
     }
@@ -149,7 +149,7 @@ public class AlgorithmTest {
     public void testGetChild_noChild()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element ele = new Element("good");
         Algorithm cut = new Algorithm(ele, ctx);
         assertNull(cut.getChild("Alex"));
@@ -159,7 +159,7 @@ public class AlgorithmTest {
     public void testGetChild_hasChild()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element ele = new Element("good");
         Element child = new Element("Alex");
         ele.addContent(child);
@@ -173,7 +173,7 @@ public class AlgorithmTest {
     public void testGetChildren_null()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Algorithm cut = new Algorithm(null, ctx);
         assertNull(cut.getChildren("Alex"));
     }
@@ -182,7 +182,7 @@ public class AlgorithmTest {
     public void testGetChildren_noChild()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element ele = new Element("good");
         Algorithm cut = new Algorithm(ele, ctx);
         List<Element> res = cut.getChildren("Alex");
@@ -194,7 +194,7 @@ public class AlgorithmTest {
     public void testGetChildren_hasChild()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element ele = new Element("good");
         Element child = new Element("Alex");
         ele.addContent(child);
@@ -208,7 +208,7 @@ public class AlgorithmTest {
     public void testGetChildren_hasChildren()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element ele = new Element("good");
         Element child = new Element("Alex");
         Element child2 = new Element("Alex");

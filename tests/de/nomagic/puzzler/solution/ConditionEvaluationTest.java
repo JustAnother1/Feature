@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.jdom2.Element;
 import org.junit.Test;
 
-import de.nomagic.puzzler.Context;
+import de.nomagic.puzzler.ContextImpl;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.ConditionEvaluator;
 
@@ -23,7 +23,7 @@ public class ConditionEvaluationTest {
     public void testGetBest()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         Element result = dut.getBest(null, null);
         assertEquals(null, result);
@@ -33,7 +33,7 @@ public class ConditionEvaluationTest {
     public void testevaluateConditionParenthesis_empty_string()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         String result = dut.evaluateConditionParenthesis("", caStub);
@@ -44,7 +44,7 @@ public class ConditionEvaluationTest {
     public void testevaluateConditionParenthesis_null()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         String result = dut.evaluateConditionParenthesis("true", null);
         assertEquals("false", result);
@@ -54,7 +54,7 @@ public class ConditionEvaluationTest {
     public void testevaluateConditionParenthesis_true()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         String result = dut.evaluateConditionParenthesis("true", caStub);
@@ -65,7 +65,7 @@ public class ConditionEvaluationTest {
     public void testevaluateConditionParenthesis_fasle()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         String result = dut.evaluateConditionParenthesis("false", caStub);
@@ -76,7 +76,7 @@ public class ConditionEvaluationTest {
     public void testevaluateConditionParenthesis_is()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         caStub.addPropertie("singleTask", "true");
@@ -88,7 +88,7 @@ public class ConditionEvaluationTest {
     public void testevaluateConditionParenthesis_complex()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         caStub.addPropertie("frequency", "1000");
@@ -101,7 +101,7 @@ public class ConditionEvaluationTest {
     public void testevaluateConditionParenthesis_param_true()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         caStub.addParameter("on", "true");
@@ -113,7 +113,7 @@ public class ConditionEvaluationTest {
     public void testevaluateConditionParenthesis_param_false()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         caStub.addParameter("on", "false");

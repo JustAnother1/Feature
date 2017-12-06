@@ -19,7 +19,7 @@ public class FileGetter implements Library
 {
     public final static String ALGORITHM_ROOT_ELEMENT_NAME = "algorithm";
     public final static String API_ROOT_ELEMENT_NAME = "api";
-	
+
     private static final Logger log = LoggerFactory.getLogger("FileGetter");
 
     public static Document getXmlFile(String path, String name, Context ctx)
@@ -163,13 +163,13 @@ public class FileGetter implements Library
 
         return root;
     }
-    
+
     public Element getApiElement(String ApiName, Context ctx)
     {
-    	return getFromFile(ApiName, "api", API_ROOT_ELEMENT_NAME, ctx);
+        return getFromFile(ApiName, "api", API_ROOT_ELEMENT_NAME, ctx);
     }
 
-	public Element getAlgorithmElement(String AlgorithmName, Context ctx)
+    public Element getAlgorithmElement(String AlgorithmName, Context ctx)
     {
         if((null == AlgorithmName))
         {
@@ -177,74 +177,74 @@ public class FileGetter implements Library
             return null;
         }
         return getFromFile(AlgorithmName,
-        		           "algorithm",
+                           "algorithm",
                            ALGORITHM_ROOT_ELEMENT_NAME,
                            ctx);
     }
-	
+
     private Element getFromFile(String Name,
             String type,
             String rootElementName,
             Context ctx)
-	{
-		if((null == Name)|| (null == type) || (null == rootElementName))
-		{
-			log.warn("Invalid parameters!");
-			log.warn("Name: " + Name);
-			log.warn("type: " + type);
-			log.warn("root name: " + rootElementName);
-			return null;
-		}
-		
-		// Get project specific
-		String fileName = type + File.separator + Name + "." + type + ".xml";
-		Element root = getFromFile(ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG), fileName, ctx);
-		if(null == root)
-		{
-			// if that failed then the architecture specific
-			String[] paths = ctx.cfg().getStringsOf(Configuration.ENVIRONMENT_PATH_CFG);
-			String Architecture = ctx.getEnvironment().getArchitectureName();
-			for(int i = 0; i < paths.length; i++)
-			{
-				paths[i] = paths[i] + Architecture + File.separator;
-			}
-			String FamilyName = ctx.getEnvironment().getFamilyName();
-			if(0 < FamilyName.length())
-			{
-				// if a family is given then the family has additional folders that are preferred to the general directories.
-				Vector<String> famPaths = new Vector<String>();
-				
-				for(int i = 0; i < paths.length; i++)
-				{
-					famPaths.add(paths[i] + FamilyName + File.separator);
-				}
-				for(int i = 0; i < paths.length; i++)
-				{
-					famPaths.add(paths[i]);
-				}
-				paths = (String[]) famPaths.toArray();
-			}
-			root = getFromFile(paths, fileName, ctx);
-			if(null == root)
-			{
-				// if that also failed then the common one from the library
-				root = getFromFile(ctx.cfg().getStringsOf(Configuration.LIB_PATH_CFG), fileName, ctx);
-				if(null == root)
-				{
-					ctx.addError("static:Algorithm", "Could not find the " + type + " " + Name);
-					return null;
-				}
-			}
-		}
-		
-		if(false == rootElementName.equals(root.getName()))
-		{
-			log.trace("Invalid root tag({}) in the {}", root.getName(), Name);
-			return null;
-		}
-		
-		return root;
-	}
+    {
+        if((null == Name)|| (null == type) || (null == rootElementName))
+        {
+            log.warn("Invalid parameters!");
+            log.warn("Name: " + Name);
+            log.warn("type: " + type);
+            log.warn("root name: " + rootElementName);
+            return null;
+        }
+
+        // Get project specific
+        String fileName = type + File.separator + Name + "." + type + ".xml";
+        Element root = getFromFile(ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG), fileName, ctx);
+        if(null == root)
+        {
+            // if that failed then the architecture specific
+            String[] paths = ctx.cfg().getStringsOf(Configuration.ENVIRONMENT_PATH_CFG);
+            String Architecture = ctx.getEnvironment().getArchitectureName();
+            for(int i = 0; i < paths.length; i++)
+            {
+                paths[i] = paths[i] + Architecture + File.separator;
+            }
+            String FamilyName = ctx.getEnvironment().getFamilyName();
+            if(0 < FamilyName.length())
+            {
+                // if a family is given then the family has additional folders that are preferred to the general directories.
+                Vector<String> famPaths = new Vector<String>();
+
+                for(int i = 0; i < paths.length; i++)
+                {
+                    famPaths.add(paths[i] + FamilyName + File.separator);
+                }
+                for(int i = 0; i < paths.length; i++)
+                {
+                    famPaths.add(paths[i]);
+                }
+                paths = (String[]) famPaths.toArray();
+            }
+            root = getFromFile(paths, fileName, ctx);
+            if(null == root)
+            {
+                // if that also failed then the common one from the library
+                root = getFromFile(ctx.cfg().getStringsOf(Configuration.LIB_PATH_CFG), fileName, ctx);
+                if(null == root)
+                {
+                    ctx.addError("static:Algorithm", "Could not find the " + type + " " + Name);
+                    return null;
+                }
+            }
+        }
+
+        if(false == rootElementName.equals(root.getName()))
+        {
+            log.trace("Invalid root tag({}) in the {}", root.getName(), Name);
+            return null;
+        }
+
+        return root;
+    }
 
 
 

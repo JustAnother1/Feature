@@ -286,7 +286,7 @@ public class PuzzlerMain
         {
             return;
         }
-        Context ctx = new Context(cfg);
+        Context ctx = new ContextImpl(cfg);
         // open Project file
         Project pro = new Project(ctx);
         if(false == pro.getFromFiles())

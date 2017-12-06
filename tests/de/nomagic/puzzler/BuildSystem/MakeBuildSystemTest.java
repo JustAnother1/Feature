@@ -6,14 +6,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.nomagic.puzzler.Context;
+import de.nomagic.puzzler.ContextImpl;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
 
 public class MakeBuildSystemTest 
 {
 	Configuration cfg = new Configuration();
-	Context ctx = new Context(cfg);
+	ContextImpl ctx = new ContextImpl(cfg);
 	MakeBuildSystem dut;
 	
 	@Before

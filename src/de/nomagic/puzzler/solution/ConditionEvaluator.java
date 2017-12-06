@@ -85,7 +85,7 @@ public class ConditionEvaluator extends Base
         // score the solutions TODO
         return conditions.get(0);
     }
-    
+
     private String evaluateFunction(String Word, AlgorithmInformaton algo)
     {
         int index_opening_brace = Word.indexOf('(');
@@ -222,20 +222,20 @@ public class ConditionEvaluator extends Base
         {
             return KEY_FALSE;
         }
-        
+
         // functions
         if((true == Word.contains("(")) && (true == Word.contains(")")))
         {
-        	return evaluateFunction(Word, algo);
+            return evaluateFunction(Word, algo);
         }
-        
+
         //configuration Attributes
         String val = algo.getProperty(Word);
         if(null != val)
-        {            
+        {
             return val;
         }
-        
+
         // This happens if we try to evaluate a parameter to a function defined here (e.g: "has(bla)" )
         val = algo.getParameter(Word);
         if(null != val)
@@ -244,8 +244,8 @@ public class ConditionEvaluator extends Base
         }
         else
         {
-        	// we give up. Returning the word for better error messages.
-        	return Word;
+            // we give up. Returning the word for better error messages.
+            return Word;
         }
     }
 
@@ -334,8 +334,8 @@ public class ConditionEvaluator extends Base
 
     private String evaluateFunction(String function, String first, String second, AlgorithmInformaton algo)
     {
-    	int one;
-    	int two;
+        int one;
+        int two;
         String valOne = evaluate_Word(first, algo);
         String valTwo = evaluate_Word(second, algo);
         switch(function)
@@ -430,14 +430,14 @@ public class ConditionEvaluator extends Base
             try
             {
                 two = Integer.parseInt(valTwo);
-	        }
-	        catch(NumberFormatException e)
-	        {
-	            valid = false;
-	            ctx.addError("ConditionEvaluation",
-	                    "invalid number : '" + valTwo + "'");
-	            return KEY_FALSE;
-	        }
+            }
+            catch(NumberFormatException e)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "invalid number : '" + valTwo + "'");
+                return KEY_FALSE;
+            }
             if(one > two)
             {
                 return KEY_TRUE;

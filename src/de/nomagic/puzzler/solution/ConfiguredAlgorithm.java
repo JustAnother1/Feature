@@ -316,7 +316,14 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     public boolean hasApi(String Api)
     {
-        return AlgorithmDefinition.hasApi(Api);
+        if(null == AlgorithmDefinition)
+        {
+            return false;
+        }
+        else
+        {
+            return AlgorithmDefinition.hasApi(Api);
+        }
     }
 
     @Override
@@ -332,7 +339,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     public void addAlgorithm(ConfiguredAlgorithm algo)
     {
-        if((null != cfgAlgorithms) && (null != algo))
+        if(null != algo)
         {
             cfgAlgorithms.put(algo.getName(), algo);
         }

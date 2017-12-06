@@ -7,7 +7,6 @@ import org.jdom2.Element;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Library;
 
 public class Api extends Base

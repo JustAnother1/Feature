@@ -8,7 +8,8 @@ import java.util.List;
 import org.jdom2.Element;
 import org.junit.Test;
 
-import de.nomagic.puzzler.Context;
+import de.nomagic.puzzler.ContextImpl;
+import de.nomagic.puzzler.Project;
 import de.nomagic.puzzler.configuration.Configuration;
 
 public class ConfiguredAlgorithmTest
@@ -30,7 +31,7 @@ public class ConfiguredAlgorithmTest
     public void testGetTreeFrom_noSolution()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
     }
 
@@ -38,10 +39,68 @@ public class ConfiguredAlgorithmTest
     public void testGetTreeFrom_Solution()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Solution s = new Solution(ctx);
         ctx.addSolution(s);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
+    }
+
+    @Test
+    public void testGetTreeFrom_Project()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        Project pro = new Project(ctx);
+        Solution s = new Solution(ctx);
+        assertTrue(s.getFromProject(pro));
+        ctx.addSolution(s);
+        assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
+    }
+
+    @Test
+    public void testHasApi_null()
+    {
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
+        assertEquals("dut", dut.getName());
+        assertFalse(dut.hasApi("bla"));
+    }
+
+    @Test
+    public void testHasApi_noApi()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        Element root = new Element("testElement");
+        Algorithm algo = new Algorithm(root, ctx);
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
+        assertEquals("dut", dut.getName());
+        assertFalse(dut.hasApi("bla"));
+    }
+
+    @Test
+    public void testHasApi_wrongApi()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        Element root = new Element("testElement");
+        root.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "foo");
+        Algorithm algo = new Algorithm(root, ctx);
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
+        assertEquals("dut", dut.getName());
+        assertFalse(dut.hasApi("bla"));
+    }
+
+    @Test
+    public void testHasApi_Api()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        Element root = new Element("testElement");
+        root.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "bla");
+        Algorithm algo = new Algorithm(root, ctx);
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
+        assertEquals("dut", dut.getName());
+        assertTrue(dut.hasApi("bla"));
     }
 
     @Test
@@ -195,7 +254,7 @@ public class ConfiguredAlgorithmTest
     public void testGetAlgorithmElement_noChild()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element root = new Element("testElement");
         Algorithm algo = new Algorithm(root, ctx);
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
@@ -206,7 +265,7 @@ public class ConfiguredAlgorithmTest
     public void testGetAlgorithmElement_notThatChild()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -219,7 +278,7 @@ public class ConfiguredAlgorithmTest
     public void testGetAlgorithmElement_oneChild()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -232,7 +291,7 @@ public class ConfiguredAlgorithmTest
     public void testGetAlgorithmElement_twoChildren()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         Element sibling = new Element("foo");
@@ -254,7 +313,7 @@ public class ConfiguredAlgorithmTest
     public void testGetAlgorithmElements_noChild()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element root = new Element("testElement");
         Algorithm algo = new Algorithm(root, ctx);
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
@@ -267,7 +326,7 @@ public class ConfiguredAlgorithmTest
     public void testGetAlgorithmElements_notThatChild()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -282,7 +341,7 @@ public class ConfiguredAlgorithmTest
     public void testGetAlgorithmElements_oneChild()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -297,7 +356,7 @@ public class ConfiguredAlgorithmTest
     public void testGetAlgorithmElements_twoChildren()
     {
         Configuration cfg = new Configuration();
-        Context ctx = new Context(cfg);
+        ContextImpl ctx = new ContextImpl(cfg);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         Element sibling = new Element("foo");

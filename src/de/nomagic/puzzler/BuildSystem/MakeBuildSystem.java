@@ -29,10 +29,10 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
 
     public FileGroup createBuildFor(FileGroup files)
     {
-    	if(null == files)
-    	{
-    		return null;
-    	}
+        if(null == files)
+        {
+            return null;
+        }
 
         //create the Makefile
         TextFile makeFile = new TextFile("Makefile");
