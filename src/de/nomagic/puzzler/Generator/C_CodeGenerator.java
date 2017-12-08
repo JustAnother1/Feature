@@ -158,8 +158,7 @@ public class C_CodeGenerator extends Generator
             findImplementation(logic);
             if(null == cCode)
             {
-                ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
-                        "No implementation available !");
+                ctx.addError(this, "No implementation available !");
                 return null;
             }
         }
@@ -175,14 +174,12 @@ public class C_CodeGenerator extends Generator
         }
         if(null == searchedFunctionName)
         {
-            ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
-                    "Function call to unknown function!");
+            ctx.addError(this, "Function call to unknown function!");
             return null;
         }
         if(1 > searchedFunctionName.length())
         {
-            ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
-                    "Function call to unnamed function!");
+            ctx.addError(this, "Function call to unnamed function!");
             return null;
         }
         for(int i = 0; i < funcs.size(); i++)
@@ -203,8 +200,7 @@ public class C_CodeGenerator extends Generator
                     if(null == best)
                     {
                         // function not found
-                        ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
-                                "no valid condition found!");
+                        ctx.addError(this, "no valid condition found!");
                         return null;
                     }
                     return best.getText();
@@ -212,8 +208,8 @@ public class C_CodeGenerator extends Generator
             }
         }
         // function not found
-        ctx.addError("ConfiguredAlgorithm.getFunctionCcode",
-                "Function call to missing function! (" + this.toString()
+        ctx.addError(this,
+                "Function call to missing function! (" + logic
                         + ", function name : " + functionName + " )");
         return null;
     }
@@ -227,8 +223,7 @@ public class C_CodeGenerator extends Generator
             List<Element> conditions = logic.getAlgorithmElements(ALGORITHM_IF_CHILD_NAME);
             if(null == conditions)
             {
-                ctx.addError("ConfiguredAlgorithm.findImplementation",
-                        "No Implementation found!");
+                ctx.addError(this, "No Implementation found!");
                 return;
             }
             else
@@ -236,7 +231,7 @@ public class C_CodeGenerator extends Generator
                 Element best = condiEval.getBest(conditions, logic);  // TODO
                 if(null == best)
                 {
-                    ctx.addError("ConfiguredAlgorithm.findImplementation",
+                    ctx.addError(this,
                             "no valid condition!");
                     ctx.addError(this, logic.toString());
                     ctx.addError(this, logic.dumpParameter());
@@ -246,7 +241,7 @@ public class C_CodeGenerator extends Generator
                 cCode = best.getChild(ALGORITHM_C_CODE_CHILD_NAME);
                 if(null == cCode)
                 {
-                    ctx.addError("ConfiguredAlgorithm.findImplementation",
+                    ctx.addError(this,
                             "Valid condition(" + best.toString() + ") did not have an Implementation!");
                     return;
                 }
@@ -271,8 +266,7 @@ public class C_CodeGenerator extends Generator
                 if(false == it.hasNext())
                 {
                     // We need a child to call the function !
-                    ctx.addError("ConfiguredAlgorithm.replacePlaceholders",
-                            "Function call to missing child!");
+                    ctx.addError(this, "Function call to missing child!");
                     return null;
                 }
                 while(it.hasNext())
@@ -294,8 +288,7 @@ public class C_CodeGenerator extends Generator
             findImplementation(logic);
             if(null == cCode)
             {
-                ctx.addError("ConfiguredAlgorithm.addAdditionalsTo",
-                        "No implementation available !");
+                ctx.addError(this, "No implementation available !");
                 return;
             }
         }
