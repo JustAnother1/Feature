@@ -222,7 +222,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
         // required configuration parameters
         List<Element> cfgReq = Requirements.getChildren(REQUIRED_CFG_NAME);
-        LOG.trace("{} required parameters.", cfgReq.size());
+        LOG.trace("{} has {} required parameters.", AlgorithmDefinition, cfgReq.size());
         for(int i = 0; i < cfgReq.size(); i++)
         {
             Element curE = cfgReq.get(i);
@@ -260,7 +260,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
         // required children(algorithms)
         List<Element> algoReq = Requirements.getChildren(REQUIRED_ALGORITHM_NAME);
-        LOG.trace("{} required children.", algoReq.size());
+        LOG.trace("{} has {} required children.", AlgorithmDefinition, algoReq.size());
         for(int i = 0; i < algoReq.size(); i++)
         {
             Element curE = algoReq.get(i);
