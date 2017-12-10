@@ -292,6 +292,7 @@ public class PuzzlerMain
         Project pro = new Project(ctx);
         if(false == pro.getFromFiles())
         {
+            log.error("Failed to open project!");
             ctx.close();
             return;
         }
@@ -300,6 +301,7 @@ public class PuzzlerMain
         Environment e = new Environment(ctx);
         if(false == e.getFromProject(pro))
         {
+            log.error("Failed to open environment!");
             ctx.close();
             return;
         }
@@ -309,6 +311,7 @@ public class PuzzlerMain
         Solution s = new SolutionImpl(ctx);
         if(false == s.getFromProject(pro))
         {
+            log.error("Failed to open solution!");
             ctx.close();
             return;
         }
@@ -317,6 +320,7 @@ public class PuzzlerMain
         // test that all environment References are meet by the environment.
         if(false == s.checkAndTestAgainstEnvironment())
         {
+            log.error("Solution does not match the environment!");
             ctx.close();
             return;
         }
@@ -328,6 +332,7 @@ public class PuzzlerMain
         FileGroup files = gen.generateFor();
         if(null == files)
         {
+            log.error("Failed to generate c source code!");
             ctx.close();
             return;
         }
@@ -336,17 +341,20 @@ public class PuzzlerMain
         files = make.createBuildFor(files);
         if(null == files)
         {
+            log.error("Failed to generate build environment!");
             ctx.close();
             return;
         }
 
         if(false ==files.saveToFolder(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
         {
+            log.error("Failed to save the egnerated files!");
             ctx.close();
             return;
         }
         // success ?
         successful = ctx.wasSucessful();
+        log.info("successful = {}", successful);
         ctx.close();
     }
 
