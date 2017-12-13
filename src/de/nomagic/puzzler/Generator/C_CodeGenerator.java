@@ -34,9 +34,10 @@ public class C_CodeGenerator extends Generator
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
-    private Element cCode = null;
     private ConditionEvaluator condiEval;
     private FileGroup libFiles = new FileGroup();  // TODO this is to add files that the algorithm needs additionally to the code.
+
+    // TODO. right now all code is inlined! Add support for functions (called from different places and distribution of code into separate files.
 
     public C_CodeGenerator(Context ctx)
     {
@@ -61,60 +62,51 @@ public class C_CodeGenerator extends Generator
             return null;
         }
 
-        codeGroup = getCImplementationFor(logic, codeGroup);
-
-        return codeGroup;
-    }
-
-    private FileGroup getCImplementationFor(ConfiguredAlgorithm logic, FileGroup codeGroup)
-    {
+        log.trace("starting to generate the c implementation for {}", logic);
         // we will need at least one *.c file. So create that now.
-        C_File mainC = new C_File("main.c");
-
-        // there should be a file comment explaining what this is
-        mainC.addLines(C_File.C_FILE_FILE_COMMENT_SECTION_NAME,
-                       new String[] {"/*",
-                                     "  automatically created main.c",
-                                     "  created at: " + Tool.curentDateTime(),
-                                     "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
-                                     "*/"});
+        C_File mainC = createFile("main.c");
 
         FileGetter fg = new FileGetter();
         Api api = Api.getFromFile(REQUIRED_ROOT_API, fg, ctx);
 
-        if(false == addCodeToFile(mainC, api, logic))
+        C_File imp = getImplementationFor(api, logic);
+        if(null == imp)
         {
             return null;
         }
+        mainC.addContentsOf(imp);
 
         codeGroup.addAll(libFiles);
         codeGroup.add(mainC);
+
         return codeGroup;
     }
 
-    private boolean addCodeToFile(C_File codeFile, Api api, ConfiguredAlgorithm logic)
+    private C_File getImplementationFor(Api api, ConfiguredAlgorithm logic)
     {
-        // TODO
-        // TODO parse provides
-        // TODO get Implementation from XML
+        log.trace("getting implementation of the {} from {}", api, logic);
+        C_File aFile = new C_File("noname.c");
         Function[] funcs = api.getRequiredFunctions();
         for(int i = 0; i < funcs.length; i++)
         {
             String declaration = funcs[i].getDeclaration();
             declaration = declaration.trim();
-            String implementation = getCImplementationOf(funcs[i].getName(), codeFile, logic);
+            String implementation = getCImplementationOf(funcs[i].getName(), logic);
             if(null == implementation)
             {
-                return false;
+                return null;
             }
-            codeFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME, declaration + ";");
-            codeFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME, declaration + "\n" + implementation);
+            aFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME, declaration + ";");
+            aFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME, declaration + "\n" + implementation);
         }
-        return true;
+        // add additional Stuff
+        aFile.addContentsOf(getAdditionalsFrom(logic));
+        return aFile;
     }
 
-    private String getCImplementationOf(String functionName, C_File codeFile, ConfiguredAlgorithm logic)
+    private String getCImplementationOf(String functionName, ConfiguredAlgorithm logic)
     {
+        log.trace("getting the c implemention of the function {} from {}", functionName, logic);
         String implementation = getFunctionCcode(functionName, logic);
         log.trace("implementation = {}", implementation);
         if(null == implementation)
@@ -122,25 +114,13 @@ public class C_CodeGenerator extends Generator
             return null;
         }
         implementation = implementation.trim();
-        // add additional Stuff
-        addAdditionalsTo(codeFile, logic);
-        // TODO replace all place holders with configuration values
-        // TODO add code from configuredAlgorithms into place holders.
-        implementation = replacePlaceholders(implementation, codeFile, logic);
+        implementation = replacePlaceholders(implementation, logic);
         return implementation;
     }
 
     private String getFunctionCcode(String functionName, ConfiguredAlgorithm logic)
     {
-        if(null == cCode)
-        {
-            findImplementation(logic);
-            if(null == cCode)
-            {
-                ctx.addError(this, "" + logic + " : No implementation available !");
-                return null;
-            }
-        }
+        Element cCode = findImplementation(logic);
         List<Element> funcs = cCode.getChildren(ALGORITHM_FUNCTION_CHILD_NAME);
         String searchedFunctionName = null;
         if(true == functionName.contains("("))
@@ -189,14 +169,14 @@ public class C_CodeGenerator extends Generator
             }
         }
         // function not found
-        ctx.addError(this, "" + logic + " : Function call to missing function! (" + logic
+        ctx.addError(this, "Function call to missing function! (" + logic
                         + ", function name : " + searchedFunctionName + " )");
         return null;
     }
 
-    private void findImplementation(ConfiguredAlgorithm logic)
+    private Element findImplementation(ConfiguredAlgorithm logic)
     {
-        cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
+        Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
         if(null == cCode)
         {
             // the algorithm might have the functions wrapped into if condition tags.
@@ -204,7 +184,7 @@ public class C_CodeGenerator extends Generator
             if(null == conditions)
             {
                 ctx.addError(this, "" + logic + " : No Implementation found!");
-                return;
+                return null;
             }
             else
             {
@@ -216,20 +196,25 @@ public class C_CodeGenerator extends Generator
                     ctx.addError(this, logic.toString());
                     ctx.addError(this, logic.dumpParameter());
                     ctx.addError(this, logic.dumpProperty());
-                    return;
+                    return null;
                 }
                 cCode = best.getChild(ALGORITHM_C_CODE_CHILD_NAME);
                 if(null == cCode)
                 {
                     ctx.addError(this,"" + logic + " : Valid condition(" + best.toString()
                                       + ") did not have an Implementation!");
-                    return;
+                    return null;
                 }
+                return cCode;
             }
+        }
+        else
+        {
+            return cCode;
         }
     }
 
-    private String replacePlaceholders(String implementation, C_File codeFile, ConfiguredAlgorithm logic)
+    private String replacePlaceholders(String implementation, ConfiguredAlgorithm logic)
     {
         StringBuffer res = new StringBuffer();
         String[] parts = implementation.split(IMPLEMENTATION_PLACEHOLDER_REGEX);
@@ -256,66 +241,33 @@ public class C_CodeGenerator extends Generator
                 {
                     String ChildName = it.next();
                     ConfiguredAlgorithm childAlgo = logic.getChild(ChildName);
-                    String impl = getCImplementationOf(functionName, codeFile, childAlgo);
+                    String impl = getCImplementationOf(functionName, childAlgo);
                     if(null == impl)
                     {
                         return null;
                     }
                     res.append(impl);
                 }
-
-
-                /* old:
-                // TODO function is in child of logic
-                // TODO inline function or create new file with function or create function in this file ?
-
-                // parts[i] is function name of child to call
-                Iterator<String> it = logic.getAllChildren();
-                if(false == it.hasNext())
-                {
-                    // We need a child to call the function !
-                    ctx.addError(this, "" + logic + " : Function call to missing child!");
-                    return null;
-                }
-                while(it.hasNext())
-                {
-                    String ChildName = it.next();
-                    ConfiguredAlgorithm childAlgo = logic.getChild(ChildName);
-                    String impl = getCImplementationOf(parts[i], codeFile, childAlgo);
-                    if(null == impl)
-                    {
-                        return null;
-                    }
-                    res.append(impl);
-                }
-                */
             }
         }
         return res.toString();
     }
 
-    private void addAdditionalsTo(C_File codeFile, ConfiguredAlgorithm logic)
+    private C_File getAdditionalsFrom(ConfiguredAlgorithm logic)
     {
-        if(null == cCode)
-        {
-            findImplementation(logic);
-            if(null == cCode)
-            {
-                ctx.addError(this, "" + logic + " : No implementation available !");
-                return;
-            }
-        }
+        Element cCode = findImplementation(logic);
         Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME);
         if(null == additional)
         {
             log.trace("no addionals for algorithm {}", logic);
-            return;
+            return null;
         }
         List<Element> addlist = additional.getChildren();
         if(null == addlist)
         {
-            return;
+            return null;
         }
+        C_File codeFile = new C_File("noname.c");
         for(int i = 0; i < addlist.size(); i++)
         {
             Element curElement = addlist.get(i);
@@ -339,9 +291,23 @@ public class C_CodeGenerator extends Generator
                 break;
             }
         }
+        return codeFile;
     }
 
 
+    private C_File createFile(String fileName)
+    {
+        C_File aFile = new C_File(fileName);
+
+        // there should be a file comment explaining what this is
+        aFile.addLines(C_File.C_FILE_FILE_COMMENT_SECTION_NAME,
+                       new String[] {"/*",
+                                     "  automatically created " + fileName,
+                                     "  created at: " + Tool.curentDateTime(),
+                                     "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
+                                     "*/"});
+        return aFile;
+    }
 
 }
 ;

@@ -11,7 +11,21 @@ import de.nomagic.puzzler.Library;
 
 public class Api extends Base
 {
+    public final static String API_NAME_ATTRIBUTE_NAME = "name";
     public final static String API_FUNCTION_ELEMENT_NAME = "function";
+
+    @Override
+    public String toString()
+    {
+        if(null != root)
+        {
+            return "Api " + root.getAttributeValue(API_NAME_ATTRIBUTE_NAME);
+        }
+        else
+        {
+            return "invalid Api";
+        }
+    }
 
     private Element root = null;
 

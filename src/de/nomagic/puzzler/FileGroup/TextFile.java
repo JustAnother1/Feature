@@ -14,7 +14,7 @@ public class TextFile extends AbstractFile
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     private HashMap<String, Vector<String>> sectionData = new HashMap<String,Vector<String>>();
-    private Vector<String> sections = new Vector<String>();
+    protected Vector<String> sections = new Vector<String>();
     private boolean addSeperation = false;
 
     public TextFile(String filename)
@@ -85,6 +85,29 @@ public class TextFile extends AbstractFile
     public void separateSectionWithEmptyLine(boolean b)
     {
         addSeperation = b;
+    }
+
+    public String[] getSectionLines(String sectionName)
+    {
+        Vector<String> sect = sectionData.get(sectionName);
+        if(null == sect)
+        {
+            return new String[0];
+        }
+        else
+        {
+            return sect.toArray(new String[0]);
+        }
+    }
+
+    public void addContentsOf(C_File otherFile)
+    {
+        for(int i = 0; i < otherFile.sections.size(); i++)
+        {
+            String secName = otherFile.sections.get(i);
+            String[] secLines = otherFile.getSectionLines(secName);
+            this.addLines(secName, secLines);
+        }
     }
 
 }
