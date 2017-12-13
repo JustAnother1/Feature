@@ -13,7 +13,7 @@ import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Project;
 
-public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface, AlgorithmInformaton
+public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface
 {
     public final static String REQUIRED_CFG_NAME = "parameter";
     public final static String REQUIRED_CFG_ATTRIBUTE_NAME = "ref";
@@ -193,7 +193,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                                 "Failed Tree resolve for " + nextAlgo.getName() + " !");
                 return null;
             }
-            res.addAlgorithm(nextCfgAlgo);
+            res.addChild(nextCfgAlgo);
         }
 
         if(false == res.allRequiredDataAvailable())
@@ -273,7 +273,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                 return false;
             }
             boolean found = false;
-            Iterator<String> it = getAllAlgorithms();
+            Iterator<String> it = getAllChildren();
             while(it.hasNext())
             {
                 ConfiguredAlgorithm curAlgo = cfgAlgorithms.get(it.next());
@@ -338,7 +338,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         cfgAttributes.put(curAttribute.getName(), curAttribute);
     }
 
-    public void addAlgorithm(ConfiguredAlgorithm algo)
+    public void addChild(ConfiguredAlgorithm algo)
     {
         if(null != algo)
         {
@@ -346,12 +346,12 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         }
     }
 
-    public ConfiguredAlgorithm getAlgorithm(String Name)
+    public ConfiguredAlgorithm getChild(String Name)
     {
         return cfgAlgorithms.get(Name);
     }
 
-    public Iterator<String> getAllAlgorithms()
+    public Iterator<String> getAllChildren()
     {
         return cfgAlgorithms.keySet().iterator();
     }

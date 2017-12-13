@@ -40,7 +40,7 @@ public class ConditionEvaluator extends Base
         super(ctx);
     }
 
-    public Element getBest(List<Element> conditions, AlgorithmInformaton algo)
+    public Element getBest(List<Element> conditions, AlgorithmInstanceInterface algo)
     {
         if( (null == conditions) || (null == algo) )
         {
@@ -86,7 +86,7 @@ public class ConditionEvaluator extends Base
         return conditions.get(0);
     }
 
-    private String evaluateFunction(String Word, AlgorithmInformaton algo)
+    private String evaluateFunction(String Word, AlgorithmInstanceInterface algo)
     {
         int index_opening_brace = Word.indexOf('(');
         int index_closing_brace = Word.indexOf(')');
@@ -211,7 +211,7 @@ public class ConditionEvaluator extends Base
      * @param conditionText
      * @return
      */
-    private String evaluate_Word(String Word, AlgorithmInformaton algo)
+    private String evaluate_Word(String Word, AlgorithmInstanceInterface algo)
     {
         // constants
         if(KEY_TRUE.equals(Word))
@@ -278,7 +278,7 @@ public class ConditionEvaluator extends Base
         return false;
     }
 
-    private String evaluateConditionText(String conditionText, AlgorithmInformaton algo)
+    private String evaluateConditionText(String conditionText, AlgorithmInstanceInterface algo)
     {
         // parse condition
         String[] parts = conditionText.split("\\s"); // all whitespace splits
@@ -332,7 +332,7 @@ public class ConditionEvaluator extends Base
         return result;
     }
 
-    private String evaluateFunction(String function, String first, String second, AlgorithmInformaton algo)
+    private String evaluateFunction(String function, String first, String second, AlgorithmInstanceInterface algo)
     {
         int one;
         int two;
@@ -456,7 +456,7 @@ public class ConditionEvaluator extends Base
         }
     }
 
-    public String evaluateConditionParenthesis(String condition, AlgorithmInformaton algo)
+    public String evaluateConditionParenthesis(String condition, AlgorithmInstanceInterface algo)
     {
         if( (null == condition) || (null == algo) )
         {

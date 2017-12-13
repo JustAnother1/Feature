@@ -37,6 +37,7 @@ import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.Generator.C_CodeGenerator;
 import de.nomagic.puzzler.Generator.Generator;
 import de.nomagic.puzzler.configuration.Configuration;
+import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
 import de.nomagic.puzzler.solution.Solution;
 import de.nomagic.puzzler.solution.SolutionImpl;
 
@@ -329,7 +330,7 @@ public class PuzzlerMain
         // create "code creator" back end (creates the C Source Code)
         Generator gen = new C_CodeGenerator(ctx);
         // give solution to code creator to create code project
-        FileGroup files = gen.generateFor();
+        FileGroup files = gen.generateFor(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         if(null == files)
         {
             log.error("Failed to generate c source code!");

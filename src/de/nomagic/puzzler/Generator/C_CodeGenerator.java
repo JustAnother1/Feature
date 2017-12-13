@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Tool;
-import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.C_File;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
@@ -35,9 +34,9 @@ public class C_CodeGenerator extends Generator
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
-    private FileGroup libFiles = null;
     private Element cCode = null;
     private ConditionEvaluator condiEval;
+    private FileGroup libFiles = new FileGroup();  // TODO this is to add files that the algorithm needs additionally to the code.
 
     public C_CodeGenerator(Context ctx)
     {
@@ -45,12 +44,9 @@ public class C_CodeGenerator extends Generator
         condiEval = new ConditionEvaluator(ctx);
     }
 
-    public FileGroup generateFor()
+    public FileGroup generateFor(ConfiguredAlgorithm logic)
     {
         FileGroup codeGroup = new FileGroup();
-
-        // create configured Algorithm Tree
-        ConfiguredAlgorithm logic = ConfiguredAlgorithm.getTreeFrom(ctx, null);
 
         if(null == logic)
         {
@@ -61,7 +57,7 @@ public class C_CodeGenerator extends Generator
         if(false == logic.hasApi(REQUIRED_ROOT_API))
         {
             log.trace("root: {}", logic);
-            ctx.addError(this, "" + logic + " : Root element of the solution is not an program entry point !");
+            ctx.addError(this, "" + logic + " : Root element of the solution is not an " + REQUIRED_ROOT_API + " !");
             return null;
         }
 
@@ -91,27 +87,9 @@ public class C_CodeGenerator extends Generator
             return null;
         }
 
-        FileGroup newCodeFiles = getAdditionalFiles();
-        if(null != newCodeFiles)
-        {
-            codeGroup.addAll(newCodeFiles);
-        }
+        codeGroup.addAll(libFiles);
         codeGroup.add(mainC);
         return codeGroup;
-    }
-
-    private void addCodeFile(AbstractFile additionalFile)  // TODO remove?
-    {
-        if(null == libFiles)
-        {
-            libFiles = new FileGroup();
-        }
-        libFiles.add(additionalFile);
-    }
-
-    private FileGroup getAdditionalFiles()
-    {
-        return libFiles;
     }
 
     private boolean addCodeToFile(C_File codeFile, Api api, ConfiguredAlgorithm logic)
@@ -138,6 +116,7 @@ public class C_CodeGenerator extends Generator
     private String getCImplementationOf(String functionName, C_File codeFile, ConfiguredAlgorithm logic)
     {
         String implementation = getFunctionCcode(functionName, logic);
+        log.trace("implementation = {}", implementation);
         if(null == implementation)
         {
             return null;
@@ -182,10 +161,12 @@ public class C_CodeGenerator extends Generator
             ctx.addError(this, "" + logic + " : Function call to unnamed function!");
             return null;
         }
+        log.trace("func.size() : {}", funcs.size());
         for(int i = 0; i < funcs.size(); i++)
         {
             Element curElement = funcs.get(i);
             String name = curElement.getAttributeValue(ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME);
+            log.trace("func.name : {}", name);
             if(true == searchedFunctionName.equals(name))
             {
                  List<Element> cond = curElement.getChildren(ALGORITHM_IF_CHILD_NAME);
@@ -209,7 +190,7 @@ public class C_CodeGenerator extends Generator
         }
         // function not found
         ctx.addError(this, "" + logic + " : Function call to missing function! (" + logic
-                        + ", function name : " + functionName + " )");
+                        + ", function name : " + searchedFunctionName + " )");
         return null;
     }
 
@@ -260,8 +241,11 @@ public class C_CodeGenerator extends Generator
             }
             else
             {
-                // parts[i] is function name of child to call
-                Iterator<String> it = logic.getAllAlgorithms();
+                // we found a reference to a function name
+                String functionName = parts[i];
+                // we now need to make sure that that function exists an can be called.
+                // we therefore need to extract the function out of the children of this algorithm
+                Iterator<String> it = logic.getAllChildren();
                 if(false == it.hasNext())
                 {
                     // We need a child to call the function !
@@ -271,10 +255,40 @@ public class C_CodeGenerator extends Generator
                 while(it.hasNext())
                 {
                     String ChildName = it.next();
-                    ConfiguredAlgorithm childAlgo = logic.getAlgorithm(ChildName);
-                    String impl = getCImplementationOf(parts[i], codeFile, childAlgo);
+                    ConfiguredAlgorithm childAlgo = logic.getChild(ChildName);
+                    String impl = getCImplementationOf(functionName, codeFile, childAlgo);
+                    if(null == impl)
+                    {
+                        return null;
+                    }
                     res.append(impl);
                 }
+
+
+                /* old:
+                // TODO function is in child of logic
+                // TODO inline function or create new file with function or create function in this file ?
+
+                // parts[i] is function name of child to call
+                Iterator<String> it = logic.getAllChildren();
+                if(false == it.hasNext())
+                {
+                    // We need a child to call the function !
+                    ctx.addError(this, "" + logic + " : Function call to missing child!");
+                    return null;
+                }
+                while(it.hasNext())
+                {
+                    String ChildName = it.next();
+                    ConfiguredAlgorithm childAlgo = logic.getChild(ChildName);
+                    String impl = getCImplementationOf(parts[i], codeFile, childAlgo);
+                    if(null == impl)
+                    {
+                        return null;
+                    }
+                    res.append(impl);
+                }
+                */
             }
         }
         return res.toString();

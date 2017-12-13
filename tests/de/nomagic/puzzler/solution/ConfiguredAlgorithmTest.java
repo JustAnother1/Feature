@@ -182,7 +182,7 @@ public class ConfiguredAlgorithmTest
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
-        dut.addAlgorithm(null);
+        dut.addChild(null);
     }
 
     @Test
@@ -190,7 +190,7 @@ public class ConfiguredAlgorithmTest
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
-        dut.addAlgorithm(dut);
+        dut.addChild(dut);
     }
 
     @Test
@@ -198,7 +198,7 @@ public class ConfiguredAlgorithmTest
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
-        assertNull(dut.getAlgorithm("bla"));
+        assertNull(dut.getChild("bla"));
     }
 
     @Test
@@ -206,8 +206,8 @@ public class ConfiguredAlgorithmTest
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         ConfiguredAlgorithm algo = new ConfiguredAlgorithm("algo", null, null, null);
-        dut.addAlgorithm(algo);
-        assertNull(dut.getAlgorithm("bla"));
+        dut.addChild(algo);
+        assertNull(dut.getChild("bla"));
     }
 
     @Test
@@ -215,8 +215,8 @@ public class ConfiguredAlgorithmTest
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         ConfiguredAlgorithm algo = new ConfiguredAlgorithm("bla", null, null, null);
-        dut.addAlgorithm(algo);
-        assertSame(algo, dut.getAlgorithm("bla"));
+        dut.addChild(algo);
+        assertSame(algo, dut.getChild("bla"));
     }
 
     @Test
@@ -224,7 +224,7 @@ public class ConfiguredAlgorithmTest
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
-        Iterator<String> it = dut.getAllAlgorithms();
+        Iterator<String> it = dut.getAllChildren();
         assertNotNull(it);
         assertFalse(it.hasNext());
     }
@@ -235,8 +235,8 @@ public class ConfiguredAlgorithmTest
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
         ConfiguredAlgorithm algo = new ConfiguredAlgorithm("algo", null, null, null);
-        dut.addAlgorithm(algo);
-        Iterator<String> it = dut.getAllAlgorithms();
+        dut.addChild(algo);
+        Iterator<String> it = dut.getAllChildren();
         assertNotNull(it);
         assertTrue(it.hasNext());
         assertEquals("algo", it.next());
@@ -249,10 +249,10 @@ public class ConfiguredAlgorithmTest
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
         ConfiguredAlgorithm algo = new ConfiguredAlgorithm("algo", null, null, null);
-        dut.addAlgorithm(algo);
+        dut.addChild(algo);
         ConfiguredAlgorithm algo2 = new ConfiguredAlgorithm("algo2", null, null, null);
-        dut.addAlgorithm(algo2);
-        Iterator<String> it = dut.getAllAlgorithms();
+        dut.addChild(algo2);
+        Iterator<String> it = dut.getAllChildren();
         assertNotNull(it);
         assertTrue(it.hasNext());
         assertEquals("algo2", it.next());
