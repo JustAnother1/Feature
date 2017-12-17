@@ -102,6 +102,14 @@ public class TextFile extends AbstractFile
 
     public void addContentsOf(C_File otherFile)
     {
+        if(null == otherFile)
+        {
+            return;
+        }
+        if(null == otherFile.sections)
+        {
+            return;
+        }
         for(int i = 0; i < otherFile.sections.size(); i++)
         {
             String secName = otherFile.sections.get(i);

@@ -14,13 +14,12 @@ Algorithm files are xml files. The root element is a "algorithm" element.
 === algorithm element
 ==== Attributes
 The attribute "name" defines the name of the attribute. The name is also part of the filename.
-The attribute "api" defines the Interfaces that the algorithm fulfils. Each Interface is defined in a API File. For details see the API File Format definition.
+The attribute "api" defines the Interfaces that the algorithm fulfills. Each Interface is defined in a API File. For details see the API File Format definition.
 
 ==== child elements
 The algorithm element may have a "required" element.
 The algorithm element may have a "provides" element.
-The algorithm element must have function elements for all functions defined in the apis listed in the "api" attribute.
-All child elements may be wrapped in "if" elements.
+The algorithm element may have a "c_code" element.
 
 === provides element
 ==== Attributes
@@ -61,14 +60,29 @@ The attribute "ref" defines the name of a parameter that need to be given to thi
 None.
 
 
+=== c_code element
+The c_code element must have function elements for all functions defined in the apis listed in the "api" attribute.
+
+==== Attributes
+None
+
+==== child elements
+Function elements for all functions defined in the apis.
+
 
 === function element
 ==== Attributes
 The attribute "name" defines the name of the function.The function must be a part of an Interface that this algorithm implements. Each Interface is defined in a API File. For details see the API File Format definition.
+The attribute param0_type defines the data type of the first parameter.
+The attribute param0_name defines the name of the first parameter.
+The attribute param1_type defines the data type of the second parameter.
+The attribute param1_name defines the name of the second parameter.
+The attribute param2_type defines the data type of the third parameter.
+The attribute param2_name defines the name of the third parameter.
+...
 
 ==== child elements
-The function element may have a "c_code" element.
-
+child elements  are either if elements or a CDATA section that contains the code.
 
 
 === if element
@@ -76,15 +90,8 @@ The function element may have a "c_code" element.
 The attribute "cond" defines the condition of the if element. If the condition is true then the child is used as if it was in the location of the if element. If the condition is false then the child element is not used.
 
 ==== child elements
-the if element is a wrapper therefore the child elements must be of the type that is allowed wherever the if element has been used.
-
-
-=== c_code element
-==== Attributes
-None
-
-==== child elements
 The content is a CDATA section that contains C-Code that implement the function. This C-Code also contains markers. These markers define locations in the code where c_code of child elements will be added.
+
 
 
 == Example
@@ -97,10 +104,11 @@ The content is a CDATA section that contains C-Code that implement the function.
     <childElement type="run" />
   </required>
   <provides>
-    <singleTask type="bool" value="1==numOfChild"/>
+    <singleTask type="bool" value="1 == numOfChild"/>
   </provides>
-  <function name="main">
-    <c_code>
+  <c_code>
+    <function name="main">
+     <if cond="true equals singleTask">
       <![CDATA[{
   $$$initialize$$$
   for(;;)
@@ -108,7 +116,17 @@ The content is a CDATA section that contains C-Code that implement the function.
     $$$execute$$$
   }
 }]]>
-    </c_code>
-  </function>
+      </if>
+      <if cond="false equals singleTask">
+        <![CDATA[{
+  $$$initialize$$$
+  for(;;)
+  {
+    $$$execute$$$
+  }
+}]]>
+      </if>
+    </function>
+  </c_code>
 </algorithm>
 ----

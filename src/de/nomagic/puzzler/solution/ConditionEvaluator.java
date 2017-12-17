@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,9 @@ public class ConditionEvaluator extends Base
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
     private boolean valid;
+    private AlgorithmInstanceInterface algo;
+    private String functionArguments;
+    private Element function;
 
 
     public ConditionEvaluator(Context ctx)
@@ -40,7 +44,10 @@ public class ConditionEvaluator extends Base
         super(ctx);
     }
 
-    public Element getBest(List<Element> conditions, AlgorithmInstanceInterface algo)
+    public Element getBest(List<Element> conditions,
+                           AlgorithmInstanceInterface algo,
+                           String functionArguments,
+                           Element function)
     {
         if( (null == conditions) || (null == algo) )
         {
@@ -51,6 +58,9 @@ public class ConditionEvaluator extends Base
             return null;
         }
         valid = true;
+        this.functionArguments = functionArguments;
+        this.function = function;
+        this.algo = algo;
 
         // check condition
         Vector<Element> valids = new Vector<Element>();
@@ -60,7 +70,7 @@ public class ConditionEvaluator extends Base
             Element curE = it.next();
             String conditionText = curE.getAttributeValue(CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME);
             log.trace("evaluating condition {}", conditionText);
-            if(true == KEY_TRUE.equals(evaluateConditionParenthesis(conditionText, algo)))
+            if(true == KEY_TRUE.equals(evaluateConditionParenthesis(conditionText, algo, functionArguments, function)))
             {
                 valids.add(curE);
             }
@@ -86,7 +96,97 @@ public class ConditionEvaluator extends Base
         return conditions.get(0);
     }
 
-    private String evaluateFunction(String Word, AlgorithmInstanceInterface algo)
+    public String evaluateConditionParenthesis(
+            String condition,
+            AlgorithmInstanceInterface algo,
+            String functionArguments,
+            Element function)
+    {
+        if( (null == condition) || (null == algo) )
+        {
+            return KEY_FALSE;
+        }
+        this.functionArguments = functionArguments;
+        this.function = function;
+        this.algo = algo;
+        if(false == condition.contains("("))
+        {
+            return evaluateConditionText(condition);
+        }
+        else
+        {
+            int num_openP = 0;
+            Vector<StringBuffer> sections = new Vector<StringBuffer>();
+            StringBuffer curSection = new StringBuffer();
+            sections.add(curSection);
+
+            for(int i = 0; i < condition.length(); i++)
+            {
+                char c = condition.charAt(i);
+                switch(c)
+                {
+                case '(':
+                    curSection.append(c);
+                    num_openP ++;
+
+                    try
+                    {
+                        sections.remove(num_openP);
+                    }
+                    catch(ArrayIndexOutOfBoundsException e)
+                    {
+                        // element does not exist
+                        // -> no need to delete it
+                        // -> we are done here
+                    }
+                    curSection = new StringBuffer();
+                    sections.add(curSection);
+                    break;
+
+                case ')':
+                    if(0 == num_openP)
+                    {
+                        valid = false;
+                        ctx.addError("ConditionEvaluation",
+                                "Parenthesis mismatch in condition : " + condition);
+                        return KEY_FALSE;
+                    }
+                    // else:
+                    String sectionResult = evaluateConditionText(curSection.toString());
+                    sections.remove(num_openP);
+                    num_openP--;
+                    curSection = sections.get(num_openP);
+                    curSection.append(sectionResult);
+                    curSection.append(")");
+                    break;
+
+                default:
+                    curSection.append(c);
+                    break;
+                }
+            }
+            // we parsed all the chars in the condition
+            // so first some sanity checks
+            if(0 != num_openP)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "Parenthesis mismatch at end of condition : " + condition);
+                return KEY_FALSE;
+            }
+            if(1 != sections.size())
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "Parenthesis Section mismatch at end of condition : " + condition);
+                return KEY_FALSE;
+            }
+            StringBuffer ResultSection = sections.get(0);
+            return evaluateConditionText(ResultSection.toString());
+        }
+    }
+
+    private String evaluateFunction(String Word)
     {
         int index_opening_brace = Word.indexOf('(');
         int index_closing_brace = Word.indexOf(')');
@@ -95,7 +195,7 @@ public class ConditionEvaluator extends Base
         if(1 > functionName.length())
         {
             // just additional braces -> remove those and evaluate the rest
-            return  evaluate_Word(parameter, algo);  // Caution : Recursion! So don't over do it with the unneeded braces!
+            return  evaluate_Word(parameter);  // Caution : Recursion! So don't over do it with the unneeded braces!
         }
         switch(functionName)
         {
@@ -167,18 +267,33 @@ public class ConditionEvaluator extends Base
                 return KEY_FALSE;
             }
             // If not then evaluate now
-            String paramValue = algo.getParameter(parameter);
-            if(null == paramValue)
+            log.trace("parameter is {}", parameter);
+            String value = getParameter(parameter);
+            log.trace("parameter value is {}", value);
+            if(null == value)
             {
                 // there is something wrong here
                 valid = false;
                 ctx.addError("ConditionEvaluation",
                         "unknown parameter : " + parameter);
+                ctx.addError("ConditionEvaluation",
+                        algo.dumpParameter());
+                ctx.addError("ConditionEvaluation",
+                        algo.toString());
                 return KEY_FALSE;
             }
             else
             {
-                return paramValue;
+                if(KEY_TRUE.equals(value))
+                {
+                    return KEY_TRUE;
+                }
+                if(KEY_FALSE.equals(value))
+                {
+                    return KEY_FALSE;
+                }
+                log.trace("unparseable parameter value: {}", value);
+                return value;
             }
 
         default:
@@ -188,6 +303,49 @@ public class ConditionEvaluator extends Base
                     "unknown function : '" + functionName  + "' in '" + Word + "'");
             return KEY_FALSE;
         }
+    }
+
+    private String getParameter(String name)
+    {
+        if(null == name)
+        {
+            ctx.addError(this, "could not get parameter value: name is null!");
+            return null;
+        }
+        if(null == function)
+        {
+            ctx.addError(this, "could not get parameter value: function element is null!");
+            return null;
+        }
+        if(null == functionArguments)
+        {
+            ctx.addError(this, "could not get parameter value: function arguments are null!");
+            return null;
+        }
+        int i = 0;
+        String paramName = null;
+        do
+        {
+            Attribute att = function.getAttribute("param" + i + "_name");
+            if(null != att)
+            {
+                paramName = att.getValue();
+                if(null != paramName)
+                {
+                    if(true == name.equals(paramName))
+                    {
+                        // i is the parameter index (0, 1, 2,.. )
+                        String[] arguments = functionArguments.split(",");
+                        if(i < arguments.length)
+                        {
+                            return arguments[i];
+                        }
+                    }
+                }
+            }
+        }while(paramName != null);
+        // Parameter with that name was not found
+        return null;
     }
 
     /**
@@ -211,7 +369,7 @@ public class ConditionEvaluator extends Base
      * @param conditionText
      * @return
      */
-    private String evaluate_Word(String Word, AlgorithmInstanceInterface algo)
+    private String evaluate_Word(String Word)
     {
         // constants
         if(KEY_TRUE.equals(Word))
@@ -226,7 +384,7 @@ public class ConditionEvaluator extends Base
         // functions
         if((true == Word.contains("(")) && (true == Word.contains(")")))
         {
-            return evaluateFunction(Word, algo);
+            return evaluateFunction(Word);
         }
 
         //configuration Attributes
@@ -278,7 +436,7 @@ public class ConditionEvaluator extends Base
         return false;
     }
 
-    private String evaluateConditionText(String conditionText, AlgorithmInstanceInterface algo)
+    private String evaluateConditionText(String conditionText)
     {
         // parse condition
         String[] parts = conditionText.split("\\s"); // all whitespace splits
@@ -299,7 +457,7 @@ public class ConditionEvaluator extends Base
             {
                 if(i+1 < parts.length)
                 {
-                    first = evaluateFunction(curPart, first, parts[i+1], algo);
+                    first = evaluateFunction(curPart, first, parts[i+1]);
                     i++;
                 }
                 else
@@ -328,16 +486,16 @@ public class ConditionEvaluator extends Base
             }
         }
         // finish up
-        String result = evaluate_Word(first, algo);
+        String result = evaluate_Word(first);
         return result;
     }
 
-    private String evaluateFunction(String function, String first, String second, AlgorithmInstanceInterface algo)
+    private String evaluateFunction(String function, String first, String second)
     {
         int one;
         int two;
-        String valOne = evaluate_Word(first, algo);
-        String valTwo = evaluate_Word(second, algo);
+        String valOne = evaluate_Word(first);
+        String valTwo = evaluate_Word(second);
         switch(function)
         {
         case KEY_AND:
@@ -453,89 +611,6 @@ public class ConditionEvaluator extends Base
             ctx.addError("ConditionEvaluation",
                     "invalid function : " + function);
             return KEY_FALSE;
-        }
-    }
-
-    public String evaluateConditionParenthesis(String condition, AlgorithmInstanceInterface algo)
-    {
-        if( (null == condition) || (null == algo) )
-        {
-            return KEY_FALSE;
-        }
-        if(false == condition.contains("("))
-        {
-            return evaluateConditionText(condition, algo);
-        }
-        else
-        {
-            int num_openP = 0;
-            Vector<StringBuffer> sections = new Vector<StringBuffer>();
-            StringBuffer curSection = new StringBuffer();
-            sections.add(curSection);
-
-            for(int i = 0; i < condition.length(); i++)
-            {
-                char c = condition.charAt(i);
-                switch(c)
-                {
-                case '(':
-                    curSection.append(c);
-                    num_openP ++;
-
-                    try
-                    {
-                        sections.remove(num_openP);
-                    }
-                    catch(ArrayIndexOutOfBoundsException e)
-                    {
-                        // element does not exist
-                        // -> no need to delete it
-                        // -> we are done here
-                    }
-                    curSection = new StringBuffer();
-                    sections.add(curSection);
-                    break;
-
-                case ')':
-                    if(0 == num_openP)
-                    {
-                        valid = false;
-                        ctx.addError("ConditionEvaluation",
-                                "Parenthesis mismatch in condition : " + condition);
-                        return KEY_FALSE;
-                    }
-                    // else:
-                    String sectionResult = evaluateConditionText(curSection.toString(), algo);
-                    sections.remove(num_openP);
-                    num_openP--;
-                    curSection = sections.get(num_openP);
-                    curSection.append(sectionResult);
-                    curSection.append(")");
-                    break;
-
-                default:
-                    curSection.append(c);
-                    break;
-                }
-            }
-            // we parsed all the chars in the condition
-            // so first some sanity checks
-            if(0 != num_openP)
-            {
-                valid = false;
-                ctx.addError("ConditionEvaluation",
-                        "Parenthesis mismatch at end of condition : " + condition);
-                return KEY_FALSE;
-            }
-            if(1 != sections.size())
-            {
-                valid = false;
-                ctx.addError("ConditionEvaluation",
-                        "Parenthesis Section mismatch at end of condition : " + condition);
-                return KEY_FALSE;
-            }
-            StringBuffer ResultSection = sections.get(0);
-            return evaluateConditionText(ResultSection.toString(), algo);
         }
     }
 

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.jdom2.Element;
+import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,6 @@ public class C_CodeGenerator extends Generator
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     private ConditionEvaluator condiEval;
-    private FileGroup libFiles = new FileGroup();  // TODO this is to add files that the algorithm needs additionally to the code.
 
     // TODO. right now all code is inlined! Add support for functions (called from different places and distribution of code into separate files.
 
@@ -76,7 +76,6 @@ public class C_CodeGenerator extends Generator
         }
         mainC.addContentsOf(imp);
 
-        codeGroup.addAll(libFiles);
         codeGroup.add(mainC);
 
         return codeGroup;
@@ -108,7 +107,7 @@ public class C_CodeGenerator extends Generator
     {
         log.trace("getting the c implemention of the function {} from {}", functionName, logic);
         String implementation = getFunctionCcode(functionName, logic);
-        log.trace("implementation = {}", implementation);
+        // log.trace("implementation = {}", implementation);
         if(null == implementation)
         {
             return null;
@@ -118,14 +117,45 @@ public class C_CodeGenerator extends Generator
         return implementation;
     }
 
+    private String getImplementationFromFunctionElment(Element function, String FunctionArguments, ConfiguredAlgorithm logic)
+    {
+        // the algorithm might have the functions wrapped into if condition tags.
+        List<Element> cond = function.getChildren(ALGORITHM_IF_CHILD_NAME);
+        if((null == cond) || (true == cond.isEmpty()))
+        {
+            // No conditions -> only implementation
+            return function.getText();
+        }
+        else
+        {
+            // multiple variants with conditions -> find the best one
+            Element best = condiEval.getBest(cond, logic, FunctionArguments, function);
+            if(null == best)
+            {
+                // function not found
+                ctx.addError(this, "" + logic + " : no valid condition found!");
+                ctx.addError(this, logic.toString());
+                ctx.addError(this, logic.dumpParameter());
+                ctx.addError(this, logic.dumpProperty());
+                if(true == log.isTraceEnabled())
+                {
+                    XMLOutputter xmlOut = new XMLOutputter();
+                    log.trace(xmlOut.outputString(function));
+                }
+                return null;
+            }
+            return best.getText();
+        }
+    }
+
     private String getFunctionCcode(String functionName, ConfiguredAlgorithm logic)
     {
-        Element cCode = findImplementation(logic);
-        List<Element> funcs = cCode.getChildren(ALGORITHM_FUNCTION_CHILD_NAME);
         String searchedFunctionName = null;
+        String FunctionArguments = null;
         if(true == functionName.contains("("))
         {
             searchedFunctionName = functionName.substring(0, functionName.indexOf('('));
+            FunctionArguments = functionName.substring(functionName.indexOf('(') + 1, functionName.lastIndexOf(')'));
         }
         else
         {
@@ -141,77 +171,36 @@ public class C_CodeGenerator extends Generator
             ctx.addError(this, "" + logic + " : Function call to unnamed function!");
             return null;
         }
+
+        // Element cCode = getFunctionElment(searchedFunctionName, logic);
+
+        Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
+        if(null == cCode)
+        {
+            ctx.addError(this,
+                "Could not read implementation for " + functionName +
+                " from " + logic.toString());
+            return null;
+        }
+
+        List<Element> funcs = cCode.getChildren(ALGORITHM_FUNCTION_CHILD_NAME);
         log.trace("func.size() : {}", funcs.size());
         for(int i = 0; i < funcs.size(); i++)
         {
+            // check all functions
             Element curElement = funcs.get(i);
             String name = curElement.getAttributeValue(ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME);
             log.trace("func.name : {}", name);
             if(true == searchedFunctionName.equals(name))
             {
-                 List<Element> cond = curElement.getChildren(ALGORITHM_IF_CHILD_NAME);
-                if((null == cond) || (true == cond.isEmpty()))
-                {
-                    // TODO handle parameter in function
-                    return curElement.getText();
-                }
-                else
-                {
-                    Element best = condiEval.getBest(cond, logic); // TODO
-                    if(null == best)
-                    {
-                        // function not found
-                        ctx.addError(this, "" + logic + " : no valid condition found!");
-                        return null;
-                    }
-                    return best.getText();
-                }
+                // found the correct function
+                return getImplementationFromFunctionElment(curElement, FunctionArguments, logic);
             }
         }
         // function not found
         ctx.addError(this, "Function call to missing function! (" + logic
                         + ", function name : " + searchedFunctionName + " )");
         return null;
-    }
-
-    private Element findImplementation(ConfiguredAlgorithm logic)
-    {
-        Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
-        if(null == cCode)
-        {
-            // the algorithm might have the functions wrapped into if condition tags.
-            List<Element> conditions = logic.getAlgorithmElements(ALGORITHM_IF_CHILD_NAME);
-            if(null == conditions)
-            {
-                ctx.addError(this, "" + logic + " : No Implementation found!");
-                return null;
-            }
-            else
-            {
-                Element best = condiEval.getBest(conditions, logic);  // TODO
-                if(null == best)
-                {
-                    ctx.addError(this,
-                            "" + logic + " : no valid condition!");
-                    ctx.addError(this, logic.toString());
-                    ctx.addError(this, logic.dumpParameter());
-                    ctx.addError(this, logic.dumpProperty());
-                    return null;
-                }
-                cCode = best.getChild(ALGORITHM_C_CODE_CHILD_NAME);
-                if(null == cCode)
-                {
-                    ctx.addError(this,"" + logic + " : Valid condition(" + best.toString()
-                                      + ") did not have an Implementation!");
-                    return null;
-                }
-                return cCode;
-            }
-        }
-        else
-        {
-            return cCode;
-        }
     }
 
     private String replacePlaceholders(String implementation, ConfiguredAlgorithm logic)
@@ -234,7 +223,7 @@ public class C_CodeGenerator extends Generator
                 if(false == it.hasNext())
                 {
                     // We need a child to call the function !
-                    ctx.addError(this, "" + logic + " : Function call to missing child!");
+                    ctx.addError(this, "" + logic + " : Function call to missing child (" + functionName + ") !");
                     return null;
                 }
                 while(it.hasNext())
@@ -255,7 +244,13 @@ public class C_CodeGenerator extends Generator
 
     private C_File getAdditionalsFrom(ConfiguredAlgorithm logic)
     {
-        Element cCode = findImplementation(logic);
+        Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
+        if(null == cCode)
+        {
+            ctx.addError(this,
+                "Could not read implementation from " + logic.toString());
+            return null;
+        }
         Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME);
         if(null == additional)
         {
@@ -265,6 +260,7 @@ public class C_CodeGenerator extends Generator
         List<Element> addlist = additional.getChildren();
         if(null == addlist)
         {
+            log.trace("empty addionals tag for algorithm {}", logic);
             return null;
         }
         C_File codeFile = new C_File("noname.c");
@@ -288,6 +284,7 @@ public class C_CodeGenerator extends Generator
                 break;
 
             default: // ignore
+                log.warn("invalid type {} for algorithm {}", type, logic);
                 break;
             }
         }

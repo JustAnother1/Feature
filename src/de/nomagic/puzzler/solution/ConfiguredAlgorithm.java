@@ -308,7 +308,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                 String propertyValue = curE.getAttributeValue(ALGORITHM_PROVIDES_PROPERTY_VALUE);
                 LOG.trace("Property {} : {}", propertyName, propertyValue);
                 // evaluate PropertyValue
-                propertyValue = condiEval.evaluateConditionParenthesis(propertyValue, this);
+                propertyValue = condiEval.evaluateConditionParenthesis(propertyValue, this, null, null);
                 properties.put(propertyName, propertyValue);
             }
         }

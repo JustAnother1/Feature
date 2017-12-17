@@ -9,18 +9,32 @@
 
   <c_code>
     <function  name="initialize">
-      <![CDATA[/*init code for gpio TODO*/]]>
+      <![CDATA[
+        RCC->AHB1ENR |= D_IN_5_RCC_GPIO_ENABLE;
+        D_IN_5_GPIO_PORT->MODER   &= ~D_IN_5_MODER_0;
+        D_IN_5_GPIO_PORT->MODER   |=  D_IN_5_MODER_1;
+        D_IN_5_GPIO_PORT->OTYPER  &= ~D_IN_5_OTYPER_0;
+        D_IN_5_GPIO_PORT->OTYPER  |=  D_IN_5_OTYPER_1;
+        D_IN_5_GPIO_PORT->OSPEEDR &= ~D_IN_5_OSPEEDR_0;
+        D_IN_5_GPIO_PORT->OSPEEDR |=  D_IN_5_OSPEEDR_1;
+        D_IN_5_GPIO_PORT->PUPDR   &= ~D_IN_5_PUPD_0;
+        D_IN_5_GPIO_PORT->PUPDR   |=  D_IN_5_PUPD_1;
+]]>
     </function>
-    
-    <function  name="setValue"  param="bool">
-      <![CDATA[{
-  $$$initialize$$$
-  for(;;)
-  {
-    $$$execute$$$
-  }
-}]]>
+
+    <function  name="setValue"  param0_type="bool" param0_name="on">
+      <if cond="true equals param(on)">
+        <![CDATA[D_OUT_0_GPIO_PORT->ODR |= D_OUT_0_ODR;]]>
+      </if>
+      <if cond="false equals param(on)">
+        <![CDATA[D_OUT_0_GPIO_PORT->ODR &= ~D_OUT_0_ODR;]]>
+      </if>
     </function>
+
+    <function  name="getValue" result="bool">
+      <![CDATA[if(0 !=(D_IN_0_GPIO_PORT->IDR & D_IN_0_IDR)) {return DIN_HIGH;} else {return DIN_LOW;}]]>
+    </function>
+
     <additional>
       <![CDATA[
 #define PERIPH_BASE           ((uint32_t)0x40000000) /* Peripheral base address in the alias region */
@@ -96,35 +110,8 @@ typedef struct
 
 #define RCC_BASE            (AHB1PERIPH_BASE + 0x3800)
 #define RCC                 ((RCC_TypeDef *) RCC_BASE)
-
-    </additional>
-    <function  name="initialize">
-      <![CDATA[
-
-        RCC->AHB1ENR |= D_IN_5_RCC_GPIO_ENABLE;
-        D_IN_5_GPIO_PORT->MODER   &= ~D_IN_5_MODER_0;
-        D_IN_5_GPIO_PORT->MODER   |=  D_IN_5_MODER_1;
-        D_IN_5_GPIO_PORT->OTYPER  &= ~D_IN_5_OTYPER_0;
-        D_IN_5_GPIO_PORT->OTYPER  |=  D_IN_5_OTYPER_1;
-        D_IN_5_GPIO_PORT->OSPEEDR &= ~D_IN_5_OSPEEDR_0;
-        D_IN_5_GPIO_PORT->OSPEEDR |=  D_IN_5_OSPEEDR_1;
-        D_IN_5_GPIO_PORT->PUPDR   &= ~D_IN_5_PUPD_0;
-        D_IN_5_GPIO_PORT->PUPDR   |=  D_IN_5_PUPD_1;
-
 ]]>
     </additional>
 
-    <function  name="setValue"  param0_type="bool" param0_name="on">
-      <if cond="true equals param(on)">
-        <![CDATA[D_OUT_0_GPIO_PORT->ODR |= D_OUT_0_ODR;]]>
-      </if>
-      <if cond="false equals param(on)">
-        <![CDATA[D_OUT_0_GPIO_PORT->ODR &= ~D_OUT_0_ODR;]]>
-      </if>
-    </function>
-
-    <function  name="getValue" result="bool">
-      <![CDATA[if(0 !=(D_IN_0_GPIO_PORT->IDR & D_IN_0_IDR)) {return DIN_HIGH;} else {return DIN_LOW;}]]>
-    </function>
   </c_code>
 </algorithm>
