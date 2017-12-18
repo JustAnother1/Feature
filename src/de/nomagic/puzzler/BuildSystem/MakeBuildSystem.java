@@ -106,8 +106,11 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         {
             Target curentTarget = targets.get(it.next());
             String out =  curentTarget.getOutput();
-            out = out.replaceAll("%", "*");
-            sb.append(out + " ");
+            if(null != out)
+            {
+                out = out.replaceAll("%", "*");
+                sb.append(out + " ");
+            }
         }
 
         makeFile.addLines(MAKEFILE_FILE_TARGET_SECTION_NAME,
@@ -132,6 +135,7 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
 
     public void extendListVariable(String list, String newElement)
     {
+        newElement = newElement.trim();
         String oldList = listVariables.get(list);
         if(null == oldList)
         {

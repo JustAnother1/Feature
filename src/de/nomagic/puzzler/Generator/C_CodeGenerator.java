@@ -36,6 +36,8 @@ public class C_CodeGenerator extends Generator
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     private ConditionEvaluator condiEval;
+    private FileGroup codeGroup;
+    private C_File sourceFile;
 
     // TODO. right now all code is inlined! Add support for functions (called from different places and distribution of code into separate files.
 
@@ -47,7 +49,7 @@ public class C_CodeGenerator extends Generator
 
     public FileGroup generateFor(ConfiguredAlgorithm logic)
     {
-        FileGroup codeGroup = new FileGroup();
+        codeGroup = new FileGroup();
 
         if(null == logic)
         {
@@ -64,7 +66,7 @@ public class C_CodeGenerator extends Generator
 
         log.trace("starting to generate the c implementation for {}", logic);
         // we will need at least one *.c file. So create that now.
-        C_File mainC = createFile("main.c");
+        sourceFile = createFile("main.c");
 
         FileGetter fg = new FileGetter();
         Api api = Api.getFromFile(REQUIRED_ROOT_API, fg, ctx);
@@ -74,9 +76,9 @@ public class C_CodeGenerator extends Generator
         {
             return null;
         }
-        mainC.addContentsOf(imp);
+        sourceFile.addContentsOf(imp);
 
-        codeGroup.add(mainC);
+        codeGroup.add(sourceFile);
 
         return codeGroup;
     }
@@ -98,8 +100,6 @@ public class C_CodeGenerator extends Generator
             aFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME, declaration + ";");
             aFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME, declaration + "\n" + implementation);
         }
-        // add additional Stuff
-        aFile.addContentsOf(getAdditionalsFrom(logic));
         return aFile;
     }
 
@@ -112,6 +112,8 @@ public class C_CodeGenerator extends Generator
         {
             return null;
         }
+        // add additional Stuff
+        getAdditionalsFrom(logic);
         implementation = implementation.trim();
         implementation = replacePlaceholders(implementation, logic);
         return implementation;
@@ -242,28 +244,27 @@ public class C_CodeGenerator extends Generator
         return res.toString();
     }
 
-    private C_File getAdditionalsFrom(ConfiguredAlgorithm logic)
+    private void getAdditionalsFrom(ConfiguredAlgorithm logic)
     {
         Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
         if(null == cCode)
         {
             ctx.addError(this,
                 "Could not read implementation from " + logic.toString());
-            return null;
+            return;
         }
         Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME);
         if(null == additional)
         {
             log.trace("no addionals for algorithm {}", logic);
-            return null;
+            return;
         }
         List<Element> addlist = additional.getChildren();
         if(null == addlist)
         {
             log.trace("empty addionals tag for algorithm {}", logic);
-            return null;
+            return;
         }
-        C_File codeFile = new C_File("noname.c");
         for(int i = 0; i < addlist.size(); i++)
         {
             Element curElement = addlist.get(i);
@@ -271,16 +272,18 @@ public class C_CodeGenerator extends Generator
             switch(type)
             {
             case ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME:
-                codeFile.addLine(C_File.C_FILE_INCLUDE_SECTION_NAME, curElement.getText());
+                String include = curElement.getText();
+                log.trace("adding include {}", include);
+                sourceFile.addLine(C_File.C_FILE_INCLUDE_SECTION_NAME, include);
                 break;
 
             case ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME:
                 Function func = new Function(curElement);
                 String declaration = func.getDeclaration();
-                codeFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
-                                 declaration + ";");
-                codeFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
-                                 declaration + "\n" + curElement.getText());
+                sourceFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
+                                   declaration + ";");
+                sourceFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
+                                   declaration + "\n" + curElement.getText());
                 break;
 
             default: // ignore
@@ -288,7 +291,7 @@ public class C_CodeGenerator extends Generator
                 break;
             }
         }
-        return codeFile;
+        return;
     }
 
 

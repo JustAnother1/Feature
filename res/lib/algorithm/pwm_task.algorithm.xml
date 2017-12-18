@@ -17,9 +17,9 @@
         <function name="execute">
             <![CDATA[
     $$$setValue(true)$$$
-    _delay_ms(1000);        //Delay for 1000ms => 1 sec
+    _delay_ms(1000);        // Delay for 1000ms = 1 sec
     $$$setValue(false)$$$
-    _delay_ms(1000);        //Delay for 1000ms => 1 sec
+    _delay_ms(1000);        // Delay for 1000ms = 1 sec
 ]]>
         </function>
     </c_code>

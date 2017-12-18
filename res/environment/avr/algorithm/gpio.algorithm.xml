@@ -11,6 +11,7 @@
     <additional>
       <include>avr/io.h</include>
     </additional>
+
     <function  name="initialize">
       <![CDATA[DDRB |= (1<<DDB5); //Set the 6th bit on PORTB (i.e. PB5) to 1 => output]]>
     </function>
@@ -24,21 +25,9 @@
       </if>
     </function>
 
-<!--
-    <function  name="setValue"  param0_type="bool" param0_name="on">
-        <![CDATA[
-        if(true == on)
-        {
-            PORTB |= (1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 1 => on
-        }
-        else
-        {
-            PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off
-        }]]>
-    </function>
-    -->
     <function  name="getValue" result="bool">
       <![CDATA[PORTB;]]>
     </function>
+
   </c_code>
 </algorithm>

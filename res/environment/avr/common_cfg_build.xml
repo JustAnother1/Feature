@@ -5,15 +5,25 @@
       <CC>avr-gcc</CC>
       <LD>avr-ld</LD>
       <CFLAGS> -c -fno-common -O3 -g </CFLAGS>
-      <LFLAGS>-nostartfiles -T$(LKR_SCRIPT)</LFLAGS>
       <CPFLAGS>-Obinary</CPFLAGS>
     </variables>
     <targets>
+      <!-- link: *.o -> elf -->
       <target>
         <source>$(OBJS)</source>
         <output>$(project).elf</output>
-        <rule>$(LD) $(LFLAGS) -o main.elf main.o</rule>
+        <rule>$(LD) $(LFLAGS) main.o -o $(project).elf
+              avr-size -x $(project).elf</rule>
       </target>
+
+      <!-- elf -> hex -->
+      <target>
+        <source>$(project).elf</source>
+        <output>$(project).hex</output>
+        <rule> avr-objcopy -j .text -j .data -O ihex $(project).elf $(project).hex
+               avr-objcopy -j .eeprom --change-section-lma .eeprom=0 -O ihex $(project).elf $(project)_eeprom.hex</rule>
+      </target>
+
     </targets>
   </required>
   <variables>

@@ -39,6 +39,7 @@ public class Target
 
     public String getAsMakeFileTarget()
     {
+        rule = rule.replace("\n", "\n\t");
         return output + ": " + source + "\n\t" + rule;
     }
 

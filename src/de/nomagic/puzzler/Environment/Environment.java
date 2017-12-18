@@ -250,7 +250,7 @@ public class Environment extends Base
                 while(it.hasNext())
                 {
                     Element curVar = it.next();
-                    BuildSystem.addVariable(curVar.getName(),curVar.getText());
+                    BuildSystem.extendListVariable(curVar.getName(),curVar.getText());
                 }
             }
             // else no required Variables
@@ -305,7 +305,7 @@ public class Environment extends Base
                 String variValue =  variables.getChildText(variName);
                 if(null != variValue)
                 {
-                    BuildSystem.addVariable(variName, variValue);
+                    BuildSystem.extendListVariable(variName, variValue);
                 }
             }
         }

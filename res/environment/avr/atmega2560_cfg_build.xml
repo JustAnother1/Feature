@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <build_cfg>
   <required>
-      <variables>
-      <CFLAGS> -DF_CPU=16000000UL </CFLAGS>
+    <variables>
+      <CFLAGS> -DF_CPU=16000000UL -mmcu=atmega2560 </CFLAGS>
+      <LFLAGS> -mavr6 </LFLAGS>
     </variables>
+    <targets>
+        <!-- program to chip: avrdude hex -> flash -->
+        <target>
+            <source>$(project).hex</source>
+            <output>flash</output>
+            <rule>avrdude -pm2560 -cwiring -P/dev/ttyACM0 -D -U"flash:w:$(project).hex:i"</rule>
+        </target>
+    </targets>
   </required>
 </build_cfg>
