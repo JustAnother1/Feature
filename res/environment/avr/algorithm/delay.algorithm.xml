@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="delay" api="delay">
+  <c_code>
+    <additional>
+      <include>util/delay.h</include>
+    </additional>
+
+    <function  name="delay_ms">
+      <![CDATA[_delay_ms(1000);]]>
+    </function>
+
+  </c_code>
+</algorithm>

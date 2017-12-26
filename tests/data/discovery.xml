@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <environment>
-  <cpu>
-    <architecture name="ARM_Cortex-M4F" device="STM32F407"/>>
-  </cpu>
+    <cpu>
+        <architecture name="ARM_Cortex-M4F" device="STM32F407"/>>
+    </cpu>
     <pinMapping>
-      <greenLed algorithm="gpio" port="D" pin="12" />
+        <greenLed algorithm="gpio" port="D" pin="12" />
     </pinMapping>
+    <lib>
+        <delay algorithm="delay" />
+    </lib>
 </environment>

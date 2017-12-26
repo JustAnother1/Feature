@@ -27,6 +27,7 @@ public class Environment extends Base
     public final static String EXTERNAL_REFFERENCE_ATTRIBUTE_NAME = "ref";
     public final static String ROOT_ELEMENT_NAME = "environment";
     public final static String PIN_MAPPING_ELEMENT_NAME = "pinMapping";
+    public final static String LIBRARIES_ELEMENT_NAME = "lib";
     public final static String CPU_ELEMENT_NAME = "cpu";
     public final static String ARCHITECTURE_ELEMENT_NAME = "architecture";
     public final static String ARCHITECTURE_TYPE_ATTRIBUTE_NAME = "name";
@@ -188,24 +189,38 @@ public class Environment extends Base
         // the environment provides pins,...
         if(null != XmlTreeRoot)
         {
-            Element cpu = XmlTreeRoot.getChild(CPU_ELEMENT_NAME);
-            if(null != cpu)
+            Element pinMap = XmlTreeRoot.getChild(PIN_MAPPING_ELEMENT_NAME);
+            if(null != pinMap)
             {
-                Element pinMap = XmlTreeRoot.getChild(PIN_MAPPING_ELEMENT_NAME);
-                if(null != pinMap)
+                Element pin = pinMap.getChild(algoName);
+                if(null != pin)
                 {
-                    Element pin = pinMap.getChild(algoName);
                     return pin;
                 }
+                // else continue search
             }
         }
         log.trace("No pin with the name {} !", algoName);
 
-        // maybe more ???
-        // TODO Auto-generated method stub
+        // ... and libraries,...
+        if(null != XmlTreeRoot)
+        {
+            Element libraries = XmlTreeRoot.getChild(LIBRARIES_ELEMENT_NAME);
+            if(null != libraries)
+            {
+                Element lib = libraries.getChild(algoName);
+                if(null != lib)
+                {
+                    return lib;
+                }
+                // else continue search
+            }
+        }
+        log.trace("No lib with the name {} !", algoName);
+
+        // ...maybe more ???
         return null;
     }
-
 
     private Element getConfigurationElementFrom(String Path, String FileName)
     {

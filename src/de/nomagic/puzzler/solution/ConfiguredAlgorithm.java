@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
+import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Project;
 
 public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface
@@ -103,11 +104,16 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     private static ConfiguredAlgorithm getTreeFromEnvironment(Element cfgElement, Context ctx, ConfiguredAlgorithm parent)
     {
         String tagName = cfgElement.getName();
-        Element evnElement = ctx.getEnvironment().getAlgorithmCfg(tagName);
+        return getTreeFromEnvironment(tagName, ctx, parent);
+    }
+
+    public static ConfiguredAlgorithm getTreeFromEnvironment(String name, Context ctx, ConfiguredAlgorithm parent)
+    {
+        Element evnElement = ctx.getEnvironment().getAlgorithmCfg(name);
         if(null == evnElement)
         {
             ctx.addError("ConfiguredAlgorithm.getTree",
-                            "Failed to get Configuration for " + tagName + " from the environment !");
+                            "Failed to get Configuration for " + name + " from the environment !");
             return null;
         }
         // else OK
@@ -115,7 +121,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         if(null == algoName)
         {
             ctx.addError("ConfiguredAlgorithm.getTree",
-                            "Failed to get the algorithm for " + tagName
+                            "Failed to get the algorithm for " + name
                             + " from the environment (" + evnElement + ")!");
             return null;
         }
@@ -123,13 +129,19 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         Algorithm algo = ctx.getSolution().getAlgorithm(algoName);
         if(null == algo)
         {
-            ctx.addError("ConfiguredAlgorithm.getTree",
-                            "Failed to get Algorithm for " + algoName + " !");
-            return null;
+            // algorithm might be a Library
+            FileGetter lib = new FileGetter();
+            algo = Algorithm.getFromFile(evnElement, lib, ctx);
+            if(null == algo)
+            {
+                ctx.addError("ConfiguredAlgorithm.getTree",
+                                "Failed to get Algorithm for " + algoName + " !");
+                return null;
+            }
         }
         // else OK
 
-        ConfiguredAlgorithm res = new ConfiguredAlgorithm(cfgElement.getName(), algo, ctx, parent);
+        ConfiguredAlgorithm res = new ConfiguredAlgorithm(name, algo, ctx, parent);
 
         List<Attribute> attribs = evnElement.getAttributes();
         for(int i = 0; i < attribs.size(); i++)
@@ -286,7 +298,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             if(false == found)
             {
                 ctx.addError("ConfiguredAlgorithm.allRequiredDataAvailable",
-                                "required child element of type " + reqApi + " not present !");
+                                toString() + "required child element of type " + reqApi + " not present !");
                 return false;
             }
         }

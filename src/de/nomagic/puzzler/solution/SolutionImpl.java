@@ -100,7 +100,7 @@ public class SolutionImpl extends Base implements Solution
         return true;
     }
 
-    private boolean getAlgorithmForElement(Element cfgElement)
+    public boolean getAlgorithmForElement(Element cfgElement)
     {
         Attribute algoAttr = cfgElement.getAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         if(null == algoAttr)

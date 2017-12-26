@@ -39,7 +39,7 @@ public class C_CodeGenerator extends Generator
     private FileGroup codeGroup;
     private C_File sourceFile;
 
-    // TODO. right now all code is inlined! Add support for functions (called from different places and distribution of code into separate files.
+    // TODO: right now all code is inlined! Add support for functions (called from different places and distribution of code into separate files.
 
     public C_CodeGenerator(Context ctx)
     {
@@ -154,13 +154,33 @@ public class C_CodeGenerator extends Generator
     {
         String searchedFunctionName = null;
         String FunctionArguments = null;
+        if(null == logic)
+        {
+            ctx.addError(this, "" + logic + " : Requesting function without providing an Algorithm!(function name: " + functionName + ")");
+            return null;
+        }
+        if(true == functionName.contains(":"))
+        {
+            String api = functionName.substring(0, functionName.indexOf(":"));
+            if( false == logic.hasApi(api))
+            {
+                log.trace("{} : Function call to wrong API!(API: {})", logic, api);
+                return null;
+            }
+            else
+            {
+                functionName = functionName.substring( functionName.indexOf(":") + 1);
+            }
+        }
         if(true == functionName.contains("("))
         {
+            // we call a function with parameters
             searchedFunctionName = functionName.substring(0, functionName.indexOf('('));
             FunctionArguments = functionName.substring(functionName.indexOf('(') + 1, functionName.lastIndexOf(')'));
         }
         else
         {
+            // no parameters
             searchedFunctionName = functionName;
         }
         if(null == searchedFunctionName)
@@ -173,8 +193,6 @@ public class C_CodeGenerator extends Generator
             ctx.addError(this, "" + logic + " : Function call to unnamed function!");
             return null;
         }
-
-        // Element cCode = getFunctionElment(searchedFunctionName, logic);
 
         Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
         if(null == cCode)
@@ -228,6 +246,7 @@ public class C_CodeGenerator extends Generator
                     ctx.addError(this, "" + logic + " : Function call to missing child (" + functionName + ") !");
                     return null;
                 }
+                boolean found = false;
                 while(it.hasNext())
                 {
                     String ChildName = it.next();
@@ -235,9 +254,41 @@ public class C_CodeGenerator extends Generator
                     String impl = getCImplementationOf(functionName, childAlgo);
                     if(null == impl)
                     {
-                        return null;
+                        continue;
+                    }
+                    else
+                    {
+                        found = true;
                     }
                     res.append(impl);
+                }
+                if(false == found)
+                {
+                    // The Implementation was not in one of the child elements !
+                    // -> it can only be in the required Library Algorithms
+                    if(true == functionName.contains(":"))
+                    {
+                        String libAlgoName = functionName.substring(0, functionName.indexOf(":"));
+                        ConfiguredAlgorithm libAlgo = ConfiguredAlgorithm.getTreeFromEnvironment(libAlgoName, ctx, logic);
+                        if(null == libAlgo)
+                        {
+                            ctx.addError(this, "" + logic + " : The Environment does not provide the needed library (" + libAlgoName + ") !");
+                            ctx.addError(this, "" + logic + " : We needed to call the function " + functionName + " !");
+                            return null;
+                        }
+                        String impl = getCImplementationOf(functionName, libAlgo);
+                        if(null == impl)
+                        {
+                            ctx.addError(this, "" + logic + " : Function call to missing (lib) function (" + functionName + ") !");
+                            return null;
+                        }
+                        res.append(impl);
+                    }
+                    else
+                    {
+                        ctx.addError(this, "" + logic + " : Function call to missing function (" + functionName + ") !");
+                        return null;
+                    }
                 }
             }
         }

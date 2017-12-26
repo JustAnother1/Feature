@@ -24,10 +24,10 @@
 
     <function  name="setValue"  param0_type="bool" param0_name="on">
       <if cond="true equals param(on)">
-        <![CDATA[D_OUT_0_GPIO_PORT->ODR |= D_OUT_0_ODR;]]>
+        <![CDATA[GPIO$$$Port$$$->ODR |= 1<<$$$Pin$$$;]]>
       </if>
       <if cond="false equals param(on)">
-        <![CDATA[D_OUT_0_GPIO_PORT->ODR &= ~D_OUT_0_ODR;]]>
+        <![CDATA[GPIO$$$Port$$$->ODR &= ~1<<$$$Pin$$$;]]>
       </if>
     </function>
 

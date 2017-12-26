@@ -8,6 +8,7 @@ public interface Solution
 {
     Element getRootElement();
     Algorithm getAlgorithm(String Name);
+    boolean getAlgorithmForElement(Element cfgElement);
     boolean getFromProject(Project pro);
     boolean checkAndTestAgainstEnvironment();
 }
