@@ -67,11 +67,11 @@ public class TextFile extends AbstractFile
             curData = prepareSectionData(curSection, curData);
             for(int i = 0; i < curData.size(); i++)
             {
-                out.write((curData.get(i) + "\n").getBytes());
+                out.write((curData.get(i) + getLineSperator()).getBytes());
             }
             if((true == addSeperation) && (0 < curData.size()))
             {
-                out.write("\n".getBytes());
+                out.write(getLineSperator().getBytes());
             }
         }
     }
@@ -116,6 +116,11 @@ public class TextFile extends AbstractFile
             String[] secLines = otherFile.getSectionLines(secName);
             this.addLines(secName, secLines);
         }
+    }
+
+    public String getLineSperator()
+    {
+        return "\n";
     }
 
 }

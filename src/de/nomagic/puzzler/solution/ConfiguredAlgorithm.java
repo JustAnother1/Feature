@@ -342,7 +342,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     @Override
     public String toString()
     {
-        return "ConfiguredAlgorithm " + Name + "(" + AlgorithmDefinition + ")";
+        return Name + "(" + AlgorithmDefinition + ")";
     }
 
     private void addConfiguration(Attribute curAttribute)

@@ -9,10 +9,10 @@ echo "========"
 rm test_out -r 2> /dev/null
 echo "Test 2a:(STM32)"
 echo "==============="
-java -jar Puzzler.jar -v -v -o test_out/stm32 -l res/lib/ -w tests/data/ -e res/environment/ blinkyProject_stm32.xml
+java -jar Puzzler.jar -v -v -o test_out/stm32 -l res/lib/ -w tests/data/ -e res/environment/ -Ddocument_code_source=true blinkyProject_stm32.xml
 echo "Test 2a:(AVR)"
 echo "============="
-java -jar Puzzler.jar -v -v -o test_out/avr   -l res/lib/ -w tests/data/ -e res/environment/ blinkyProject_avr.xml
+java -jar Puzzler.jar -v -v -o test_out/avr   -l res/lib/ -w tests/data/ -e res/environment/ -Ddocument_code_source=true blinkyProject_avr.xml
 
 
 echo "======================"

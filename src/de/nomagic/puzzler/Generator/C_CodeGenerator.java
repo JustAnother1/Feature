@@ -33,11 +33,18 @@ public class C_CodeGenerator extends Generator
     public final static String ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME = "include";
     public final static String ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME = "function";
 
+    public final static String CFG_DOC_CODE_SRC = "document_code_source";
+
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     private ConditionEvaluator condiEval;
     private FileGroup codeGroup;
     private C_File sourceFile;
+
+    // if this is true then all code sniplets will be wrapped into comment lines explaining where they came from.
+    private boolean document_code_source = false;
+
+
 
     // TODO: right now all code is inlined! Add support for functions (called from different places and distribution of code into separate files.
 
@@ -97,8 +104,23 @@ public class C_CodeGenerator extends Generator
             {
                 return null;
             }
-            aFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME, declaration + ";");
-            aFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME, declaration + "\n" + implementation);
+            if(true == document_code_source)
+            {
+                aFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
+                        "// from " + logic + aFile.getLineSperator()
+                        + declaration + ";" + aFile.getLineSperator()
+                        + "// end of " + logic);
+                aFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
+                        "// from " + logic + aFile.getLineSperator()
+                        + declaration + aFile.getLineSperator()
+                        + implementation+ aFile.getLineSperator()
+                        + "// end of " + logic);
+            }
+            else
+            {
+                aFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME, declaration + ";");
+                aFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME, declaration + aFile.getLineSperator() + implementation);
+            }
         }
         return aFile;
     }
@@ -214,7 +236,16 @@ public class C_CodeGenerator extends Generator
             if(true == searchedFunctionName.equals(name))
             {
                 // found the correct function
-                return getImplementationFromFunctionElment(curElement, FunctionArguments, logic);
+                if(true == document_code_source)
+                {
+                    return "// from " + logic + "\n" // TODO aFile.getLineSperator()
+                           + getImplementationFromFunctionElment(curElement, FunctionArguments, logic)
+                           + "// end of " + logic;
+                }
+                else
+                {
+                    return getImplementationFromFunctionElment(curElement, FunctionArguments, logic);
+                }
             }
         }
         // function not found
@@ -260,7 +291,17 @@ public class C_CodeGenerator extends Generator
                     {
                         found = true;
                     }
-                    res.append(impl);
+                    if(true == document_code_source)
+                    {
+                        res.append(
+                                "// from " + logic + "\n" // TODO aFile.getLineSperator()
+                                + impl + ";" + "\n" // TODO aFile.getLineSperator()
+                                + "// end of " + logic +  "\n"); // TODO aFile.getLineSperator()
+                    }
+                    else
+                    {
+                        res.append(impl);
+                    }
                 }
                 if(false == found)
                 {
@@ -282,7 +323,17 @@ public class C_CodeGenerator extends Generator
                             ctx.addError(this, "" + logic + " : Function call to missing (lib) function (" + functionName + ") !");
                             return null;
                         }
-                        res.append(impl);
+                        if(true == document_code_source)
+                        {
+                            res.append(
+                                    "// from " + logic + "\n" // TODO aFile.getLineSperator()
+                                    + impl + ";" + "\n" // TODO aFile.getLineSperator()
+                                    + "// end of " + logic +  "\n"); // TODO aFile.getLineSperator()
+                        }
+                        else
+                        {
+                            res.append(impl);
+                        }
                     }
                     else
                     {
@@ -325,16 +376,41 @@ public class C_CodeGenerator extends Generator
             case ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME:
                 String include = curElement.getText();
                 log.trace("adding include {}", include);
-                sourceFile.addLine(C_File.C_FILE_INCLUDE_SECTION_NAME, include);
+                if(true == document_code_source)
+                {
+                    sourceFile.addLineWithComment(C_File.C_FILE_INCLUDE_SECTION_NAME,
+                            include, logic.toString());
+                }
+                else
+                {
+                    sourceFile.addLine(C_File.C_FILE_INCLUDE_SECTION_NAME, include);
+                }
                 break;
 
             case ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME:
                 Function func = new Function(curElement);
                 String declaration = func.getDeclaration();
-                sourceFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
-                                   declaration + ";");
-                sourceFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
-                                   declaration + "\n" + curElement.getText());
+
+
+                if(true == document_code_source)
+                {
+                    sourceFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
+                            "// from " + logic + sourceFile.getLineSperator()
+                            + declaration + ";" + sourceFile.getLineSperator()
+                            + "// end of " + logic);
+                    sourceFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
+                            "// from " + logic + sourceFile.getLineSperator()
+                            + declaration + sourceFile.getLineSperator()
+                            + curElement.getText() + sourceFile.getLineSperator()
+                            + "// end of " + logic);
+                }
+                else
+                {
+                    sourceFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
+                            declaration + ";");
+                    sourceFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
+                            declaration +  sourceFile.getLineSperator() + curElement.getText());
+                }
                 break;
 
             default: // ignore
@@ -358,6 +434,16 @@ public class C_CodeGenerator extends Generator
                                      "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
                                      "*/"});
         return aFile;
+    }
+
+    @Override
+    public void configure(Configuration cfg)
+    {
+        if("true".equals(cfg.getString(CFG_DOC_CODE_SRC)))
+        {
+            log.trace("Switching on documentation of code source");
+            document_code_source = true;
+        }
     }
 
 }

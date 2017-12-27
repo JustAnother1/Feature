@@ -18,6 +18,8 @@ public class C_File extends TextFile
     public final static String C_FILE_FUNCTIONS_SECTION_NAME                 = "publicFunctions";
     public final static String C_FILE_STATIC_FUNCTIONS_SECTION_NAME          = "privateFunctions";
 
+    protected Vector<String> inc_comments= null;
+
     public C_File(String filename)
     {
         super(filename);
@@ -49,6 +51,23 @@ public class C_File extends TextFile
         BuildSystem.extendListVariable("OBJS", objName);
     }
 
+    public void addLineWithComment(String sectionName, String line, String comment)
+    {
+        if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
+        {
+            if(null == inc_comments)
+            {
+                inc_comments = new Vector<String>();
+            }
+            inc_comments.add(comment);
+            addLine(sectionName, line);
+        }
+        else
+        {
+            addLine(sectionName, line + " // " + comment);
+        }
+    }
+
     protected Vector<String> prepareSectionData(String sectionName, Vector<String> sectionData)
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
@@ -57,28 +76,40 @@ public class C_File extends TextFile
             {
                 return sectionData;
             }
-            // remove duplicates
-            Collections.sort(sectionData);
-            Iterator<String> it = sectionData.iterator();
-            String first = it.next(); // we just checked that it is not empty, so this should work.
-            while(it.hasNext())
+            if(null == inc_comments)
             {
-                String next = it.next();
-                if(first.equals(next))
+                // remove duplicates
+                Collections.sort(sectionData);
+                Iterator<String> it = sectionData.iterator();
+                String first = it.next(); // we just checked that it is not empty, so this should work.
+                while(it.hasNext())
                 {
-                    it.remove();
-                }
-                else
-                {
-                    first = next;
+                    String next = it.next();
+                    if(first.equals(next))
+                    {
+                        it.remove();
+                    }
+                    else
+                    {
+                        first = next;
+                    }
                 }
             }
-            Vector<String> res = new Vector<String>();
+            // else can not remove duplicates if they have comments to not loose comments
+
             // expand to valid include statement
+            Vector<String> res = new Vector<String>();
             for(int i = 0; i < sectionData.size(); i++)
             {
                 String line = sectionData.get(i);
-                line = "#include <" + line + ">";
+                if(null == inc_comments)
+                {
+                    line = "#include <" + line + ">";
+                }
+                else
+                {
+                    line = "#include <" + line + "> // " + inc_comments.get(i);
+                }
                 res.add(line);
             }
             return res;

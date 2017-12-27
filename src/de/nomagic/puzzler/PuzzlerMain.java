@@ -92,6 +92,9 @@ public class PuzzlerMain
     {
         System.out.println("Feature Puzzler [Parameters] [Project File]");
         System.out.println("Parameters:");
+        System.out.println("-D<SettingName>=<Value>    : Set a value to a configuration variable.");
+        System.out.println("                           : currently supported:");
+        System.out.println("                           : " + C_CodeGenerator.CFG_DOC_CODE_SRC + "=true  : code source in code");
         System.out.println("-e /--environment_dirctory : directory with environment configuration.");
 
         System.out.println("-h / --help                : print this message.");
@@ -245,6 +248,23 @@ public class PuzzlerMain
                     cfg.setString(Configuration.ENVIRONMENT_PATH_CFG, envDir);
                     log.trace("command Line config: environment Directory {}", envDir);
                 }
+                else if(true == args[i].startsWith("-D"))
+                {
+                    // Some configuration variable
+                    int idx = args[i].indexOf('=');
+                    if(-1 == idx)
+                    {
+                        System.err.println("Invalid Parameter(-D needs '=') : " + args[i]);
+                        return false;
+                    }
+                    String settingName = args[i].substring(2, idx); // skip the "-D"
+                    String settingValue = args[i].substring(idx + 1);
+                    settingName = settingName.trim();
+                    settingValue = settingValue.trim();
+
+                    cfg.setString(settingName, settingValue);
+                    log.trace("command Line config: {} = {}", settingName, settingValue);
+                }
                 else
                 {
                     System.err.println("Invalid Parameter : " + args[i]);
@@ -329,6 +349,7 @@ public class PuzzlerMain
 
         // create "code creator" back end (creates the C Source Code)
         Generator gen = new C_CodeGenerator(ctx);
+        gen.configure(cfg);
         // give solution to code creator to create code project
         FileGroup files = gen.generateFor(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         if(null == files)
