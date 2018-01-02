@@ -51,4 +51,11 @@ public class SolutionStub implements Solution
         return false;
     }
 
+    @Override
+    public boolean getAlgorithmForElement(Element cfgElement)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

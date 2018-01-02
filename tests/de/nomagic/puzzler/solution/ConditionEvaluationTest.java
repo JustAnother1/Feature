@@ -25,10 +25,10 @@ public class ConditionEvaluationTest {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
-        Element result = dut.getBest(null, null);
+        Element result = dut.getBest(null, null, null, null);
         assertEquals(null, result);
     }
-    
+
     @Test
     public void testevaluateConditionParenthesis_empty_string()
     {
@@ -36,7 +36,7 @@ public class ConditionEvaluationTest {
         ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
-        String result = dut.evaluateConditionParenthesis("", caStub);
+        String result = dut.evaluateConditionParenthesis("", caStub, null, null);
         assertEquals("", result);
     }
 
@@ -46,10 +46,10 @@ public class ConditionEvaluationTest {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
-        String result = dut.evaluateConditionParenthesis("true", null);
+        String result = dut.evaluateConditionParenthesis("true", null, null, null);
         assertEquals("false", result);
     }
-    
+
     @Test
     public void testevaluateConditionParenthesis_true()
     {
@@ -57,7 +57,7 @@ public class ConditionEvaluationTest {
         ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
-        String result = dut.evaluateConditionParenthesis("true", caStub);
+        String result = dut.evaluateConditionParenthesis("true", caStub, null, null);
         assertEquals("true", result);
     }
 
@@ -68,7 +68,7 @@ public class ConditionEvaluationTest {
         ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
-        String result = dut.evaluateConditionParenthesis("false", caStub);
+        String result = dut.evaluateConditionParenthesis("false", caStub, null, null);
         assertEquals("false", result);
     }
 
@@ -80,7 +80,7 @@ public class ConditionEvaluationTest {
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         caStub.addPropertie("singleTask", "true");
-        String result = dut.evaluateConditionParenthesis("is(singleTask)", caStub);
+        String result = dut.evaluateConditionParenthesis("is(singleTask)", caStub, null, null);
         assertEquals("true", result);
     }
 
@@ -93,7 +93,7 @@ public class ConditionEvaluationTest {
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         caStub.addPropertie("frequency", "1000");
         caStub.addPropertie("msTimer", "available");
-        String result = dut.evaluateConditionParenthesis("(frequency smallerThan 1001) and has('msTimer')", caStub);
+        String result = dut.evaluateConditionParenthesis("(frequency smallerThan 1001) and has('msTimer')", caStub, null, null);
         assertEquals("true", result);
     }
 
@@ -105,7 +105,7 @@ public class ConditionEvaluationTest {
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         caStub.addParameter("on", "true");
-        String result = dut.evaluateConditionParenthesis("true equals param(on)", caStub);
+        String result = dut.evaluateConditionParenthesis("true equals param(on)", caStub, null, null);
         assertEquals("true", result);
     }
 
@@ -117,7 +117,7 @@ public class ConditionEvaluationTest {
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         caStub.addParameter("on", "false");
-        String result = dut.evaluateConditionParenthesis("true equals param(on)", caStub);
+        String result = dut.evaluateConditionParenthesis("true equals param(on)", caStub, null, null);
         assertEquals("false", result);
     }
 
