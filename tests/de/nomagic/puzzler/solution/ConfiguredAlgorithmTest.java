@@ -174,7 +174,7 @@ public class ConfiguredAlgorithmTest
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
-        assertEquals("ConfiguredAlgorithm dut(null)", dut.toString());
+        assertEquals("dut(null)", dut.toString());
     }
 
     @Test
