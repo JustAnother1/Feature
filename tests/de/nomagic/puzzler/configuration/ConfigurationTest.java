@@ -21,6 +21,9 @@ public class ConfigurationTest
         assertNotNull(cfg);
         String res = cfg.getString("bla");
         assertEquals("", res);
+        String[] arr = cfg.getStringsOf("bla");
+        assertNotNull(arr);
+        assertEquals(0, arr.length);
     }
 
     @Test

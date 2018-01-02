@@ -49,18 +49,7 @@ public class Configuration
         Vector<String> curVector = StringArraySettings.get(setting);
         if(null == curVector)
         {
-            // A single String setting
-            String help = getString(setting);
-            if(null != help)
-            {
-                String[] res = new String[1];
-                res[0] = help;
-                return res;
-            }
-            else
-            {
-                return new String[0];
-            }
+            return new String[0];
         }
         else
         {
