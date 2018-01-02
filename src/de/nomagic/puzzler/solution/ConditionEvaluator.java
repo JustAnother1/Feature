@@ -481,6 +481,9 @@ public class ConditionEvaluator extends Base
                     valid = false;
                     ctx.addError("ConditionEvaluation",
                             "two non function words in : " + conditionText);
+                    ctx.addError("ConditionEvaluation", "Algorithm: " + algo.toString());
+                    ctx.addError("ConditionEvaluation", algo.dumpParameter());
+                    ctx.addError("ConditionEvaluation", algo.dumpProperty());
                     return KEY_FALSE;
                 }
             }
