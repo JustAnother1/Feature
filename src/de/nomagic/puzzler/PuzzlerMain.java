@@ -376,7 +376,7 @@ public class PuzzlerMain
         }
         // success ?
         successful = ctx.wasSucessful();
-        log.info("successful = {}", successful);
+        log.trace("successful = {}", successful);
         ctx.close();
     }
 
