@@ -331,7 +331,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     {
         if(null == AlgorithmDefinition)
         {
-            return true;
+            return false;
         }
         else
         {

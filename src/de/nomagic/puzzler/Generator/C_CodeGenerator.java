@@ -58,6 +58,10 @@ public class C_CodeGenerator extends Generator
     @Override
     public void configure(Configuration cfg)
     {
+        if(null == cfg)
+        {
+            return;
+        }
         if("true".equals(cfg.getString(CFG_DOC_CODE_SRC)))
         {
             log.trace("Switching on documentation of code source");
