@@ -271,13 +271,6 @@ public class C_CodeGenerator extends Generator
         // we now need to make sure that that function exists an can be called.
         // we therefore need to extract the function out of the children of this algorithm
         Iterator<String> it = logic.getAllChildren();
-        if(false == it.hasNext())
-        {
-            // We need a child to call the function !
-            ctx.addError(this, "" + logic + " : Function call to missing child ("
-            + functionName + ") !");
-            return null;
-        }
         StringBuffer res = new StringBuffer();
         boolean found = false;
         while(it.hasNext())
@@ -523,6 +516,8 @@ public class C_CodeGenerator extends Generator
                             declaration +  sourceFile.getLineSperator() + curElement.getText());
                 }
                 break;
+
+                // TODO additional File
 
             default: // ignore
                 log.warn("invalid type {} for algorithm {}", type, logic);

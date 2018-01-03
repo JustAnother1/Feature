@@ -144,4 +144,27 @@ public class ConditionEvaluationTest {
         assertEquals("50", result);
     }
 
+    @Test
+    public void testevaluateConditionParenthesis_param_char()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        caStub.addParameter("port", "D");
+        String result = dut.evaluateConditionParenthesis("A equals port", caStub, null, null);
+        assertEquals("false", result);
+    }
+
+    @Test
+    public void testevaluateConditionParenthesis_param_char_match()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        caStub.addParameter("port", "A");
+        String result = dut.evaluateConditionParenthesis("A equals port", caStub, null, null);
+        assertEquals("true", result);
+    }
 }
