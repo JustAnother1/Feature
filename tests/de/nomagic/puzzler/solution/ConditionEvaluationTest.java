@@ -121,4 +121,27 @@ public class ConditionEvaluationTest {
         assertEquals("false", result);
     }
 
+    @Test
+    public void testevaluateConditionParenthesis_substract()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        String result = dut.evaluateConditionParenthesis("100 - 12", caStub, null, null);
+        assertEquals("88", result);
+    }
+
+    @Test
+    public void testevaluateConditionParenthesis_substract_andAlgorithmParameter()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        ConditionEvaluator dut = new ConditionEvaluator(ctx);
+        ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
+        caStub.addParameter("dutyCycle_percent", "50");
+        String result = dut.evaluateConditionParenthesis("100 - dutyCycle_percent", caStub, null, null);
+        assertEquals("50", result);
+    }
+
 }

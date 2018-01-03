@@ -15,15 +15,14 @@
             <include>util/delay.h</include>
         </additional>
         <function  name="initialize">
-            <![CDATA[$$$binaryOut:initialize$$$]]>
+            <![CDATA[$$$binaryOut:initialize()$$$]]>
         </function>
         <function name="execute">
             <![CDATA[
     $$$binaryOut:setValue(true)$$$
-    $$$delay:delay_ms(1000)$$$ // Delay for 1000ms = 1 sec
+    $$$delay:delay_ms(10 / frequency_Hz * dutyCycle_percent)$$$ // Delay
     $$$binaryOut:setValue(false)$$$
-    $$$delay:delay_ms(1000)$$$ // Delay for 1000ms = 1 sec
-]]>
+    $$$delay:delay_ms(10 / frequency_Hz * (100 - dutyCycle_percent))$$$ // Delay]]>
         </function>
     </c_code>
 </algorithm>

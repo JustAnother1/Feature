@@ -4,6 +4,7 @@ package de.nomagic.puzzler.Generator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -54,6 +55,16 @@ public class C_CodeGenerator extends Generator
         condiEval = new ConditionEvaluator(ctx);
     }
 
+    @Override
+    public void configure(Configuration cfg)
+    {
+        if("true".equals(cfg.getString(CFG_DOC_CODE_SRC)))
+        {
+            log.trace("Switching on documentation of code source");
+            document_code_source = true;
+        }
+    }
+
     public FileGroup generateFor(ConfiguredAlgorithm logic)
     {
         codeGroup = new FileGroup();
@@ -99,7 +110,8 @@ public class C_CodeGenerator extends Generator
         {
             String declaration = funcs[i].getDeclaration();
             declaration = declaration.trim();
-            String implementation = getCImplementationOf(funcs[i].getName(), logic);
+            C_functionCall fc = new C_functionCall(funcs[i].getName());
+            String implementation = getCImplementationOf(fc, logic);
             if(null == implementation)
             {
                 return null;
@@ -118,17 +130,58 @@ public class C_CodeGenerator extends Generator
             }
             else
             {
-                aFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME, declaration + ";");
-                aFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME, declaration + aFile.getLineSperator() + implementation);
+                aFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
+                        declaration + ";");
+                aFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
+                        declaration + aFile.getLineSperator() + implementation);
             }
         }
         return aFile;
     }
 
-    private String getCImplementationOf(String functionName, ConfiguredAlgorithm logic)
+    private String getCImplementationOf(C_functionCall functionToCall, ConfiguredAlgorithm logic)
     {
-        log.trace("getting the c implemention of the function {} from {}", functionName, logic);
-        String implementation = getFunctionCcode(functionName, logic);
+        log.trace("getting the c implemention of the function {} from {}",
+                functionToCall, logic);
+
+        if( false == logic.hasApi(functionToCall.getApi()))
+        {
+            log.trace("{} : Function call to wrong API!(API: {})", logic, functionToCall.getApi());
+            return null;
+        }
+
+        functionToCall.setFunctionArguments(
+                condiEval.evaluateConditionParenthesis(functionToCall.getArguments(), logic, null, null));
+
+        String searchedFunctionName = functionToCall.getName();
+        if(null == searchedFunctionName)
+        {
+            ctx.addError(this, "" + logic + " : Function call to unknown function!");
+            return null;
+        }
+        if(1 > searchedFunctionName.length())
+        {
+            ctx.addError(this, "" + logic + " : Function call to unnamed function!");
+            return null;
+        }
+        Element functionElement = getFunctionElement(searchedFunctionName, functionToCall.getArguments(), logic);
+        if(null == functionElement)
+        {
+            return null;
+        }
+        String implementation = null;
+
+        if(true == document_code_source)
+        {
+            implementation =  "// from " + logic + "\n" // TODO aFile.getLineSperator()
+                   + getImplementationFromFunctionElment(functionElement, functionToCall.getArguments(), logic)
+                   + "// end of " + logic;
+        }
+        else
+        {
+            implementation = getImplementationFromFunctionElment(functionElement, functionToCall.getArguments(), logic);
+        }
+
         // log.trace("implementation = {}", implementation);
         if(null == implementation)
         {
@@ -137,7 +190,7 @@ public class C_CodeGenerator extends Generator
         // add additional Stuff
         getAdditionalsFrom(logic);
         implementation = implementation.trim();
-        implementation = replacePlaceholders(implementation, logic);
+        implementation = replacePlaceholders(implementation, functionToCall.getArguments(), logic, functionElement);
         return implementation;
     }
 
@@ -172,47 +225,11 @@ public class C_CodeGenerator extends Generator
         }
     }
 
-    private String getFunctionCcode(String functionName, ConfiguredAlgorithm logic)
+    private Element getFunctionElement(String searchedFunctionName, String FunctionArguments, ConfiguredAlgorithm logic)
     {
-        String searchedFunctionName = null;
-        String FunctionArguments = null;
         if(null == logic)
         {
-            ctx.addError(this, "" + logic + " : Requesting function without providing an Algorithm!(function name: " + functionName + ")");
-            return null;
-        }
-        if(true == functionName.contains(":"))
-        {
-            String api = functionName.substring(0, functionName.indexOf(":"));
-            if( false == logic.hasApi(api))
-            {
-                log.trace("{} : Function call to wrong API!(API: {})", logic, api);
-                return null;
-            }
-            else
-            {
-                functionName = functionName.substring( functionName.indexOf(":") + 1);
-            }
-        }
-        if(true == functionName.contains("("))
-        {
-            // we call a function with parameters
-            searchedFunctionName = functionName.substring(0, functionName.indexOf('('));
-            FunctionArguments = functionName.substring(functionName.indexOf('(') + 1, functionName.lastIndexOf(')'));
-        }
-        else
-        {
-            // no parameters
-            searchedFunctionName = functionName;
-        }
-        if(null == searchedFunctionName)
-        {
-            ctx.addError(this, "" + logic + " : Function call to unknown function!");
-            return null;
-        }
-        if(1 > searchedFunctionName.length())
-        {
-            ctx.addError(this, "" + logic + " : Function call to unnamed function!");
+            ctx.addError(this, "" + logic + " : Requesting function without providing an Algorithm!(function name: " + searchedFunctionName + ")");
             return null;
         }
 
@@ -220,7 +237,7 @@ public class C_CodeGenerator extends Generator
         if(null == cCode)
         {
             ctx.addError(this,
-                "Could not read implementation for " + functionName +
+                "Could not read implementation for " + searchedFunctionName +
                 " from " + logic.toString());
             return null;
         }
@@ -236,16 +253,7 @@ public class C_CodeGenerator extends Generator
             if(true == searchedFunctionName.equals(name))
             {
                 // found the correct function
-                if(true == document_code_source)
-                {
-                    return "// from " + logic + "\n" // TODO aFile.getLineSperator()
-                           + getImplementationFromFunctionElment(curElement, FunctionArguments, logic)
-                           + "// end of " + logic;
-                }
-                else
-                {
-                    return getImplementationFromFunctionElment(curElement, FunctionArguments, logic);
-                }
+                return curElement;
             }
         }
         // function not found
@@ -254,7 +262,95 @@ public class C_CodeGenerator extends Generator
         return null;
     }
 
-    private String replacePlaceholders(String implementation, ConfiguredAlgorithm logic)
+    private String fillInFunctionCall(String functionName, ConfiguredAlgorithm logic)
+    {
+        // we now need to make sure that that function exists an can be called.
+        // we therefore need to extract the function out of the children of this algorithm
+        Iterator<String> it = logic.getAllChildren();
+        if(false == it.hasNext())
+        {
+            // We need a child to call the function !
+            ctx.addError(this, "" + logic + " : Function call to missing child ("
+            + functionName + ") !");
+            return null;
+        }
+        StringBuffer res = new StringBuffer();
+        boolean found = false;
+        while(it.hasNext())
+        {
+            String ChildName = it.next();
+            ConfiguredAlgorithm childAlgo = logic.getChild(ChildName);
+            C_functionCall fc = new C_functionCall(functionName);
+            String params = fc.getArguments();
+            params = condiEval.evaluateConditionParenthesis(params, logic, null, null);
+            fc.setFunctionArguments(params);
+            String impl = getCImplementationOf(fc, childAlgo);
+            if(null == impl)
+            {
+                continue;
+            }
+            else
+            {
+                found = true;
+            }
+            if(true == document_code_source)
+            {
+                res.append(
+                        "// from " + logic + "\n" // TODO aFile.getLineSperator()
+                        + impl + ";" + "\n" // TODO aFile.getLineSperator()
+                        + "// end of " + logic +  "\n"); // TODO aFile.getLineSperator()
+            }
+            else
+            {
+                res.append(impl);
+            }
+        }
+        if(false == found)
+        {
+            // The Implementation was not in one of the child elements !
+            // -> it can only be in the required Library Algorithms
+            if(true == functionName.contains(":"))
+            {
+                String libAlgoName = functionName.substring(0, functionName.indexOf(":"));
+                ConfiguredAlgorithm libAlgo = ConfiguredAlgorithm.getTreeFromEnvironment(libAlgoName, ctx, logic);
+                if(null == libAlgo)
+                {
+                    ctx.addError(this, "" + logic + " : The Environment does not provide the needed library (" + libAlgoName + ") !");
+                    ctx.addError(this, "" + logic + " : We needed to call the function " + functionName + " !");
+                    return null;
+                }
+                C_functionCall fc = new C_functionCall(functionName);
+                String impl = getCImplementationOf(fc, libAlgo);
+                if(null == impl)
+                {
+                    ctx.addError(this, "" + logic + " : Function call to missing (lib) function (" + functionName + ") !");
+                    return null;
+                }
+                if(true == document_code_source)
+                {
+                    res.append(
+                            "// from " + logic + "\n" // TODO aFile.getLineSperator()
+                            + impl + ";" + "\n" // TODO aFile.getLineSperator()
+                            + "// end of " + logic +  "\n"); // TODO aFile.getLineSperator()
+                }
+                else
+                {
+                    res.append(impl);
+                }
+            }
+            else
+            {
+                ctx.addError(this, "" + logic + " : Function call to missing function (" + functionName + ") !");
+                return null;
+            }
+        }
+        return res.toString();
+    }
+
+    private String replacePlaceholders(String implementation,
+            String FunctionParameters,
+            ConfiguredAlgorithm logic,
+            Element functionElement)
     {
         StringBuffer res = new StringBuffer();
         String[] parts = implementation.split(IMPLEMENTATION_PLACEHOLDER_REGEX);
@@ -266,84 +362,95 @@ public class C_CodeGenerator extends Generator
             }
             else
             {
-                // we found a reference to a function name
-                String functionName = parts[i];
-                // we now need to make sure that that function exists an can be called.
-                // we therefore need to extract the function out of the children of this algorithm
-                Iterator<String> it = logic.getAllChildren();
-                if(false == it.hasNext())
+                if(true == parts[i].endsWith(")"))
                 {
-                    // We need a child to call the function !
-                    ctx.addError(this, "" + logic + " : Function call to missing child (" + functionName + ") !");
-                    return null;
-                }
-                boolean found = false;
-                while(it.hasNext())
-                {
-                    String ChildName = it.next();
-                    ConfiguredAlgorithm childAlgo = logic.getChild(ChildName);
-                    String impl = getCImplementationOf(functionName, childAlgo);
-                    if(null == impl)
+                    if(false == parts[i].contains("("))
                     {
-                        continue;
+                        ctx.addError(this,
+                            "Invalid Function Name (missing open brace?) " + parts[i] );
+                        return null;
                     }
                     else
                     {
-                        found = true;
-                    }
-                    if(true == document_code_source)
-                    {
-                        res.append(
-                                "// from " + logic + "\n" // TODO aFile.getLineSperator()
-                                + impl + ";" + "\n" // TODO aFile.getLineSperator()
-                                + "// end of " + logic +  "\n"); // TODO aFile.getLineSperator()
-                    }
-                    else
-                    {
-                        res.append(impl);
-                    }
-                }
-                if(false == found)
-                {
-                    // The Implementation was not in one of the child elements !
-                    // -> it can only be in the required Library Algorithms
-                    if(true == functionName.contains(":"))
-                    {
-                        String libAlgoName = functionName.substring(0, functionName.indexOf(":"));
-                        ConfiguredAlgorithm libAlgo = ConfiguredAlgorithm.getTreeFromEnvironment(libAlgoName, ctx, logic);
-                        if(null == libAlgo)
+                        // we found a reference to a function name
+                        String functionName = parts[i];
+                        String help = fillInFunctionCall(functionName, logic);
+                        if(null == help)
                         {
-                            ctx.addError(this, "" + logic + " : The Environment does not provide the needed library (" + libAlgoName + ") !");
-                            ctx.addError(this, "" + logic + " : We needed to call the function " + functionName + " !");
                             return null;
-                        }
-                        String impl = getCImplementationOf(functionName, libAlgo);
-                        if(null == impl)
-                        {
-                            ctx.addError(this, "" + logic + " : Function call to missing (lib) function (" + functionName + ") !");
-                            return null;
-                        }
-                        if(true == document_code_source)
-                        {
-                            res.append(
-                                    "// from " + logic + "\n" // TODO aFile.getLineSperator()
-                                    + impl + ";" + "\n" // TODO aFile.getLineSperator()
-                                    + "// end of " + logic +  "\n"); // TODO aFile.getLineSperator()
                         }
                         else
                         {
-                            res.append(impl);
+                            res.append(help);
                         }
+                    }
+                }
+                else
+                {
+                    String paramValue = getFunctionParameterValue(parts[i],
+                            functionElement,
+                            FunctionParameters);
+                    if(null == paramValue)
+                    {
+                        // Not a parameter passed in the function call,
+                        // but a parameter in the algorithm configuration?
+                        paramValue = logic.getParameter(parts[i]);
+                    }
+
+                    if(null == paramValue)
+                    {
+                        ctx.addError(this,
+                            "Invalid parameter requested : " + parts[i] );
+                        ctx.addError(this,"available parameters: " + logic.dumpParameter());
+                        return null;
                     }
                     else
                     {
-                        ctx.addError(this, "" + logic + " : Function call to missing function (" + functionName + ") !");
-                        return null;
+                        res.append(paramValue);
                     }
                 }
             }
         }
         return res.toString();
+    }
+
+    private String getFunctionParameterValue(String ParameterName,
+            Element functionElement,
+            String FunctionParameters )
+    {
+        // Reference to Algorithm parameter
+        // get which parameter this is (1st 2nd 3rd,..)
+        int ParamIndex = 0;
+        do {
+            Attribute attr = functionElement.getAttribute("param" + ParamIndex + "_name");
+            if(null == attr)
+            {
+                log.trace("Function parameter {} not found !", ParameterName);
+                return null;
+            }
+            if(true == ParameterName.equals(attr.getValue()))
+            {
+                break;
+            }
+            else
+            {
+                ParamIndex++;
+            }
+        }while(true);
+
+        // get value for that parameter from FunctionParameters
+        String[] parameters = FunctionParameters.split(",");
+        if(ParamIndex < parameters.length)
+        {
+            return parameters[ParamIndex];
+        }
+        else
+        {
+            ctx.addError(this,
+                    "Could not get the " + ParamIndex
+            + ". parameter to this function from the parameters given as " + FunctionParameters );
+                return null;
+        }
     }
 
     private void getAdditionalsFrom(ConfiguredAlgorithm logic)
@@ -434,16 +541,6 @@ public class C_CodeGenerator extends Generator
                                      "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
                                      "*/"});
         return aFile;
-    }
-
-    @Override
-    public void configure(Configuration cfg)
-    {
-        if("true".equals(cfg.getString(CFG_DOC_CODE_SRC)))
-        {
-            log.trace("Switching on documentation of code source");
-            document_code_source = true;
-        }
     }
 
 }

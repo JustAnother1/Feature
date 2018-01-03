@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <algorithm name="gpio" api="binaryOut,binaryIn">
-  <configurationAttribute name="Port" type="character"/>
-  <configurationAttribute name="Pin" type="unsigned integer"/>
+  <configurationAttribute name="port" type="character"/>
+  <configurationAttribute name="pin" type="unsigned integer"/>
   <required>
     <parameter ref="port" />
     <parameter ref="pin" />
@@ -13,20 +13,20 @@
     </additional>
 
     <function  name="initialize">
-      <![CDATA[DDRB |= (1<<DDB5); //Set the 6th bit on PORTB (i.e. PB5) to 1 => output]]>
+      <![CDATA[DDR$$$port$$$ |= (1<<DD$$$port$$$$$$pin$$$); //Set the pin $$$pin$$$ on Port$$$port$$$ to output]]>
     </function>
 
-    <function  name="setValue"  param0_type="bool" param0_name="on">
+    <function  name="setValue" param0_type="bool" param0_name="on">
       <if cond="true equals param(on)">
-        <![CDATA[PORTB |= (1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 1 => on]]>
+        <![CDATA[PORT$$$port$$$ |= (1<<PORT$$$port$$$$$$pin$$$);    // Turn bit $$$pin$$$ on Port$$$port$$$ to 1 => on]]>
       </if>
       <if cond="false equals param(on)">
-        <![CDATA[PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off]]>
+        <![CDATA[PORT$$$port$$$ &= ~(1<<PORT$$$port$$$$$$pin$$$);    // Turn bit $$$pin$$$ on Port$$$port$$$ to 0 => off]]>
       </if>
     </function>
 
     <function  name="getValue" result="bool">
-      <![CDATA[PORTB;]]>
+      <![CDATA[(PORT$$$port$$$ & 1<<$$$pin$$$);]]>
     </function>
 
   </c_code>

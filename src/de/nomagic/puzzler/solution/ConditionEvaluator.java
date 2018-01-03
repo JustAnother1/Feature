@@ -30,6 +30,11 @@ public class ConditionEvaluator extends Base
     public final static String KEY_HAS = "has";
     public final static String KEY_IS = "is";
     public final static String KEY_PARAM = "param";
+    // math
+    public final static String KEY_MINUS = "-";
+    public final static String KEY_PLUS = "+";
+    public final static String KEY_MULTIPLY = "*";
+    public final static String KEY_DEVIDE = "/";
 
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
@@ -433,6 +438,22 @@ public class ConditionEvaluator extends Base
         {
             return true;
         }
+        if(KEY_MINUS.equals(Word))
+        {
+            return true;
+        }
+        if(KEY_PLUS.equals(Word))
+        {
+            return true;
+        }
+        if(KEY_MULTIPLY.equals(Word))
+        {
+            return true;
+        }
+        if(KEY_DEVIDE.equals(Word))
+        {
+            return true;
+        }
         return false;
     }
 
@@ -608,6 +629,118 @@ public class ConditionEvaluator extends Base
                 return KEY_FALSE;
             }
 
+
+        case KEY_MINUS:
+            try
+            {
+                one = Integer.parseInt(valOne);
+            }
+            catch(NumberFormatException e)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "one invalid number : '" + valOne + "'");
+                ctx.addError("ConditionEvaluation", algo.toString());
+                ctx.addError("ConditionEvaluation", algo.dumpParameter());
+                ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                return KEY_FALSE;
+            }
+            try
+            {
+                two = Integer.parseInt(valTwo);
+            }
+            catch(NumberFormatException e)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "invalid number : '" + valTwo + "'");
+                return KEY_FALSE;
+            }
+            return "" + (one - two);
+
+        case KEY_PLUS:
+            try
+            {
+                one = Integer.parseInt(valOne);
+            }
+            catch(NumberFormatException e)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "one invalid number : '" + valOne + "'");
+                ctx.addError("ConditionEvaluation", algo.toString());
+                ctx.addError("ConditionEvaluation", algo.dumpParameter());
+                ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                return KEY_FALSE;
+            }
+            try
+            {
+                two = Integer.parseInt(valTwo);
+            }
+            catch(NumberFormatException e)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "invalid number : '" + valTwo + "'");
+                return KEY_FALSE;
+            }
+            return "" + (one + two);
+
+        case KEY_MULTIPLY:
+            try
+            {
+                one = Integer.parseInt(valOne);
+            }
+            catch(NumberFormatException e)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "one invalid number : '" + valOne + "'");
+                ctx.addError("ConditionEvaluation", algo.toString());
+                ctx.addError("ConditionEvaluation", algo.dumpParameter());
+                ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                return KEY_FALSE;
+            }
+            try
+            {
+                two = Integer.parseInt(valTwo);
+            }
+            catch(NumberFormatException e)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "invalid number : '" + valTwo + "'");
+                return KEY_FALSE;
+            }
+            return "" + (one * two);
+
+        case KEY_DEVIDE:
+            try
+            {
+                one = Integer.parseInt(valOne);
+            }
+            catch(NumberFormatException e)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "one invalid number : '" + valOne + "'");
+                ctx.addError("ConditionEvaluation", algo.toString());
+                ctx.addError("ConditionEvaluation", algo.dumpParameter());
+                ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                return KEY_FALSE;
+            }
+            try
+            {
+                two = Integer.parseInt(valTwo);
+            }
+            catch(NumberFormatException e)
+            {
+                valid = false;
+                ctx.addError("ConditionEvaluation",
+                        "invalid number : '" + valTwo + "'");
+                return KEY_FALSE;
+            }
+            return "" + (one / two);
 
         default:
             valid = false;

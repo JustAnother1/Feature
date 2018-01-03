@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <algorithm name="gpio" api="binaryOut,binaryIn">
-  <configurationAttribute name="Port" type="character"/>
-  <configurationAttribute name="Pin" type="unsigned integer"/>
+  <configurationAttribute name="port" type="character"/>
+  <configurationAttribute name="pin" type="unsigned integer"/>
   <required>
     <parameter ref="port" />
     <parameter ref="pin" />
@@ -11,28 +11,28 @@
     <function  name="initialize">
       <![CDATA[
         RCC->AHB1ENR |= D_IN_5_RCC_GPIO_ENABLE;
-        D_IN_5_GPIO_PORT->MODER   &= ~D_IN_5_MODER_0;
-        D_IN_5_GPIO_PORT->MODER   |=  D_IN_5_MODER_1;
-        D_IN_5_GPIO_PORT->OTYPER  &= ~D_IN_5_OTYPER_0;
-        D_IN_5_GPIO_PORT->OTYPER  |=  D_IN_5_OTYPER_1;
-        D_IN_5_GPIO_PORT->OSPEEDR &= ~D_IN_5_OSPEEDR_0;
-        D_IN_5_GPIO_PORT->OSPEEDR |=  D_IN_5_OSPEEDR_1;
-        D_IN_5_GPIO_PORT->PUPDR   &= ~D_IN_5_PUPD_0;
-        D_IN_5_GPIO_PORT->PUPDR   |=  D_IN_5_PUPD_1;
+        GPIO$$$port$$$->MODER   &= ~D_IN_5_MODER_0;
+        GPIO$$$port$$$->MODER   |=  D_IN_5_MODER_1;
+        GPIO$$$port$$$->OTYPER  &= ~D_IN_5_OTYPER_0;
+        GPIO$$$port$$$->OTYPER  |=  D_IN_5_OTYPER_1;
+        GPIO$$$port$$$->OSPEEDR &= ~D_IN_5_OSPEEDR_0;
+        GPIO$$$port$$$->OSPEEDR |=  D_IN_5_OSPEEDR_1;
+        GPIO$$$port$$$->PUPDR   &= ~D_IN_5_PUPD_0;
+        GPIO$$$port$$$->PUPDR   |=  D_IN_5_PUPD_1;
 ]]>
     </function>
 
     <function  name="setValue"  param0_type="bool" param0_name="on">
       <if cond="true equals param(on)">
-        <![CDATA[GPIO$$$Port$$$->ODR |= 1<<$$$Pin$$$;]]>
+        <![CDATA[GPIO$$$port$$$->ODR |= 1<<$$$pin$$$;]]>
       </if>
       <if cond="false equals param(on)">
-        <![CDATA[GPIO$$$Port$$$->ODR &= ~1<<$$$Pin$$$;]]>
+        <![CDATA[GPIO$$$port$$$->ODR &= ~1<<$$$pin$$$;]]>
       </if>
     </function>
 
     <function  name="getValue" result="bool">
-      <![CDATA[if(0 !=(D_IN_0_GPIO_PORT->IDR & D_IN_0_IDR)) {return DIN_HIGH;} else {return DIN_LOW;}]]>
+      <![CDATA[if(0 !=(GPIO$$$port$$$->IDR & 1<<$$$pin$$$)) {return DIN_HIGH;} else {return DIN_LOW;}]]>
     </function>
 
     <additional>

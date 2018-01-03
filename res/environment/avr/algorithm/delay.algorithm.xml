@@ -5,8 +5,8 @@
       <include>util/delay.h</include>
     </additional>
 
-    <function  name="delay_ms">
-      <![CDATA[_delay_ms(1000);]]>
+    <function  name="delay_ms" param0_type="int" param0_name="time">
+      <![CDATA[_delay_ms($$$time$$$);]]>
     </function>
 
   </c_code>
