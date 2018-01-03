@@ -72,6 +72,10 @@ public class Algorithm extends Base
 
     public boolean hasApi(String api)
     {
+        if(null == api)
+        {
+            return true;
+        }
         if(null != root)
         {
             String apis = root.getAttributeValue(ALGORITHM_API_ATTRIBUTE_NAME);
