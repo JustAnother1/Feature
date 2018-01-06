@@ -112,32 +112,20 @@ public class C_CodeGenerator extends Generator
         Function[] funcs = api.getRequiredFunctions();
         for(int i = 0; i < funcs.length; i++)
         {
-            String declaration = funcs[i].getDeclaration();
-            declaration = declaration.trim();
             C_functionCall fc = new C_functionCall(funcs[i].getName());
             String implementation = getCImplementationOf(fc, logic);
             if(null == implementation)
             {
                 return null;
             }
+            funcs[i].setImplementation(implementation);
             if(true == document_code_source)
             {
-                aFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
-                        "// from " + logic + aFile.getLineSperator()
-                        + declaration + ";" + aFile.getLineSperator()
-                        + "// end of " + logic);
-                aFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
-                        "// from " + logic + aFile.getLineSperator()
-                        + declaration + aFile.getLineSperator()
-                        + implementation+ aFile.getLineSperator()
-                        + "// end of " + logic);
+                aFile.addFunction(funcs[i], logic);
             }
             else
             {
-                aFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
-                        declaration + ";");
-                aFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
-                        declaration + aFile.getLineSperator() + implementation);
+                aFile.addFunction(funcs[i]);
             }
         }
         return aFile;
@@ -150,7 +138,7 @@ public class C_CodeGenerator extends Generator
 
         if( false == logic.hasApi(functionToCall.getApi()))
         {
-            log.trace("{} : Function call to wrong API!(API: {})", logic, functionToCall.getApi());
+            log.warn("{} : Function call to wrong API!(API: {})", logic, functionToCall.getApi());
             return null;
         }
 
@@ -493,27 +481,14 @@ public class C_CodeGenerator extends Generator
 
             case ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME:
                 Function func = new Function(curElement);
-                String declaration = func.getDeclaration();
-
 
                 if(true == document_code_source)
                 {
-                    sourceFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
-                            "// from " + logic + sourceFile.getLineSperator()
-                            + declaration + ";" + sourceFile.getLineSperator()
-                            + "// end of " + logic);
-                    sourceFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
-                            "// from " + logic + sourceFile.getLineSperator()
-                            + declaration + sourceFile.getLineSperator()
-                            + curElement.getText() + sourceFile.getLineSperator()
-                            + "// end of " + logic);
+                    sourceFile.addFunction(func, logic);
                 }
                 else
                 {
-                    sourceFile.addLine(C_File.C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME,
-                            declaration + ";");
-                    sourceFile.addLine(C_File.C_FILE_FUNCTIONS_SECTION_NAME,
-                            declaration +  sourceFile.getLineSperator() + curElement.getText());
+                    sourceFile.addFunction(func);
                 }
                 break;
 

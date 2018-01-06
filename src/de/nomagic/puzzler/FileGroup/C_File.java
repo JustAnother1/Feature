@@ -1,11 +1,11 @@
 package de.nomagic.puzzler.FileGroup;
 
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Vector;
 
 import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
 import de.nomagic.puzzler.BuildSystem.Target;
+import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
+import de.nomagic.puzzler.solution.Function;
 
 public class C_File extends TextFile
 {
@@ -18,7 +18,8 @@ public class C_File extends TextFile
     public final static String C_FILE_FUNCTIONS_SECTION_NAME                 = "publicFunctions";
     public final static String C_FILE_STATIC_FUNCTIONS_SECTION_NAME          = "privateFunctions";
 
-    protected Vector<String> inc_comments= null;
+    private ElementHandler includes = new IncludeHandler();
+    private ElementHandler functions = new FunctionHandler();
 
     public C_File(String filename)
     {
@@ -32,6 +33,17 @@ public class C_File extends TextFile
                                      C_FILE_FUNCTIONS_SECTION_NAME,
                                      C_FILE_STATIC_FUNCTIONS_SECTION_NAME});
         separateSectionWithEmptyLine(true);
+    }
+    @Override
+    public void addContentsOf(C_File otherFile)
+    {
+        if(null == otherFile)
+        {
+            return;
+        }
+        includes.addAll(otherFile.includes);
+        functions.addAll(otherFile.functions);
+        super.addContentsOf(otherFile);
     }
 
     @Override
@@ -55,12 +67,8 @@ public class C_File extends TextFile
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
         {
-            if(null == inc_comments)
-            {
-                inc_comments = new Vector<String>();
-            }
-            inc_comments.add(comment);
-            addLine(sectionName, line);
+            C_include inc = new C_include(line, comment);
+            includes.add(inc);
         }
         else
         {
@@ -68,57 +76,50 @@ public class C_File extends TextFile
         }
     }
 
+    public void addLine(String sectionName, String line)
+    {
+        if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
+        {
+            C_include inc = new C_include(line, null);
+            includes.add(inc);
+        }
+        else
+        {
+            super.addLine(sectionName, line);
+        }
+    }
+
     protected Vector<String> prepareSectionData(String sectionName, Vector<String> sectionData)
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
         {
-            if(sectionData.isEmpty())
-            {
-                return sectionData;
-            }
-            if(null == inc_comments)
-            {
-                // remove duplicates
-                Collections.sort(sectionData);
-                Iterator<String> it = sectionData.iterator();
-                String first = it.next(); // we just checked that it is not empty, so this should work.
-                while(it.hasNext())
-                {
-                    String next = it.next();
-                    if(first.equals(next))
-                    {
-                        it.remove();
-                    }
-                    else
-                    {
-                        first = next;
-                    }
-                }
-            }
-            // else can not remove duplicates if they have comments to not loose comments
-
-            // expand to valid include statement
-            Vector<String> res = new Vector<String>();
-            for(int i = 0; i < sectionData.size(); i++)
-            {
-                String line = sectionData.get(i);
-                if(null == inc_comments)
-                {
-                    line = "#include <" + line + ">";
-                }
-                else
-                {
-                    line = "#include <" + line + "> // " + inc_comments.get(i);
-                }
-                res.add(line);
-            }
-            return res;
+            return includes.getCode(0, getLineSperator());
+        }
+        else if(true == C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME.equals(sectionName))
+        {
+            return functions.getCode(FunctionHandler.TYPE_DECLARATION, getLineSperator());
+        }
+        else if(true == C_FILE_FUNCTIONS_SECTION_NAME.equals(sectionName))
+        {
+            return functions.getCode(FunctionHandler.TYPE_IMPLEMENTATION, getLineSperator());
         }
         else
         {
             // Nothing to do here
             return sectionData;
         }
+
+    }
+
+    public void addFunction(Function func, ConfiguredAlgorithm logic)
+    {
+        func.addComment(logic.toString());
+        functions.add(func);
+    }
+
+    public void addFunction(Function func)
+    {
+        functions.add(func);
     }
 
 }

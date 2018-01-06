@@ -11,9 +11,6 @@
         <required>
             <libraryAlgorithm type="delay"/>
         </required>
-        <additional>
-            <include>util/delay.h</include>
-        </additional>
         <function  name="initialize">
             <![CDATA[$$$binaryOut:initialize()$$$]]>
         </function>
