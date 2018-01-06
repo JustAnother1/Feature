@@ -4,7 +4,7 @@
         <additional>
             <include>st_gpio.h</include>
             <include>st_rcc.h</include>
-             <file name="st_gpio.h"> <![CDATA[#define PERIPH_BASE           ((uint32_t)0x40000000) /* Peripheral base address in the alias region */
+             <file name="st_gpio.h"><![CDATA[#define PERIPH_BASE           ((uint32_t)0x40000000) /* Peripheral base address in the alias region */
 #define AHB1PERIPH_BASE       (PERIPH_BASE + 0x00020000)
 
 #define GPIOA_BASE          (AHB1PERIPH_BASE + 0x0000)
@@ -41,7 +41,7 @@ typedef struct
 #define GPIOH               ((GPIO_TypeDef *) GPIOH_BASE)
 #define GPIOI               ((GPIO_TypeDef *) GPIOI_BASE)
 ]]></file>
-             <file name="st_rcc.h"> <![CDATA[typedef struct
+             <file name="st_rcc.h"><![CDATA[typedef struct
 {
   __IO uint32_t CR;            /* RCC clock control register,                                  Address offset: 0x00 */
   __IO uint32_t PLLCFGR;       /* RCC PLL configuration register,                              Address offset: 0x04 */

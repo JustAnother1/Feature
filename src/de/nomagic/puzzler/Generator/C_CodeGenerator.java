@@ -15,6 +15,7 @@ import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.FileGroup.C_File;
 import de.nomagic.puzzler.FileGroup.FileGroup;
+import de.nomagic.puzzler.FileGroup.TextFile;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.Api;
 import de.nomagic.puzzler.solution.ConditionEvaluator;
@@ -33,6 +34,8 @@ public class C_CodeGenerator extends Generator
     public final static String ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME = "additional";
     public final static String ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME = "include";
     public final static String ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME = "function";
+    public final static String ALGORITHM_ADDITIONAL_FILE_CHILD_NAME = "file";
+    public final static String ALGORITHM_ADDITIONAL_FILE_NAME_ATTRIBUTE = "name";
 
     public final static String CFG_DOC_CODE_SRC = "document_code_source";
 
@@ -492,7 +495,12 @@ public class C_CodeGenerator extends Generator
                 }
                 break;
 
-                // TODO additional File
+            case ALGORITHM_ADDITIONAL_FILE_CHILD_NAME:
+                TextFile addFile = new TextFile(curElement.getAttributeValue(ALGORITHM_ADDITIONAL_FILE_NAME_ATTRIBUTE));
+                addFile.createSection("content");
+                addFile.addLine("content", curElement.getText());
+                codeGroup.add(addFile);
+                break;
 
             default: // ignore
                 log.warn("invalid type {} for algorithm {}", type, logic);
