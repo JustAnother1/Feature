@@ -9,6 +9,7 @@ public class IncludeHandler extends ElementHandler
 
     public IncludeHandler()
     {
+        super();
     }
 
     @Override

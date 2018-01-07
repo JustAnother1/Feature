@@ -13,6 +13,7 @@ public class FunctionHandler extends ElementHandler
 
     public FunctionHandler()
     {
+        super();
     }
 
     @Override
