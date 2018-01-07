@@ -5,8 +5,8 @@ import org.jdom2.Element;
 public class Target
 {
     private String source;
-    private String output = "";
-    private String rule = "";
+    private String output;
+    private String rule;
 
     public Target(String source)
     {
@@ -15,11 +15,7 @@ public class Target
 
     public Target(Element Xml)
     {
-        if(null == Xml)
-        {
-            source = "";
-        }
-        else
+        if(null != Xml)
         {
             source = Xml.getChildText("source");
             output = Xml.getChildText("output");
