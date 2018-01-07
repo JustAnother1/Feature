@@ -5,7 +5,7 @@
       <CC>arm-none-eabi-gcc</CC>
       <LD>arm-none-eabi-ld</LD>
       <LKR_SCRIPT>stm32.ld</LKR_SCRIPT>
-      <CFLAGS>-c -fno-common -O0 -g -mcpu=cortex-m3 -mthumb</CFLAGS>
+      <CFLAGS>-c -fno-common -O0 -g -mcpu=cortex-m3 -mthumb -I.</CFLAGS>
       <LFLAGS>-nostartfiles -T$(LKR_SCRIPT)</LFLAGS>
       <CPFLAGS>-Obinary</CPFLAGS>
     </variables>
