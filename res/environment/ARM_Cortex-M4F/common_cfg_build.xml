@@ -4,16 +4,25 @@
     <variables>
       <CC>arm-none-eabi-gcc</CC>
       <LD>arm-none-eabi-ld</LD>
+      <AS>arm-none-eabi-as</AS>
       <LKR_SCRIPT>stm32.ld</LKR_SCRIPT>
-      <CFLAGS>-c -fno-common -O0 -g -mcpu=cortex-m3 -mthumb -I.</CFLAGS>
+      <CFLAGS>-c -fno-common -O0 -g -mcpu=cortex-m4 -mfpu=vfpv4-d16 -mthumb -I.</CFLAGS>
       <LFLAGS>-nostartfiles -T$(LKR_SCRIPT)</LFLAGS>
       <CPFLAGS>-Obinary</CPFLAGS>
+      <C_SRC>SystemInit.c</C_SRC>
+      <OBJS>startup.o SystemInit.o</OBJS>
+      <ASFLAGS> -g -Wall -gdwarf-2 -mthumb -mcpu=cortex-m4 -mfpu=vfpv4-d16 </ASFLAGS>
     </variables>
     <targets>
       <target>
         <source>$(OBJS)</source>
         <output>$(project).elf</output>
-        <rule>$(LD) $(LFLAGS) -o main.elf main.o</rule>
+        <rule>$(LD) $(LFLAGS) -o $(project).elf $(OBJS)</rule>
+      </target>
+      <target>
+        <source>startup.s</source>
+        <output>startup.o</output>
+        <rule>$(AS) -c $(AFLAGS) -o startup.o startup.o</rule>
       </target>
     </targets>
   </required>
