@@ -22,7 +22,13 @@
       <target>
         <source>startup.s</source>
         <output>startup.o</output>
-        <rule>$(AS) -c $(AFLAGS) -o startup.o startup.o</rule>
+        <rule>$(AS) -c $(ASFLAGS) -o startup.o startup.o</rule>
+      </target>
+      <target>
+        <source>$(project).elf</source>
+        <output>flash</output>
+        <rule>arm-none-eabi-objcopy -O binary -S $(project).elf $(project).bin
+        st-flash write $(project).bin 0x8000000</rule>
       </target>
     </targets>
   </required>
