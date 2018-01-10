@@ -2,10 +2,14 @@ package de.nomagic.puzzler.FileGroup;
 
 import org.jdom2.Element;
 
-public class FileFactory
+public final class FileFactory
 {
     public final static String UNSTRUCTURED_TEXT_SECTION = "unstructured";
     public final static String ALGORITHM_ADDITIONAL_FILE_NAME_ATTRIBUTE = "name";
+
+    private FileFactory()
+    {
+    }
 
     public static AbstractFile getFileFromXml(Element xml)
     {
