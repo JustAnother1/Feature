@@ -42,6 +42,11 @@ public class SolutionImpl extends Base implements Solution
 
     public boolean getFromProject(Project pro)
     {
+        if(null == ctx)
+        {
+            System.out.println("ERROR: no Context !");
+            return false;
+        }
         if(null == pro)
         {
             ctx.addError(this, "No Project provided !");
@@ -175,6 +180,11 @@ public class SolutionImpl extends Base implements Solution
 
     public boolean checkAndTestAgainstEnvironment()
     {
+        if(null == ctx)
+        {
+            System.out.println("ERROR: no Context !");
+            return false;
+        }
         if(null == ctx.getEnvironment())
         {
             ctx.addError(this, "No Environment provided !");

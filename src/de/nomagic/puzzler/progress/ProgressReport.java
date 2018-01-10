@@ -42,7 +42,14 @@ public class ProgressReport
         }
         else
         {
-            System.err.println("ERROR(" + ref.getClass().getName() + ") : " + msg);
+            if(null == ref)
+            {
+                System.err.println("ERROR(null) : " + msg);
+            }
+            else
+            {
+                System.err.println("ERROR(" + ref.getClass().getName() + ") : " + msg);
+            }
         }
     }
 

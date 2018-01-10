@@ -14,6 +14,14 @@ public class Api extends Base
     public final static String API_NAME_ATTRIBUTE_NAME = "name";
     public final static String API_FUNCTION_ELEMENT_NAME = "function";
 
+    private Element root = null;
+
+    public Api(Element root, Context ctx)
+    {
+        super(ctx);
+        this.root = root;
+    }
+
     @Override
     public String toString()
     {
@@ -27,17 +35,12 @@ public class Api extends Base
         }
     }
 
-    private Element root = null;
-
-    public Api(Element root, Context ctx)
-    {
-        super(ctx);
-        this.root = root;
-    }
-
-
     public static Api getFromFile(String name, Library lib, Context ctx)
     {
+        if(null == lib)
+        {
+            return null;
+        }
         Element root = lib.getApiElement(name, ctx);
         if(null != root)
         {

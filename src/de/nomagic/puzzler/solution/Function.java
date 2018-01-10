@@ -71,6 +71,11 @@ public class Function extends C_element
 
     public boolean sameAs(Function next)
     {
+        if(null == next)
+        {
+            return false;
+        }
+
         if(false == this.name.equals(next.name))
         {
             log.trace("name differs");
@@ -215,6 +220,11 @@ public class Function extends C_element
     @Override
     public String getCode(int type, String lineSperator)
     {
+        if(null == tag)
+        {
+            return null;
+        }
+
         if(FunctionHandler.TYPE_DECLARATION == type)
         {
             if(null == comment)

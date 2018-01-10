@@ -27,6 +27,12 @@
       <target>
         <source>$(project).elf</source>
         <output>flash</output>
+
+        # openocd
+        openocd -f board/stm32f4discovery.cfg -c "program blinkyProject_stm32.elf verify reset exit"
+        # oder
+        openocd -f board/stm32f4discovery.cfg -c "program blinkyProject_stm32.bin exit 0x08000000"
+
         <rule>arm-none-eabi-objcopy -O binary -S $(project).elf $(project).bin
         st-flash write $(project).bin 0x8000000</rule>
       </target>
