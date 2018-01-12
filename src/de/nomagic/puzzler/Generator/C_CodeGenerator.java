@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.C_File;
@@ -93,8 +92,7 @@ public class C_CodeGenerator extends Generator
         // we will need at least one *.c file. So create that now.
         sourceFile = createFile("main.c");
 
-        FileGetter fg = new FileGetter();
-        Api api = Api.getFromFile(REQUIRED_ROOT_API, fg, ctx);
+        Api api = Api.getFromFile(REQUIRED_ROOT_API, ctx);
 
         C_File imp = getImplementationFor(api, logic);
         if(null == imp)

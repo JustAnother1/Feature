@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.Library;
+import de.nomagic.puzzler.FileGetter;
 
 public class Algorithm extends Base
 {
@@ -50,9 +50,9 @@ public class Algorithm extends Base
         }
     }
 
-    public static Algorithm getFromFile(Element curElement, Library lib, Context ctx)
+    public static Algorithm getFromFile(Element curElement, Context ctx)
     {
-        if((null == curElement) || (null == lib))
+        if(null == curElement)
         {
             return null;
         }
@@ -61,7 +61,7 @@ public class Algorithm extends Base
         {
             return null;
         }
-        Element root = lib.getAlgorithmElement(algoAttr.getValue(), ctx);
+        Element root = FileGetter.getAlgorithmElement(algoAttr.getValue(), ctx);
         Algorithm res = new Algorithm(root, ctx);
 
         // TODO check required configuration

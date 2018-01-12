@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Project;
 
 public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface
@@ -130,8 +129,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         if(null == algo)
         {
             // algorithm might be a Library
-            FileGetter lib = new FileGetter();
-            algo = Algorithm.getFromFile(evnElement, lib, ctx);
+            algo = Algorithm.getFromFile(evnElement, ctx);
             if(null == algo)
             {
                 ctx.addError("ConfiguredAlgorithm.getTree",

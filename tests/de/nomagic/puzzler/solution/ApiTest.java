@@ -27,7 +27,7 @@ public class ApiTest
     @Test
     public void testGetFromFile_null()
     {
-        assertNull(Api.getFromFile(null, null, null));
+        assertNull(Api.getFromFile(null, null));
     }
 
     @Test

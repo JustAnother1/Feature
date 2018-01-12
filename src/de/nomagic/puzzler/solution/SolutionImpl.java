@@ -117,8 +117,7 @@ public class SolutionImpl extends Base implements Solution
         else
         {
             // load Algorithm
-            FileGetter fg = new FileGetter();
-            Algorithm algo = Algorithm.getFromFile(cfgElement, fg,  ctx);
+            Algorithm algo = Algorithm.getFromFile(cfgElement, ctx);
 
             if(null == algo)
             {

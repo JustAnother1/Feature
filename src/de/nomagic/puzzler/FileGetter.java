@@ -15,16 +15,25 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.configuration.Configuration;
 
-public class FileGetter implements Library
+public final class FileGetter
 {
     public final static String ALGORITHM_ROOT_ELEMENT_NAME = "algorithm";
     public final static String API_ROOT_ELEMENT_NAME = "api";
 
     private static final Logger log = LoggerFactory.getLogger("FileGetter");
 
+    private FileGetter()
+    {
+    }
+
     public static Document getXmlFile(String path, String name, Context ctx)
     {
         return tryToGetXmlFile(path, name, true, ctx);
+    }
+
+    public static Document getXmlFile(String[] paths, String name, Context ctx)
+    {
+        return tryToGetXmlFile(paths, name, true, ctx);
     }
 
     public static Document tryToGetXmlFile(String path,
@@ -32,6 +41,10 @@ public class FileGetter implements Library
                                            boolean failureIsError,
                                            Context ctx)
     {
+        if(null == name)
+        {
+            return null;
+        }
         String xmlSource;
         if(null == path)
         {
@@ -78,11 +91,6 @@ public class FileGetter implements Library
         return jdomDocument;
     }
 
-    public static Document getXmlFile(String[] paths, String name, Context ctx)
-    {
-        return tryToGetXmlFile(paths, name, true, ctx);
-    }
-
     public static Document tryToGetXmlFile(String[] paths,
                                       String name,
                                       boolean failureIsError,
@@ -92,7 +100,14 @@ public class FileGetter implements Library
         {
             if(true == failureIsError)
             {
-                ctx.addError("FileGetter", "no paths supplied");
+                if(null != ctx)
+                {
+                    ctx.addError("FileGetter", "no paths supplied");
+                }
+                else
+                {
+                    System.out.println("ERROR: FileGetter : no paths supplied");
+                }
             }
             return null;
         }
@@ -164,12 +179,12 @@ public class FileGetter implements Library
         return root;
     }
 
-    public Element getApiElement(String ApiName, Context ctx)
+    public static Element getApiElement(String ApiName, Context ctx)
     {
         return getFromFile(ApiName, "api", API_ROOT_ELEMENT_NAME, ctx);
     }
 
-    public Element getAlgorithmElement(String AlgorithmName, Context ctx)
+    public static Element getAlgorithmElement(String AlgorithmName, Context ctx)
     {
         if((null == AlgorithmName))
         {
@@ -182,7 +197,7 @@ public class FileGetter implements Library
                            ctx);
     }
 
-    private Element getFromFile(String Name,
+    private static Element getFromFile(String Name,
             String type,
             String rootElementName,
             Context ctx)

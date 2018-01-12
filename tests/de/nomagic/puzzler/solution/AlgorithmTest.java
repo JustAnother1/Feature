@@ -56,23 +56,21 @@ public class AlgorithmTest {
     @Test
     public void testGetFromFile_null()
     {
-        assertNull(Algorithm.getFromFile(null, null, null));
+        assertNull(Algorithm.getFromFile(null, null));
     }
 
     @Test
     public void testGetFromFile_badElement()
     {
         Element root = new Element("bad");
-        assertNull(Algorithm.getFromFile(root, null, null));
+        assertNull(Algorithm.getFromFile(root, null));
     }
 
     @Test
     public void testGetFromFile_badElement_lib()
     {
         Element root = new Element("bad");
-        LibraryStub libstub = new LibraryStub();
-        libstub.setResult(null);
-        assertNull(Algorithm.getFromFile(root, libstub, null));
+        assertNull(Algorithm.getFromFile(root, null));
     }
 
     @Test
@@ -80,7 +78,7 @@ public class AlgorithmTest {
     {
         Element root = new Element("good");
         root.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, "bla");
-        assertNull(Algorithm.getFromFile(root, null, null));
+        assertNull(Algorithm.getFromFile(root, null));
     }
 
     @Test
@@ -88,9 +86,7 @@ public class AlgorithmTest {
     {
         Element root = new Element("good");
         root.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, "bla");
-        LibraryStub libstub = new LibraryStub();
-        libstub.setResult(null);
-        Algorithm res = Algorithm.getFromFile(root, libstub, null);
+        Algorithm res = Algorithm.getFromFile(root, null);
         assertNotNull(res);
         assertSame("ERROR: unconfigured Algorithm", res.toString());
     }
