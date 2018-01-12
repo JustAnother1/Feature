@@ -74,14 +74,6 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testGetFromFile_noLib()
-    {
-        Element root = new Element("good");
-        root.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, "bla");
-        assertNull(Algorithm.getFromFile(root, null));
-    }
-
-    @Test
     public void testGetFromFile_noImplementation()
     {
         Element root = new Element("good");
@@ -96,8 +88,9 @@ public class AlgorithmTest {
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
-        Algorithm cut = new Algorithm(null, ctx);
-        assertFalse(cut.hasApi("blupp"));
+        Element ele = new Element("bad");
+        Algorithm cut = new Algorithm(ele, ctx);
+        assertTrue(cut.hasApi(null));
     }
 
     @Test

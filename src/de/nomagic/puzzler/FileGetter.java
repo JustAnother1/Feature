@@ -202,12 +202,16 @@ public final class FileGetter
             String rootElementName,
             Context ctx)
     {
-        if((null == Name)|| (null == type) || (null == rootElementName))
+        if(   (null == Name)
+           || (null == type)
+           || (null == rootElementName)
+           || (null == ctx) )
         {
             log.warn("Invalid parameters!");
             log.warn("Name: " + Name);
             log.warn("type: " + type);
             log.warn("root name: " + rootElementName);
+            log.warn("context: " + ctx);
             return null;
         }
 
