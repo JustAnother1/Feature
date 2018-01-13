@@ -53,6 +53,23 @@ public class ToolTest {
     }
 
     @Test
+    public void testFromByteBufferToHexString_int_len_off_null()
+    {
+        int[] buf = null;
+        assertEquals("[]", Tool.fromByteBufferToHexString(buf, 10, 5));
+    }
+
+    @Test
+    public void testFromByteBufferToHexString_int_len_off()
+    {
+        int[] buf = new int[3];
+        buf[0] = 0x1122;
+        buf[1] = 0x3344;
+        buf[2] = 0x5566;
+        assertEquals("[44 66]", Tool.fromByteBufferToHexString(buf, 2, 1));
+    }
+
+    @Test
     public void testFromByteBufferToHexString_byte_null()
     {
         byte[] buf = null;
@@ -127,6 +144,12 @@ public class ToolTest {
         string[10] = (byte)0x64; // d
         string[11] = (byte)0x21; // !
         assertEquals("[Hello World!]", Tool.fromByteBufferToUtf8String(string));
+    }
+
+    @Test
+    public void testFromByteBufferToUtf8String_len_off_null()
+    {
+        assertEquals("[]", Tool.fromByteBufferToUtf8String(null, 5, 3));
     }
 
     @Test
