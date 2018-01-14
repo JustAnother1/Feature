@@ -105,17 +105,40 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         while(it.hasNext())
         {
             Target curentTarget = targets.get(it.next());
-            String out =  curentTarget.getOutput();
-            if(null != out)
+            if(false == curentTarget.isPhony())
             {
-                out = out.replaceAll("%", "*");
-                sb.append(out + " ");
+                String out =  curentTarget.getOutput();
+                if(null != out)
+                {
+                    out = out.replaceAll("%", "*");
+                    sb.append(out + " ");
+                }
             }
+            // else phony targets do not create files
         }
-
         makeFile.addLines(MAKEFILE_FILE_TARGET_SECTION_NAME,
                 new String[] {"clean:",
                               "\trm " + sb.toString() });
+
+        // PHONY
+        it = targets.keySet().iterator();
+        sb = new StringBuffer();
+        while(it.hasNext())
+        {
+            Target curentTarget = targets.get(it.next());
+            if(true == curentTarget.isPhony())
+            {
+                String out =  curentTarget.getOutput();
+                if(null != out)
+                {
+                    out = out.replaceAll("%", "*");
+                    sb.append(out + " ");
+                }
+            }
+            // else phony targets do not create files
+        }
+        makeFile.addLines(MAKEFILE_FILE_TARGET_SECTION_NAME,
+                new String[] {".PHONY: " + sb.toString() });
 
         files.add(makeFile);
         files.addAll(buildFiles);
