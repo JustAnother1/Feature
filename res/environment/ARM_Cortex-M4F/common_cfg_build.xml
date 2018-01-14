@@ -3,11 +3,11 @@
   <required>
     <variables>
       <CC>arm-none-eabi-gcc</CC>
-      <LD>arm-none-eabi-ld</LD>
+      <LD>arm-none-eabi-gcc</LD>
       <AS>arm-none-eabi-as</AS>
       <LKR_SCRIPT>stm32.ld</LKR_SCRIPT>
-      <CFLAGS>-c -fno-common -O0 -g -mcpu=cortex-m4 -mfpu=vfpv4-d16 -mthumb -I.</CFLAGS>
-      <LFLAGS>-nostartfiles -T$(LKR_SCRIPT)</LFLAGS>
+      <CFLAGS>-c -fno-common -ffreestanding -nostdlib -nostdinc -O0 -g -mcpu=cortex-m4 -mfpu=vfpv4-d16 -mthumb -I.</CFLAGS>
+      <LFLAGS>-nostartfiles -nostdlib -nostdinc -g -T$(LKR_SCRIPT)</LFLAGS>
       <CPFLAGS>-Obinary</CPFLAGS>
       <C_SRC>SystemInit.c</C_SRC>
       <OBJS>startup.o SystemInit.o</OBJS>
@@ -15,24 +15,24 @@
     </variables>
     <targets>
       <target>
-        <source>$(OBJS)</source>
+        <source>$(OBJS) startup.o</source>
         <output>$(project).elf</output>
         <rule>$(LD) $(LFLAGS) -o $(project).elf $(OBJS)</rule>
       </target>
       <target>
         <source>startup.s</source>
         <output>startup.o</output>
-        <rule>$(AS) -c $(ASFLAGS) -o startup.o startup.o</rule>
+        <rule>$(AS) -c $(ASFLAGS) -o startup.o startup.s</rule>
       </target>
-      <target>
+      <target phony="true">
         <source>$(project).elf</source>
         <output>flash</output>
-
+<!--
         # openocd
         openocd -f board/stm32f4discovery.cfg -c "program blinkyProject_stm32.elf verify reset exit"
         # oder
         openocd -f board/stm32f4discovery.cfg -c "program blinkyProject_stm32.bin exit 0x08000000"
-
+-->
         <rule>arm-none-eabi-objcopy -O binary -S $(project).elf $(project).bin
         st-flash write $(project).bin 0x8000000</rule>
       </target>

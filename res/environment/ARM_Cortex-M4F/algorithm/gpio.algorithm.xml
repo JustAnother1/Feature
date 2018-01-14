@@ -14,13 +14,13 @@
     <function  name="initialize">
       <![CDATA[$$$st_gpio:enablePort(port)$$$
     // Moder: 00=Input; 01=Output;10=AlternateFunction;11=Analog Mode
-    GPIO$$$port$$$->MODER   |=  3<<(2*$$$pin$$$);
+    GPIO$$$port$$$->MODER   |=  1<<(2*$$$pin$$$);
     // Typer: 0= PushPull; 1=OpenDrain
     // reset state GPIO$$$port$$$->OTYPER  &= ~1<<$$$pin$$$;
     // OSpeedR 00=low speed; 01= medium speed; 10=high speed; 11=very high speed
-    GPIO$$$port$$$->OSPEEDR &= ~(3<<(2*$$$pin$$$));
+    // GPIO$$$port$$$->OSPEEDR &= ~(0<<(2*$$$pin$$$));
     // PuPdR: 00=no pull up, no pull down; 01= pull-up; 10=pull-down
-    GPIO$$$port$$$->PUPDR   &= ~(3<<(2*$$$pin$$$));]]>
+    // GPIO$$$port$$$->PUPDR   &= ~(0<<(2*$$$pin$$$));]]>
     </function>
 
     <function  name="setValue"  param0_type="bool" param0_name="on">

@@ -51,8 +51,8 @@ public class C_File extends TextFile
     {
         if(false == BuildSystem.hasTargetFor("%.c"))
         {
-            Target cTarget = new Target("%c");
-            cTarget.setOutput("%o");
+            Target cTarget = new Target("%.c");
+            cTarget.setOutput("%.o");
             cTarget.setRule(" $(CC) -c $(CFLAGS) $< -o $@");
             BuildSystem.addRequiredVariable("CC");
             BuildSystem.addRequiredVariable("CFLAGS");
