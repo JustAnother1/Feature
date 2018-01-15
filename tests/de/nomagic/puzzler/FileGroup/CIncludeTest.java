@@ -4,73 +4,73 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class C_includeTest
+public class CIncludeTest
 {
 
     @Test
-    public void testGetName_null()
+    public void testGetNameNull()
     {
-        C_include dut = new C_include(null, null);
+        CInclude dut = new CInclude(null, null);
         assertNull(dut.getName());
     }
 
     @Test
     public void testGetName()
     {
-        C_include dut = new C_include("bla.h", null);
+        CInclude dut = new CInclude("bla.h", null);
         assertEquals("bla.h", dut.getName());
     }
 
     @Test
-    public void testGetName_comment()
+    public void testGetNameComment()
     {
-        C_include dut = new C_include("bla.h", "no comment");
+        CInclude dut = new CInclude("bla.h", "no comment");
         assertEquals("bla.h", dut.getName());
     }
 
     @Test
-    public void testGetComment_null()
+    public void testGetCommentNull()
     {
-        C_include dut = new C_include("bla.h", null);
+        CInclude dut = new CInclude("bla.h", null);
         assertEquals(null, dut.getComment());
     }
 
     @Test
     public void testGetComment()
     {
-        C_include dut = new C_include("bla.h", "no comment");
+        CInclude dut = new CInclude("bla.h", "no comment");
         assertEquals("no comment", dut.getComment());
     }
 
     @Test
     public void testAddComment()
     {
-        C_include dut = new C_include("bla.h", null);
+        CInclude dut = new CInclude("bla.h", null);
         assertEquals(null, dut.getComment());
         dut.addComment("no comment");
         assertEquals("no comment", dut.getComment());
     }
 
     @Test
-    public void testAddComment_add()
+    public void testAddCommentAdd()
     {
-        C_include dut = new C_include("bla.h", "no");
+        CInclude dut = new CInclude("bla.h", "no");
         assertEquals("no", dut.getComment());
         dut.addComment("comment");
         assertEquals("no comment", dut.getComment());
     }
 
     @Test
-    public void testgetCode_noComment()
+    public void testgetCodeNoComment()
     {
-        C_include dut = new C_include("bla.h", null);
+        CInclude dut = new CInclude("bla.h", null);
         assertEquals("#include <bla.h>", dut.getCode(0, null));
     }
 
     @Test
-    public void testgetCode_Comment()
+    public void testgetCodeComment()
     {
-        C_include dut = new C_include("bla.h", "bla bla bla");
+        CInclude dut = new CInclude("bla.h", "bla bla bla");
         assertEquals("#include <bla.h> // bla bla bla", dut.getCode(0, null));
     }
 

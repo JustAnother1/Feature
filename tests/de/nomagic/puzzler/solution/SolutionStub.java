@@ -26,15 +26,15 @@ public class SolutionStub implements Solution
         return root;
     }
 
-    public void addAlgorithm(String Name, Algorithm algo)
+    public void addAlgorithm(String name, Algorithm algo)
     {
-        algos.put(Name, algo);
+        algos.put(name, algo);
     }
 
     @Override
-    public Algorithm getAlgorithm(String Name)
+    public Algorithm getAlgorithm(String name)
     {
-        return algos.get(Name);
+        return algos.get(name);
     }
 
     @Override

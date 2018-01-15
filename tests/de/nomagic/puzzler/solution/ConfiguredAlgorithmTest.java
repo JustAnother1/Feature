@@ -21,20 +21,20 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetTreeFrom_null_null()
+    public void testGetTreeFromNullNull()
     {
         assertNull(ConfiguredAlgorithm.getTreeFrom(null, null));
     }
 
     @Test
-    public void testGetTreeFrom_noSolution()
+    public void testGetTreeFromNoSolution()
     {
         Context ctx = new ContextStub();
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
     }
 
     @Test
-    public void testGetTreeFrom_noRoot()
+    public void testGetTreeFromNoRoot()
     {
         ContextStub ctx = new ContextStub();
         Solution s = new SolutionStub();
@@ -46,7 +46,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetTreeFrom_badRoot()
+    public void testGetTreeFromBadRoot()
     {
         ContextStub ctx = new ContextStub();
         SolutionStub s = new SolutionStub();
@@ -60,7 +60,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetTreeFrom_noChildren()
+    public void testGetTreeFromNoChildren()
     {
         ContextStub ctx = new ContextStub();
         SolutionStub s = new SolutionStub();
@@ -74,7 +74,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetTreeFrom_badChildren()
+    public void testGetTreeFromBadChildren()
     {
         ContextStub ctx = new ContextStub();
         SolutionStub s = new SolutionStub();
@@ -90,7 +90,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetTreeFrom_badAlgo()
+    public void testGetTreeFromBadAlgo()
     {
         ContextStub ctx = new ContextStub();
         SolutionStub s = new SolutionStub();
@@ -107,7 +107,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetTreeFrom_Algo()
+    public void testGetTreeFromAlgo()
     {
         ContextStub ctx = new ContextStub();
         SolutionStub s = new SolutionStub();
@@ -127,7 +127,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testHasApi_null()
+    public void testHasApiNull()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
@@ -135,7 +135,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testHasApi_noApi()
+    public void testHasApiNoApi()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");
@@ -146,7 +146,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testHasApi_wrongApi()
+    public void testHasApiWrongApi()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");
@@ -158,7 +158,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testHasApi_Api()
+    public void testHasApiApi()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");
@@ -178,7 +178,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testAddAlgorithm_null()
+    public void testAddAlgorithmNull()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
@@ -186,7 +186,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testAddAlgorithm_null2()
+    public void testAddAlgorithmNull2()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
@@ -194,7 +194,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithm_null()
+    public void testGetAlgorithmNull()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
@@ -202,7 +202,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithm_wrongName()
+    public void testGetAlgorithmWrongName()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         ConfiguredAlgorithm algo = new ConfiguredAlgorithm("algo", null, null, null);
@@ -211,7 +211,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithm_hasOne()
+    public void testGetAlgorithmHasOne()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         ConfiguredAlgorithm algo = new ConfiguredAlgorithm("bla", null, null, null);
@@ -220,7 +220,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAllAlgorithms_none()
+    public void testGetAllAlgorithmsNone()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
@@ -230,7 +230,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAllAlgorithms_one()
+    public void testGetAllAlgorithmsOne()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
@@ -244,7 +244,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAllAlgorithms_two()
+    public void testGetAllAlgorithmsTwo()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
@@ -262,7 +262,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetBuildIn_bla()
+    public void testGetBuildInBla()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
@@ -270,7 +270,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetBuildIn_numChilds()
+    public void testGetBuildInNumChilds()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
@@ -310,14 +310,14 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithmElement_null()
+    public void testGetAlgorithmElementNull()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertNull(dut.getAlgorithmElement("bla"));
     }
 
     @Test
-    public void testGetAlgorithmElement_noChild()
+    public void testGetAlgorithmElementNoChild()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");
@@ -327,7 +327,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithmElement_notThatChild()
+    public void testGetAlgorithmElementNotThatChild()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");
@@ -339,7 +339,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithmElement_oneChild()
+    public void testGetAlgorithmElementOneChild()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");
@@ -351,7 +351,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithmElement_twoChildren()
+    public void testGetAlgorithmElementTwoChildren()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");
@@ -365,14 +365,14 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithmElements_null()
+    public void testGetAlgorithmElementsNull()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertNull(dut.getAlgorithmElements("bla"));
     }
 
     @Test
-    public void testGetAlgorithmElements_noChild()
+    public void testGetAlgorithmElementsNoChild()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");
@@ -384,7 +384,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithmElements_notThatChild()
+    public void testGetAlgorithmElementsNotThatChild()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");
@@ -398,7 +398,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithmElements_oneChild()
+    public void testGetAlgorithmElementsOneChild()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");
@@ -412,7 +412,7 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
-    public void testGetAlgorithmElements_twoChildren()
+    public void testGetAlgorithmElementsTwoChildren()
     {
         Context ctx = new ContextStub();
         Element root = new Element("testElement");

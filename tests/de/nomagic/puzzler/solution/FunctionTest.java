@@ -11,14 +11,14 @@ public class FunctionTest
 {
 
     @Test
-    public void testSameAs_null()
+    public void testSameAsNull()
     {
         Function dut = new Function(null);
         assertFalse(dut.sameAs(null));
     }
 
     @Test
-    public void testSameAs_name()
+    public void testSameAsName()
     {
         Element e1 = new Element("bla");
         Element e2 = new Element("bla");
@@ -30,7 +30,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testSameAs_result_1()
+    public void testSameAsResult1()
     {
         Element e1 = new Element("bla");
         Element e2 = new Element("bla");
@@ -43,7 +43,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testSameAs_result_2()
+    public void testSameAsResult2()
     {
         Element e1 = new Element("bla");
         Element e2 = new Element("bla");
@@ -56,7 +56,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testSameAs_implementation_1()
+    public void testSameAsImplementation1()
     {
         Element e1 = new Element("bla");
         Element e2 = new Element("bla");
@@ -69,7 +69,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testSameAs_implementation_2()
+    public void testSameAsImplementation2()
     {
         Element e1 = new Element("bla");
         Element e2 = new Element("bla");
@@ -82,7 +82,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testSameAs_parameter_1()
+    public void testSameAsParameter1()
     {
         Element e1 = new Element("bla");
         Element e2 = new Element("bla");
@@ -98,7 +98,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testSameAs_parameter_2()
+    public void testSameAsParameter2()
     {
         Element e1 = new Element("bla");
         Element e2 = new Element("bla");
@@ -116,7 +116,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testSameAs_required_1()
+    public void testSameAsRequired1()
     {
         Element e1 = new Element("bla");
         Element e2 = new Element("bla");
@@ -137,7 +137,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testSameAs_required_2()
+    public void testSameAsRequired2()
     {
         Element e1 = new Element("bla");
         Element e2 = new Element("bla");
@@ -154,7 +154,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testSameAs_match()
+    public void testSameAsMatch()
     {
         Element e1 = new Element("bla");
         Element e2 = new Element("bla");
@@ -183,14 +183,14 @@ public class FunctionTest
     }
 
     @Test
-    public void testIsRequired_null()
+    public void testIsRequiredNull()
     {
         Function dut = new Function(null);
         assertFalse("", dut.isRequired());
     }
 
     @Test
-    public void testGetName_null()
+    public void testGetNameNull()
     {
         Function dut = new Function(null);
         assertEquals("", dut.getName());
@@ -208,7 +208,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testGetCode_null()
+    public void testGetCodeNull()
     {
         Function dut = new Function(null);
         assertNull(dut.getCode(FunctionHandler.TYPE_DECLARATION, "bla"));
@@ -217,7 +217,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testGetCode_emptyTag()
+    public void testGetCodeEmptyTag()
     {
         Element tag = new Element("a");
         Function dut = new Function(tag);
@@ -227,7 +227,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testGetCode_name()
+    public void testGetCodeName()
     {
         Element tag = new Element("a");
         tag.setAttribute(Function.FUNCTION_NAME_ATTRIBUTE_NAME, "Bob");
@@ -238,7 +238,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testGetCode_comment()
+    public void testGetCodeComment()
     {
         Element tag = new Element("a");
         tag.setAttribute(Function.FUNCTION_NAME_ATTRIBUTE_NAME, "Bob");
@@ -250,7 +250,7 @@ public class FunctionTest
     }
 
     @Test
-    public void testGetCode_implementation()
+    public void testGetCodeImplementation()
     {
         Element tag = new Element("a");
         tag.setAttribute(Function.FUNCTION_NAME_ATTRIBUTE_NAME, "Bob");

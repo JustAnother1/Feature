@@ -146,9 +146,9 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
     }
 
     @Override
-    public boolean hasTargetFor(String Source)
+    public boolean hasTargetFor(String source)
     {
-        return targets.containsKey(Source);
+        return targets.containsKey(source);
     }
 
     public void addTarget(Target aTarget)
@@ -177,9 +177,9 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         listVariables.put(variName, variValue);
     }
 
-    public void addRequiredVariable(String Name)
+    public void addRequiredVariable(String name)
     {
-        requiredEnvironmentVariables.put(Name, "");
+        requiredEnvironmentVariables.put(name, "");
     }
 
     public void addFile(AbstractFile newFile)

@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import de.nomagic.puzzler.ContextImpl;
 import de.nomagic.puzzler.configuration.Configuration;
-import de.nomagic.puzzler.solution.ConditionEvaluator;
 
 public class ConditionEvaluationTest {
 
@@ -30,7 +29,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_empty_string()
+    public void testevaluateConditionParenthesisEmptyString()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -41,7 +40,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_null()
+    public void testevaluateConditionParenthesisNull()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -51,7 +50,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_true()
+    public void testevaluateConditionParenthesisTrue()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -62,7 +61,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_fasle()
+    public void testevaluateConditionParenthesisFalse()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -73,7 +72,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_is()
+    public void testevaluateConditionParenthesisIs()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -85,7 +84,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_complex()
+    public void testevaluateConditionParenthesisComplex()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -98,7 +97,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_param_true()
+    public void testevaluateConditionParenthesisParamTrue()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -110,7 +109,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_param_false()
+    public void testevaluateConditionParenthesisParamFalse()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -122,7 +121,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_substract()
+    public void testevaluateConditionParenthesisSubstract()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -133,7 +132,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_substract_andAlgorithmParameter()
+    public void testevaluateConditionParenthesisSubstractAndAlgorithmParameter()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -145,7 +144,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_param_char()
+    public void testevaluateConditionParenthesisParamChar()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -157,7 +156,7 @@ public class ConditionEvaluationTest {
     }
 
     @Test
-    public void testevaluateConditionParenthesis_param_char_match()
+    public void testevaluateConditionParenthesisParamCharMatch()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);

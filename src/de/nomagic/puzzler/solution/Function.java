@@ -7,10 +7,10 @@ import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.nomagic.puzzler.FileGroup.C_element;
+import de.nomagic.puzzler.FileGroup.CElement;
 import de.nomagic.puzzler.FileGroup.FunctionHandler;
 
-public class Function extends C_element
+public class Function extends CElement
 {
     public final static String FUNCTION_NAME_ATTRIBUTE_NAME = "name";
     public final static String FUNCTION_TYPE_ATTRIBUTE_NAME = "type";
@@ -21,7 +21,7 @@ public class Function extends C_element
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private String result;
-    private Vector<String> parameter_definitions = new Vector<String>();
+    private Vector<String> parameterDefinitions = new Vector<String>();
     private String name = "";
     private String comment = null;
     private boolean required = false;
@@ -54,19 +54,19 @@ public class Function extends C_element
         result = tag.getAttributeValue(FUNCTION_RESULT_ATTRIBUTE_NAME);
         // Parameters
         int i = 0;
-        String param_name;
-        String param_type;
+        String paramName;
+        String paramType;
         do
         {
-            param_name = tag.getAttributeValue(FUNCTION_PARAMETER_ATTRIBUTE_NAME + i + "_" + FUNCTION_NAME_ATTRIBUTE_NAME);
-            param_type = tag.getAttributeValue(FUNCTION_PARAMETER_ATTRIBUTE_NAME + i + "_" + FUNCTION_TYPE_ATTRIBUTE_NAME);
-            if((null != param_name) && (null != param_type))
+            paramName = tag.getAttributeValue(FUNCTION_PARAMETER_ATTRIBUTE_NAME + i + "_" + FUNCTION_NAME_ATTRIBUTE_NAME);
+            paramType = tag.getAttributeValue(FUNCTION_PARAMETER_ATTRIBUTE_NAME + i + "_" + FUNCTION_TYPE_ATTRIBUTE_NAME);
+            if((null != paramName) && (null != paramType))
             {
-                parameter_definitions.add(param_type + " " + param_name);
+                parameterDefinitions.add(paramType + " " + paramName);
             }
             i++;
         }
-        while((null != param_name) && (null != param_type));
+        while((null != paramName) && (null != paramType));
     }
 
     public boolean sameAs(Function next)
@@ -116,7 +116,7 @@ public class Function extends C_element
             }
         }
 
-        if(false == this.parameter_definitions.equals(next.parameter_definitions))
+        if(false == this.parameterDefinitions.equals(next.parameterDefinitions))
         {
             log.trace("parameter_definitions differs");
             return false;
@@ -183,17 +183,17 @@ public class Function extends C_element
         sb.append(" ");
         sb.append(name);
         sb.append("(");
-        if(0 == parameter_definitions.size())
+        if(0 == parameterDefinitions.size())
         {
             sb.append("void");
         }
         else
         {
-            sb.append(parameter_definitions.get(0));
-            for(int i = 1; i < parameter_definitions.size(); i++)
+            sb.append(parameterDefinitions.get(0));
+            for(int i = 1; i < parameterDefinitions.size(); i++)
             {
                 sb.append(", ");
-                sb.append(parameter_definitions.get(i));
+                sb.append(parameterDefinitions.get(i));
             }
         }
         sb.append(")");

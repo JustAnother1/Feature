@@ -7,7 +7,7 @@ import de.nomagic.puzzler.Project;
 public interface Solution
 {
     Element getRootElement();
-    Algorithm getAlgorithm(String Name);
+    Algorithm getAlgorithm(String name);
     boolean getAlgorithmForElement(Element cfgElement);
     boolean getFromProject(Project pro);
     boolean checkAndTestAgainstEnvironment();

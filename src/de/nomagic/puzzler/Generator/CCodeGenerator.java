@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
-import de.nomagic.puzzler.FileGroup.C_File;
+import de.nomagic.puzzler.FileGroup.CFile;
 import de.nomagic.puzzler.FileGroup.FileFactory;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
@@ -22,7 +22,7 @@ import de.nomagic.puzzler.solution.ConditionEvaluator;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
 import de.nomagic.puzzler.solution.Function;
 
-public class C_CodeGenerator extends Generator
+public class CCodeGenerator extends Generator
 {
     public final static String REQUIRED_ROOT_API = "program_entry_point";
     public final static String IMPLEMENTATION_PLACEHOLDER_REGEX = "\\$\\$\\$";
@@ -42,16 +42,16 @@ public class C_CodeGenerator extends Generator
 
     private ConditionEvaluator condiEval;
     private FileGroup codeGroup;
-    private C_File sourceFile;
+    private CFile sourceFile;
 
     // if this is true then all code sniplets will be wrapped into comment lines explaining where they came from.
-    private boolean document_code_source = false;
+    private boolean documentCodeSource = false;
 
 
 
     // TODO: right now all code is inlined! Add support for functions (called from different places and distribution of code into separate files.
 
-    public C_CodeGenerator(Context ctx)
+    public CCodeGenerator(Context ctx)
     {
         super(ctx);
         condiEval = new ConditionEvaluator(ctx);
@@ -67,7 +67,7 @@ public class C_CodeGenerator extends Generator
         if("true".equals(cfg.getString(CFG_DOC_CODE_SRC)))
         {
             log.trace("Switching on documentation of code source");
-            document_code_source = true;
+            documentCodeSource = true;
         }
     }
 
@@ -94,7 +94,7 @@ public class C_CodeGenerator extends Generator
 
         Api api = Api.getFromFile(REQUIRED_ROOT_API, ctx);
 
-        C_File imp = getImplementationFor(api, logic);
+        CFile imp = getImplementationFor(api, logic);
         if(null == imp)
         {
             return null;
@@ -106,21 +106,21 @@ public class C_CodeGenerator extends Generator
         return codeGroup;
     }
 
-    private C_File getImplementationFor(Api api, ConfiguredAlgorithm logic)
+    private CFile getImplementationFor(Api api, ConfiguredAlgorithm logic)
     {
         log.trace("getting implementation of the {} from {}", api, logic);
-        C_File aFile = new C_File("noname.c");
+        CFile aFile = new CFile("noname.c");
         Function[] funcs = api.getRequiredFunctions();
         for(int i = 0; i < funcs.length; i++)
         {
-            C_functionCall fc = new C_functionCall(funcs[i].getName());
+            CFunctionCall fc = new CFunctionCall(funcs[i].getName());
             String implementation = getCImplementationOf(fc, logic);
             if(null == implementation)
             {
                 return null;
             }
             funcs[i].setImplementation(implementation);
-            if(true == document_code_source)
+            if(true == documentCodeSource)
             {
                 aFile.addFunction(funcs[i], logic);
             }
@@ -132,7 +132,7 @@ public class C_CodeGenerator extends Generator
         return aFile;
     }
 
-    private String getCImplementationOf(C_functionCall functionToCall, ConfiguredAlgorithm logic)
+    private String getCImplementationOf(CFunctionCall functionToCall, ConfiguredAlgorithm logic)
     {
         log.trace("getting the c implemention of the function {} from {}",
                 functionToCall, logic);
@@ -164,7 +164,7 @@ public class C_CodeGenerator extends Generator
         }
         String implementation = null;
 
-        if(true == document_code_source)
+        if(true == documentCodeSource)
         {
             implementation =  "// from " + logic + "\n" // TODO aFile.getLineSperator()
                    + getImplementationFromFunctionElment(functionElement, functionToCall.getArguments(), logic)
@@ -264,9 +264,9 @@ public class C_CodeGenerator extends Generator
         boolean found = false;
         while(it.hasNext())
         {
-            String ChildName = it.next();
-            ConfiguredAlgorithm childAlgo = logic.getChild(ChildName);
-            C_functionCall fc = new C_functionCall(functionName);
+            String childName = it.next();
+            ConfiguredAlgorithm childAlgo = logic.getChild(childName);
+            CFunctionCall fc = new CFunctionCall(functionName);
             String params = fc.getArguments();
             params = condiEval.evaluateConditionParenthesis(params, logic, null, null);
             fc.setFunctionArguments(params);
@@ -279,7 +279,7 @@ public class C_CodeGenerator extends Generator
             {
                 found = true;
             }
-            if(true == document_code_source)
+            if(true == documentCodeSource)
             {
                 res.append(
                         "// from " + logic + "\n" // TODO aFile.getLineSperator()
@@ -305,14 +305,14 @@ public class C_CodeGenerator extends Generator
                     ctx.addError(this, "" + logic + " : We needed to call the function " + functionName + " !");
                     return null;
                 }
-                C_functionCall fc = new C_functionCall(functionName);
+                CFunctionCall fc = new CFunctionCall(functionName);
                 String impl = getCImplementationOf(fc, libAlgo);
                 if(null == impl)
                 {
                     ctx.addError(this, "" + logic + " : Function call to missing (lib) function (" + functionName + ") !");
                     return null;
                 }
-                if(true == document_code_source)
+                if(true == documentCodeSource)
                 {
                     res.append(
                             "// from " + logic + "\n" // TODO aFile.getLineSperator()
@@ -406,9 +406,9 @@ public class C_CodeGenerator extends Generator
     {
         // Reference to Algorithm parameter
         // get which parameter this is (1st 2nd 3rd,..)
-        int ParamIndex = 0;
+        int paramIndex = 0;
         do {
-            Attribute attr = functionElement.getAttribute("param" + ParamIndex + "_name");
+            Attribute attr = functionElement.getAttribute("param" + paramIndex + "_name");
             if(null == attr)
             {
                 log.trace("Function parameter {} not found !", ParameterName);
@@ -420,20 +420,20 @@ public class C_CodeGenerator extends Generator
             }
             else
             {
-                ParamIndex++;
+                paramIndex++;
             }
         }while(true);
 
         // get value for that parameter from FunctionParameters
         String[] parameters = FunctionParameters.split(",");
-        if(ParamIndex < parameters.length)
+        if(paramIndex < parameters.length)
         {
-            return parameters[ParamIndex];
+            return parameters[paramIndex];
         }
         else
         {
             ctx.addError(this,
-                    "Could not get the " + ParamIndex
+                    "Could not get the " + paramIndex
             + ". parameter to this function from the parameters given as " + FunctionParameters );
                 return null;
         }
@@ -469,21 +469,21 @@ public class C_CodeGenerator extends Generator
             case ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME:
                 String include = curElement.getText();
                 log.trace("adding include {}", include);
-                if(true == document_code_source)
+                if(true == documentCodeSource)
                 {
-                    sourceFile.addLineWithComment(C_File.C_FILE_INCLUDE_SECTION_NAME,
+                    sourceFile.addLineWithComment(CFile.C_FILE_INCLUDE_SECTION_NAME,
                             include, logic.toString());
                 }
                 else
                 {
-                    sourceFile.addLine(C_File.C_FILE_INCLUDE_SECTION_NAME, include);
+                    sourceFile.addLine(CFile.C_FILE_INCLUDE_SECTION_NAME, include);
                 }
                 break;
 
             case ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME:
                 Function func = new Function(curElement);
 
-                if(true == document_code_source)
+                if(true == documentCodeSource)
                 {
                     sourceFile.addFunction(func, logic);
                 }
@@ -507,12 +507,12 @@ public class C_CodeGenerator extends Generator
     }
 
 
-    private C_File createFile(String fileName)
+    private CFile createFile(String fileName)
     {
-        C_File aFile = new C_File(fileName);
+        CFile aFile = new CFile(fileName);
 
         // there should be a file comment explaining what this is
-        aFile.addLines(C_File.C_FILE_FILE_COMMENT_SECTION_NAME,
+        aFile.addLines(CFile.C_FILE_FILE_COMMENT_SECTION_NAME,
                        new String[] {"/*",
                                      "  automatically created " + fileName,
                                      "  created at: " + Tool.curentDateTime(),

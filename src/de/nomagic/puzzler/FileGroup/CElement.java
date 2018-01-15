@@ -1,11 +1,11 @@
 package de.nomagic.puzzler.FileGroup;
 
-public abstract class C_element implements  Comparable<C_element>
+public abstract class CElement implements  Comparable<CElement>
 {
     public abstract String getName();
 
     @Override
-    public int compareTo(C_element n)
+    public int compareTo(CElement n)
     {
         return this.getName().compareTo(n.getName());
     }

@@ -120,7 +120,7 @@ public class ConditionEvaluator extends Base
         }
         else
         {
-            int num_openP = 0;
+            int numOpenP = 0;
             Vector<StringBuffer> sections = new Vector<StringBuffer>();
             StringBuffer curSection = new StringBuffer();
             sections.add(curSection);
@@ -132,11 +132,11 @@ public class ConditionEvaluator extends Base
                 {
                 case '(':
                     curSection.append(c);
-                    num_openP ++;
+                    numOpenP ++;
 
                     try
                     {
-                        sections.remove(num_openP);
+                        sections.remove(numOpenP);
                     }
                     catch(ArrayIndexOutOfBoundsException e)
                     {
@@ -149,7 +149,7 @@ public class ConditionEvaluator extends Base
                     break;
 
                 case ')':
-                    if(0 == num_openP)
+                    if(0 == numOpenP)
                     {
                         valid = false;
                         ctx.addError("ConditionEvaluation",
@@ -158,9 +158,9 @@ public class ConditionEvaluator extends Base
                     }
                     // else:
                     String sectionResult = evaluateConditionText(curSection.toString());
-                    sections.remove(num_openP);
-                    num_openP--;
-                    curSection = sections.get(num_openP);
+                    sections.remove(numOpenP);
+                    numOpenP--;
+                    curSection = sections.get(numOpenP);
                     curSection.append(sectionResult);
                     curSection.append(")");
                     break;
@@ -172,7 +172,7 @@ public class ConditionEvaluator extends Base
             }
             // we parsed all the chars in the condition
             // so first some sanity checks
-            if(0 != num_openP)
+            if(0 != numOpenP)
             {
                 valid = false;
                 ctx.addError("ConditionEvaluation",
@@ -186,21 +186,21 @@ public class ConditionEvaluator extends Base
                         "Parenthesis Section mismatch at end of condition : " + condition);
                 return KEY_FALSE;
             }
-            StringBuffer ResultSection = sections.get(0);
-            return evaluateConditionText(ResultSection.toString());
+            StringBuffer resultSection = sections.get(0);
+            return evaluateConditionText(resultSection.toString());
         }
     }
 
     private String evaluateFunction(String Word)
     {
-        int index_opening_brace = Word.indexOf('(');
-        int index_closing_brace = Word.indexOf(')');
-        String functionName = Word.substring(0, index_opening_brace);
-        String parameter = Word.substring(index_opening_brace + 1, index_closing_brace);
+        int indexOpeningBrace = Word.indexOf('(');
+        int indexClosingBrace = Word.indexOf(')');
+        String functionName = Word.substring(0, indexOpeningBrace);
+        String parameter = Word.substring(indexOpeningBrace + 1, indexClosingBrace);
         if(1 > functionName.length())
         {
             // just additional braces -> remove those and evaluate the rest
-            return  evaluate_Word(parameter);  // Caution : Recursion! So don't over do it with the unneeded braces!
+            return  evaluateWord(parameter);  // Caution : Recursion! So don't over do it with the unneeded braces!
         }
         switch(functionName)
         {
@@ -374,7 +374,7 @@ public class ConditionEvaluator extends Base
      * @param conditionText
      * @return
      */
-    private String evaluate_Word(String Word)
+    private String evaluateWord(String Word)
     {
         // constants
         if(KEY_TRUE.equals(Word))
@@ -510,7 +510,7 @@ public class ConditionEvaluator extends Base
             }
         }
         // finish up
-        String result = evaluate_Word(first);
+        String result = evaluateWord(first);
         return result;
     }
 
@@ -518,8 +518,8 @@ public class ConditionEvaluator extends Base
     {
         int one;
         int two;
-        String valOne = evaluate_Word(first);
-        String valTwo = evaluate_Word(second);
+        String valOne = evaluateWord(first);
+        String valTwo = evaluateWord(second);
         switch(function)
         {
         case KEY_AND:

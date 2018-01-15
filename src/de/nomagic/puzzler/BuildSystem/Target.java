@@ -16,14 +16,14 @@ public class Target
         this.source = source;
     }
 
-    public Target(Element Xml)
+    public Target(Element xml)
     {
-        if(null != Xml)
+        if(null != xml)
         {
-            source = Xml.getChildText("source");
-            output = Xml.getChildText("output");
-            rule = Xml.getChildText("rule");
-            String att = Xml.getAttributeValue(PHONY_ATTRIBUTE_NAME);
+            source = xml.getChildText("source");
+            output = xml.getChildText("output");
+            rule = xml.getChildText("rule");
+            String att = xml.getAttributeValue(PHONY_ATTRIBUTE_NAME);
             if(null == att)
             {
                 phony = false;

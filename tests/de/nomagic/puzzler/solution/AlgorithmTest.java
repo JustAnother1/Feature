@@ -22,7 +22,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testToString_null()
+    public void testToStringNull()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -42,7 +42,7 @@ public class AlgorithmTest {
     }
 
    @Test
-    public void testToString_Api()
+    public void testToStringApi()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -54,27 +54,27 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testGetFromFile_null()
+    public void testGetFromFileNull()
     {
         assertNull(Algorithm.getFromFile(null, null));
     }
 
     @Test
-    public void testGetFromFile_badElement()
+    public void testGetFromFileBadElement()
     {
         Element root = new Element("bad");
         assertNull(Algorithm.getFromFile(root, null));
     }
 
     @Test
-    public void testGetFromFile_badElement_lib()
+    public void testGetFromFileBadElementLib()
     {
         Element root = new Element("bad");
         assertNull(Algorithm.getFromFile(root, null));
     }
 
     @Test
-    public void testGetFromFile_noImplementation()
+    public void testGetFromFileNoImplementation()
     {
         Element root = new Element("good");
         root.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, "bla");
@@ -84,7 +84,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testHasApi_null()
+    public void testHasApiNull()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -94,7 +94,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testHasApi_bad()
+    public void testHasApiBad()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -104,7 +104,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testHasApi_wrongApi()
+    public void testHasApiWrongApi()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -115,7 +115,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testHasApi_hasApi()
+    public void testHasApiHasApi()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -126,7 +126,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testGetChild_null()
+    public void testGetChildNull()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -135,7 +135,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testGetChild_noChild()
+    public void testGetChildNoChild()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -145,7 +145,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testGetChild_hasChild()
+    public void testGetChildHasChild()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -159,7 +159,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testGetChildren_null()
+    public void testGetChildrenNull()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -168,7 +168,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testGetChildren_noChild()
+    public void testGetChildrenNoChild()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -180,7 +180,7 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testGetChildren_hasChild()
+    public void testGetChildrenHasChild()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
@@ -194,7 +194,7 @@ public class AlgorithmTest {
         assertEquals(res.get(0), child);
     }
     @Test
-    public void testGetChildren_hasChildren()
+    public void testGetChildrenHasChildren()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);

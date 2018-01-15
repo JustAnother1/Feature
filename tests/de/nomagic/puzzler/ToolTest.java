@@ -18,7 +18,7 @@ public class ToolTest {
     }
 
     @Test
-    public void testFromExceptionToString_null()
+    public void testFromExceptionToStringNull()
     {
         assertEquals("Exception [null]", Tool.fromExceptionToString(null));
     }
@@ -39,28 +39,28 @@ public class ToolTest {
     }
 
     @Test
-    public void testFromByteBufferToHexString_int_null()
+    public void testFromByteBufferToHexStringIntNull()
     {
         int[] buf = null;
         assertEquals("[]", Tool.fromByteBufferToHexString(buf));
     }
 
     @Test
-    public void testFromByteBufferToHexString_int()
+    public void testFromByteBufferToHexStringInt()
     {
         int[] buf = new int[0];
         assertEquals("[]", Tool.fromByteBufferToHexString(buf));
     }
 
     @Test
-    public void testFromByteBufferToHexString_int_len_off_null()
+    public void testFromByteBufferToHexStringIntLenOffNull()
     {
         int[] buf = null;
         assertEquals("[]", Tool.fromByteBufferToHexString(buf, 10, 5));
     }
 
     @Test
-    public void testFromByteBufferToHexString_int_len_off()
+    public void testFromByteBufferToHexStringIntLenOff()
     {
         int[] buf = new int[3];
         buf[0] = 0x1122;
@@ -70,21 +70,21 @@ public class ToolTest {
     }
 
     @Test
-    public void testFromByteBufferToHexString_byte_null()
+    public void testFromByteBufferToHexStringByteNull()
     {
         byte[] buf = null;
         assertEquals("[]", Tool.fromByteBufferToHexString(buf));
     }
 
     @Test
-    public void testFromByteBufferToHexString_byte()
+    public void testFromByteBufferToHexStringByte()
     {
         byte[] buf = new byte[0];
         assertEquals("[]", Tool.fromByteBufferToHexString(buf));
     }
 
     @Test
-    public void testFromByteBufferToHexString_byte_length()
+    public void testFromByteBufferToHexStringByteLength()
     {
         byte[] buf = new byte[2];
         buf[0] = (byte)0xaf;
@@ -93,14 +93,14 @@ public class ToolTest {
     }
 
     @Test
-    public void testFromByteBufferToHexString_byte_len_off_null()
+    public void testFromByteBufferToHexStringByteLenOffNull()
     {
         byte[] buf = null;
         assertEquals("[]", Tool.fromByteBufferToHexString(buf, 10, 5));
     }
 
     @Test
-    public void testFromByteBufferToHexString_byte_len_off()
+    public void testFromByteBufferToHexStringByteLenOff()
     {
         byte[] buf = new byte[2];
         buf[0] = (byte)0xaf;
@@ -109,7 +109,7 @@ public class ToolTest {
     }
 
     @Test
-    public void testFromByteBufferToHexString_byte_len_off_long()
+    public void testFromByteBufferToHexStringByteLenOffLong()
     {
         byte[] buf = new byte[6];
         buf[0] = (byte)0xaf;
@@ -122,7 +122,7 @@ public class ToolTest {
     }
 
     @Test
-    public void testFromByteBufferToUtf8String_null()
+    public void testFromByteBufferToUtf8StringNull()
     {
         assertEquals("[]", Tool.fromByteBufferToUtf8String(null));
     }
@@ -147,13 +147,13 @@ public class ToolTest {
     }
 
     @Test
-    public void testFromByteBufferToUtf8String_len_off_null()
+    public void testFromByteBufferToUtf8StringLenOffNull()
     {
         assertEquals("[]", Tool.fromByteBufferToUtf8String(null, 5, 3));
     }
 
     @Test
-    public void testFromByteBufferToUtf8String_len_off()
+    public void testFromByteBufferToUtf8StringLenOff()
     {
         byte[] string = new byte[12];
         string[ 0] = (byte)0x48; // H
@@ -256,25 +256,25 @@ public class ToolTest {
     }
 
     @Test
-    public void testValidatePath_null()
+    public void testValidatePathNull()
     {
         assertEquals("", Tool.validatePath(null));
     }
 
     @Test
-    public void testValidatePath_empty()
+    public void testValidatePathEmpty()
     {
         assertEquals("", Tool.validatePath(""));
     }
 
     @Test
-    public void testValidatePath_wrongEnd()
+    public void testValidatePathWrongEnd()
     {
         assertEquals("bla" + File.separator, Tool.validatePath("bla"));
     }
 
     @Test
-    public void testValidatePath_ok()
+    public void testValidatePathOk()
     {
         assertEquals("bla" + File.separator, Tool.validatePath("bla" + File.separator));
     }

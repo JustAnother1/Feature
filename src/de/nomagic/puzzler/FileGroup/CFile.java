@@ -7,7 +7,7 @@ import de.nomagic.puzzler.BuildSystem.Target;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
 import de.nomagic.puzzler.solution.Function;
 
-public class C_File extends TextFile
+public class CFile extends TextFile
 {
     public final static String C_FILE_FILE_COMMENT_SECTION_NAME              = "FileHeader";
     public final static String C_FILE_INCLUDE_SECTION_NAME                   = "include";
@@ -21,7 +21,7 @@ public class C_File extends TextFile
     private ElementHandler includes = new IncludeHandler();
     private ElementHandler functions = new FunctionHandler();
 
-    public C_File(String filename)
+    public CFile(String filename)
     {
         super(filename);
         createSections(new String[] {C_FILE_FILE_COMMENT_SECTION_NAME,
@@ -35,7 +35,7 @@ public class C_File extends TextFile
         separateSectionWithEmptyLine(true);
     }
     @Override
-    public void addContentsOf(C_File otherFile)
+    public void addContentsOf(CFile otherFile)
     {
         if(null == otherFile)
         {
@@ -47,27 +47,27 @@ public class C_File extends TextFile
     }
 
     @Override
-    public void addToBuild(BuildSystemAddApi BuildSystem)
+    public void addToBuild(BuildSystemAddApi buildSystem)
     {
-        if(false == BuildSystem.hasTargetFor("%.c"))
+        if(false == buildSystem.hasTargetFor("%.c"))
         {
             Target cTarget = new Target("%.c");
             cTarget.setOutput("%.o");
             cTarget.setRule(" $(CC) -c $(CFLAGS) $< -o $@");
-            BuildSystem.addRequiredVariable("CC");
-            BuildSystem.addRequiredVariable("CFLAGS");
-            BuildSystem.addTarget(cTarget);
+            buildSystem.addRequiredVariable("CC");
+            buildSystem.addRequiredVariable("CFLAGS");
+            buildSystem.addTarget(cTarget);
         }
-        BuildSystem.extendListVariable("C_SRC", fileName);
+        buildSystem.extendListVariable("C_SRC", fileName);
         String objName = fileName.substring(0, fileName.length() - ".c".length()) + ".o";
-        BuildSystem.extendListVariable("OBJS", objName);
+        buildSystem.extendListVariable("OBJS", objName);
     }
 
     public void addLineWithComment(String sectionName, String line, String comment)
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
         {
-            C_include inc = new C_include(line, comment);
+            CInclude inc = new CInclude(line, comment);
             includes.add(inc);
         }
         else
@@ -80,7 +80,7 @@ public class C_File extends TextFile
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
         {
-            C_include inc = new C_include(line, null);
+            CInclude inc = new CInclude(line, null);
             includes.add(inc);
         }
         else

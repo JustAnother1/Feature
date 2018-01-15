@@ -25,21 +25,21 @@ public class ProgressReportTest
     }
 
     @Test
-    public void testAddError_null()
+    public void testAddErrorNull()
     {
         ProgressReport dut = new ProgressReport();
         dut.addError(null, null);
     }
 
     @Test
-    public void testAddError_noSource()
+    public void testAddErrorNoSource()
     {
         ProgressReport dut = new ProgressReport();
         dut.addError(null, "Boom!");
     }
 
     @Test
-    public void testAddError_Source()
+    public void testAddErrorSource()
     {
         ProgressReport dut = new ProgressReport();
         dut.addError(dut, "Boom!");

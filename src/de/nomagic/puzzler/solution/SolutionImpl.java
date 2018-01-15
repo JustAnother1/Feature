@@ -23,7 +23,7 @@ public class SolutionImpl extends Base implements Solution
 
     private HashMap<String, Algorithm> referencedAlgorithms = new HashMap<String,Algorithm>();
 
-    private Element SolutionRoot = null;
+    private Element solutionRoot = null;
 
     public SolutionImpl(Context ctx)
     {
@@ -32,12 +32,12 @@ public class SolutionImpl extends Base implements Solution
 
     public Element getRootElement()
     {
-        return SolutionRoot;
+        return solutionRoot;
     }
 
-    public Algorithm getAlgorithm(String Name)
+    public Algorithm getAlgorithm(String name)
     {
-        return referencedAlgorithms.get(Name);
+        return referencedAlgorithms.get(name);
     }
 
     public boolean getFromProject(Project pro)
@@ -53,16 +53,16 @@ public class SolutionImpl extends Base implements Solution
             return false;
         }
 
-        SolutionRoot = pro.getSolutionElement();
-        if(null == SolutionRoot)
+        solutionRoot = pro.getSolutionElement();
+        if(null == solutionRoot)
         {
             ctx.addError(this, "No Solution Tag in Project !");
             return false;
         }
 
-        if(true == SolutionRoot.hasAttributes())
+        if(true == solutionRoot.hasAttributes())
         {
-            Attribute attr = SolutionRoot.getAttribute(EXTERNAL_REFFERENCE_ATTRIBUTE_NAME);
+            Attribute attr = solutionRoot.getAttribute(EXTERNAL_REFFERENCE_ATTRIBUTE_NAME);
             if(null != attr)
             {
                 String externalReferenceFileName = attr.getValue();
@@ -93,7 +93,7 @@ public class SolutionImpl extends Base implements Solution
                             + " has an invalid root tag (" + extRefEleemnt.getName() + ") !");
                     return false;
                 }
-                SolutionRoot = extRefEleemnt;
+                solutionRoot = extRefEleemnt;
                 ctx.cfg().setString(Configuration.SOLUTION_FILE_CFG, externalReferenceFileName);
             }
             else
@@ -189,13 +189,13 @@ public class SolutionImpl extends Base implements Solution
             ctx.addError(this, "No Environment provided !");
             return false;
         }
-        if(null == SolutionRoot)
+        if(null == solutionRoot)
         {
             ctx.addError(this, "No Solution Tag in Project !");
             return false;
         }
 
-        List<Element> children = SolutionRoot.getChildren();
+        List<Element> children = solutionRoot.getChildren();
         if((null == children) || (true == children.isEmpty()))
         {
             ctx.addError(this, "No external Reference in empty solution tag");

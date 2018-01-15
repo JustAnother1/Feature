@@ -11,28 +11,28 @@ public class EnvironmentTest
 {
 
     @Test
-    public void testGetArchitectureName_null()
+    public void testGetArchitectureNameNull()
     {
         Environment dut = new Environment(null);
         assertEquals("", dut.getArchitectureName());
     }
 
     @Test
-    public void testGetFamilyName_null()
+    public void testGetFamilyNameNull()
     {
         Environment dut = new Environment(null);
         assertEquals("", dut.getFamilyName());
     }
 
     @Test(expected = NullPointerException.class)
-    public void testGetFromProject_null_ctx()
+    public void testGetFromProjectNullCtx()
     {
         Environment dut = new Environment(null);
         assertFalse(dut.getFromProject(null));
     }
 
     @Test
-    public void testGetFromProject_null()
+    public void testGetFromProjectNull()
     {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);

@@ -17,12 +17,12 @@ public class FunctionHandler extends ElementHandler
     }
 
     @Override
-    protected Vector<C_element> makeUnique()
+    protected Vector<CElement> makeUnique()
     {
-        Vector<C_element> unique = new Vector<C_element>();
+        Vector<CElement> unique = new Vector<CElement>();
         // remove duplicates
         Collections.sort(elements);
-        Iterator<C_element> it = elements.iterator();
+        Iterator<CElement> it = elements.iterator();
         Function first = (Function)it.next(); // we just checked that it is not empty, so this should work.
         while(it.hasNext())
         {

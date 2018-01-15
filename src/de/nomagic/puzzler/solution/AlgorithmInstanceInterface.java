@@ -1,10 +1,10 @@
 package de.nomagic.puzzler.solution;
 
-public interface AlgorithmInstanceInterface 
+public interface AlgorithmInstanceInterface
 {
-	String getProperty(String name);
-	String dumpProperty();
-	String getParameter(String name);
-	String dumpParameter();
-	String getBuildIn(String word);
+    String getProperty(String name);
+    String dumpProperty();
+    String getParameter(String name);
+    String dumpParameter();
+    String getBuildIn(String word);
 }

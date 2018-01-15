@@ -4,55 +4,55 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class C_functionCallTest
+public class CFunctionCallTest
 {
 
     @Test
     public void testToString()
     {
-        C_functionCall dut = new C_functionCall("bla:blubb(blabla)");
+        CFunctionCall dut = new CFunctionCall("bla:blubb(blabla)");
         assertEquals("bla:blubb(blabla)", dut.toString());
     }
 
     @Test
-    public void testGetApi_null()
+    public void testGetApiNull()
     {
-        C_functionCall dut = new C_functionCall("bla");
+        CFunctionCall dut = new CFunctionCall("bla");
         assertEquals(null, dut.getApi());
     }
 
     @Test
     public void testGetApi()
     {
-        C_functionCall dut = new C_functionCall("bla:blubb(blabla)");
+        CFunctionCall dut = new CFunctionCall("bla:blubb(blabla)");
         assertEquals("bla", dut.getApi());
     }
 
     @Test
-    public void testGetArguments_null()
+    public void testGetArgumentsNull()
     {
-        C_functionCall dut = new C_functionCall("bla");
+        CFunctionCall dut = new CFunctionCall("bla");
         assertEquals(null, dut.getApi());
     }
 
     @Test
     public void testGetArguments()
     {
-        C_functionCall dut = new C_functionCall("bla(blubb)");
+        CFunctionCall dut = new CFunctionCall("bla(blubb)");
         assertEquals("blubb", dut.getArguments());
     }
 
     @Test
     public void testGetName()
     {
-        C_functionCall dut = new C_functionCall("bla(blubb)");
+        CFunctionCall dut = new CFunctionCall("bla(blubb)");
         assertEquals("bla", dut.getName());
     }
 
     @Test
     public void testSetFunctionalArguments()
     {
-        C_functionCall dut = new C_functionCall("bla:bla");
+        CFunctionCall dut = new CFunctionCall("bla:bla");
         assertEquals(null, dut.getArguments());
         dut.setFunctionArguments("aloha");
         assertEquals("aloha", dut.getArguments());

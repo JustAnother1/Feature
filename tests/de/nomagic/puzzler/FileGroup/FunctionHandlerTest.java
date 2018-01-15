@@ -12,7 +12,7 @@ public class FunctionHandlerTest
 {
 
     @Test
-    public void testIsEmpty_empty()
+    public void testIsEmptyEmpty()
     {
         FunctionHandler dut = new FunctionHandler();
         assertTrue(dut.isEmpty());
@@ -29,7 +29,7 @@ public class FunctionHandlerTest
     }
 
     @Test
-    public void testAddAll_empty()
+    public void testAddAllEmpty()
     {
         FunctionHandler dut = new FunctionHandler();
         FunctionHandler dut2 = new FunctionHandler();
@@ -60,7 +60,7 @@ public class FunctionHandlerTest
     }
 
     @Test
-    public void testgetCode_inc()
+    public void testgetCodeInc()
     {
         FunctionHandler dut = new FunctionHandler();
         Function func = new Function(null);
@@ -71,7 +71,7 @@ public class FunctionHandlerTest
     }
 
     @Test
-    public void testgetCode_unique()
+    public void testgetCodeUnique()
     {
         FunctionHandler dut = new FunctionHandler();
         Function func = new Function(null);
@@ -83,7 +83,7 @@ public class FunctionHandlerTest
     }
 
     @Test
-    public void testgetCode_sorted()
+    public void testgetCodeSorted()
     {
         FunctionHandler dut = new FunctionHandler();
         Function funca = new Function(null);

@@ -17,13 +17,13 @@
  */
 package de.nomagic.puzzler.Generator;
 
-public class C_functionCall
+public class CFunctionCall
 {
     private final String api;
     private final String functionName;
     private String functionArguments;
 
-    public C_functionCall(String functionDescriptor)
+    public CFunctionCall(String functionDescriptor)
     {
         // Split functionName into API Function name and parameters
         if(true == functionDescriptor.contains(":"))

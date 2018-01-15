@@ -20,7 +20,7 @@ public final class FileGetter
     public final static String ALGORITHM_ROOT_ELEMENT_NAME = "algorithm";
     public final static String API_ROOT_ELEMENT_NAME = "api";
 
-    private static final Logger log = LoggerFactory.getLogger("FileGetter");
+    private static final Logger LOG = LoggerFactory.getLogger("FileGetter");
 
     private FileGetter()
     {
@@ -74,7 +74,7 @@ public final class FileGetter
             {
                 ctx.addError("FileGetter", "JDOM Exception");
             }
-            log.trace(Tool.fromExceptionToString(e));
+            LOG.trace(Tool.fromExceptionToString(e));
             jdomDocument = null;
         }
         catch (IOException e)
@@ -84,7 +84,7 @@ public final class FileGetter
                 ctx.addError("FileGetter", "IOException for file " + xmlSource);
                 ctx.addError("FileGetter", e.getMessage());
             }
-            log.trace(Tool.fromExceptionToString(e));
+            LOG.trace(Tool.fromExceptionToString(e));
             jdomDocument = null;
         }
 
@@ -141,7 +141,7 @@ public final class FileGetter
     {
         if(null == paths)
         {
-            log.trace("no paths supplied");
+            LOG.trace("no paths supplied");
             return null;
         }
         Element res = null;
@@ -164,7 +164,7 @@ public final class FileGetter
                 ctx);
         if(null == algo)
         {
-            log.trace("Could not load the Element from the file {}",
+            LOG.trace("Could not load the Element from the file {}",
                     path + fileName);
             return null;
         }
@@ -172,26 +172,26 @@ public final class FileGetter
         Element root = algo.getRootElement();
         if(null == root)
         {
-            log.trace("No root tag in the File {} ", fileName);
+            LOG.trace("No root tag in the File {} ", fileName);
             return null;
         }
 
         return root;
     }
 
-    public static Element getApiElement(String ApiName, Context ctx)
+    public static Element getApiElement(String apiName, Context ctx)
     {
-        return getFromFile(ApiName, "api", API_ROOT_ELEMENT_NAME, ctx);
+        return getFromFile(apiName, "api", API_ROOT_ELEMENT_NAME, ctx);
     }
 
-    public static Element getAlgorithmElement(String AlgorithmName, Context ctx)
+    public static Element getAlgorithmElement(String algorithmName, Context ctx)
     {
-        if((null == AlgorithmName))
+        if((null == algorithmName))
         {
-            log.warn("AlgorithmName null !");
+            LOG.warn("AlgorithmName null !");
             return null;
         }
-        return getFromFile(AlgorithmName,
+        return getFromFile(algorithmName,
                            "algorithm",
                            ALGORITHM_ROOT_ELEMENT_NAME,
                            ctx);
@@ -207,11 +207,11 @@ public final class FileGetter
            || (null == rootElementName)
            || (null == ctx) )
         {
-            log.warn("Invalid parameters!");
-            log.warn("Name: " + Name);
-            log.warn("type: " + type);
-            log.warn("root name: " + rootElementName);
-            log.warn("context: " + ctx);
+            LOG.warn("Invalid parameters!");
+            LOG.warn("Name: " + Name);
+            LOG.warn("type: " + type);
+            LOG.warn("root name: " + rootElementName);
+            LOG.warn("context: " + ctx);
             return null;
         }
 
@@ -222,20 +222,20 @@ public final class FileGetter
         {
             // if that failed then the architecture specific
             String[] paths = ctx.cfg().getStringsOf(Configuration.ENVIRONMENT_PATH_CFG);
-            String Architecture = ctx.getEnvironment().getArchitectureName();
+            String architecture = ctx.getEnvironment().getArchitectureName();
             for(int i = 0; i < paths.length; i++)
             {
-                paths[i] = paths[i] + Architecture + File.separator;
+                paths[i] = paths[i] + architecture + File.separator;
             }
-            String FamilyName = ctx.getEnvironment().getFamilyName();
-            if(0 < FamilyName.length())
+            String familyName = ctx.getEnvironment().getFamilyName();
+            if(0 < familyName.length())
             {
                 // if a family is given then the family has additional folders that are preferred to the general directories.
                 Vector<String> famPaths = new Vector<String>();
 
                 for(int i = 0; i < paths.length; i++)
                 {
-                    famPaths.add(paths[i] + FamilyName + File.separator);
+                    famPaths.add(paths[i] + familyName + File.separator);
                 }
                 for(int i = 0; i < paths.length; i++)
                 {
@@ -258,7 +258,7 @@ public final class FileGetter
 
         if(false == rootElementName.equals(root.getName()))
         {
-            log.trace("Invalid root tag({}) in the {}", root.getName(), Name);
+            LOG.trace("Invalid root tag({}) in the {}", root.getName(), Name);
             return null;
         }
 

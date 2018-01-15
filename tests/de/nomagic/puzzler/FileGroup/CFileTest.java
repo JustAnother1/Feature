@@ -2,21 +2,21 @@ package de.nomagic.puzzler.FileGroup;
 
 import org.junit.Test;
 
-public class C_FileTest
+public class CFileTest
 {
 
     @Test
-    public void testAddContentsOf_null()
+    public void testAddContentsOfNull()
     {
-        C_File dut = new C_File(null);
+        CFile dut = new CFile(null);
         dut.addContentsOf(null);
     }
 
     @Test
     public void testAddContentsOf()
     {
-        C_File emptyFile = new C_File("empty");
-        C_File dut = new C_File("dut");
+        CFile emptyFile = new CFile("empty");
+        CFile dut = new CFile("dut");
         dut.addContentsOf(emptyFile);
     }
 

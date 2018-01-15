@@ -1,11 +1,11 @@
 package de.nomagic.puzzler.FileGroup;
 
-public class C_include extends C_element
+public class CInclude extends CElement
 {
     private final String fileName;
     private String comment;
 
-    public C_include(String fileName, String comment)
+    public CInclude(String fileName, String comment)
     {
         this.fileName = fileName;
         this.comment = comment;

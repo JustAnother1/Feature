@@ -9,7 +9,7 @@ public class FileFactoryTest
 {
 
     @Test
-    public void testGetFileFromXml_null()
+    public void testGetFileFromXmlNull()
     {
         assertNull(FileFactory.getFileFromXml(null));
     }

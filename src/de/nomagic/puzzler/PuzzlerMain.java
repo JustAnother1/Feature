@@ -34,7 +34,7 @@ import de.nomagic.puzzler.BuildSystem.BuildSystem;
 import de.nomagic.puzzler.BuildSystem.MakeBuildSystem;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.FileGroup;
-import de.nomagic.puzzler.Generator.C_CodeGenerator;
+import de.nomagic.puzzler.Generator.CCodeGenerator;
 import de.nomagic.puzzler.Generator.Generator;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
@@ -94,7 +94,7 @@ public class PuzzlerMain
         System.out.println("Parameters:");
         System.out.println("-D<SettingName>=<Value>    : Set a value to a configuration variable.");
         System.out.println("                           : currently supported:");
-        System.out.println("                           : " + C_CodeGenerator.CFG_DOC_CODE_SRC + "=true  : code source in code");
+        System.out.println("                           : " + CCodeGenerator.CFG_DOC_CODE_SRC + "=true  : code source in code");
         System.out.println("-e /--environment_dirctory : directory with environment configuration.");
 
         System.out.println("-h / --help                : print this message.");
@@ -176,8 +176,8 @@ public class PuzzlerMain
 
     public boolean parseCommandLineParameters(String[] args)
     {
-        boolean found_outputDirectory = false;
-        boolean found_libDirectory = false;
+        boolean foundOutputDirectory = false;
+        boolean foundLibDirectory = false;
         Configuration cfg = new Configuration();
         for(int i = 0; i < args.length; i++)
         {
@@ -218,7 +218,7 @@ public class PuzzlerMain
                         return false;
                     }
                     cfg.setString(Configuration.LIB_PATH_CFG, libDir);
-                    found_libDirectory = true;
+                    foundLibDirectory = true;
                     log.trace("command Line config: library Directory {}", libDir);
                 }
                 else if( (true == "-o".equals(args[i])) || (true == "--output_dirctory".equals(args[i])))
@@ -232,7 +232,7 @@ public class PuzzlerMain
                         return false;
                     }
                     cfg.setString(Configuration.OUTPUT_PATH_CFG, outputDirectory);
-                    found_outputDirectory = true;
+                    foundOutputDirectory = true;
                     log.trace("command Line config: output Directory {}", outputDirectory);
                 }
                 else if( (true == "-e".equals(args[i])) || (true == "--environment_dirctory".equals(args[i])))
@@ -275,8 +275,8 @@ public class PuzzlerMain
             {
                 if(true == args[i].endsWith(".xml"))
                 {
-                    String ProjectName =  args[i].substring(0, args[i].length() - ".xml".length());
-                    cfg.setString(Configuration.PROJECT_FILE_CFG, ProjectName);
+                    String projectName =  args[i].substring(0, args[i].length() - ".xml".length());
+                    cfg.setString(Configuration.PROJECT_FILE_CFG, projectName);
                 }
                 else
                 {
@@ -286,14 +286,14 @@ public class PuzzlerMain
             }
         }
         // check parameters
-        if(false == found_outputDirectory)
+        if(false == foundOutputDirectory)
         {
             System.err.println("ERROR: You need to provide the output directory");
             return false;
         }
         // TODO give them command line parameters
         cfg.setString(Configuration.PROJECT_PATH_CFG, cfg.getString(Configuration.ROOT_PATH_CFG));
-        if(false == found_libDirectory)
+        if(false == foundLibDirectory)
         {
             cfg.setString(Configuration.LIB_PATH_CFG, cfg.getString(Configuration.ROOT_PATH_CFG) + "lib/");
         }
@@ -348,7 +348,7 @@ public class PuzzlerMain
         ctx.addSolution(s);
 
         // create "code creator" back end (creates the C Source Code)
-        Generator gen = new C_CodeGenerator(ctx);
+        Generator gen = new CCodeGenerator(ctx);
         gen.configure(cfg);
         // give solution to code creator to create code project
         FileGroup files = gen.generateFor(ConfiguredAlgorithm.getTreeFrom(ctx, null));

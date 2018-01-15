@@ -9,7 +9,7 @@ public class ApiTest
 {
 
     @Test
-    public void testToString_invalid()
+    public void testToStringInvalid()
     {
         Api dut = new Api(null, null);
         assertEquals("invalid Api", dut.toString());
@@ -25,7 +25,7 @@ public class ApiTest
     }
 
     @Test
-    public void testGetFromFile_null()
+    public void testGetFromFileNull()
     {
         assertNull(Api.getFromFile(null, null));
     }

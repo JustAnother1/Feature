@@ -15,7 +15,7 @@ public class ConfigurationTest
     }
 
     @Test
-    public void testGetString_notSet()
+    public void testGetStringNotSet()
     {
         Configuration cfg = new Configuration();
         assertNotNull(cfg);
@@ -41,7 +41,7 @@ public class ConfigurationTest
     }
 
     @Test
-    public void testGetString_overwrite()
+    public void testGetStringOverwrite()
     {
         Configuration cfg = new Configuration();
         assertNotNull(cfg);

@@ -13,7 +13,7 @@ public class Configuration
     public final static String SOLUTION_FILE_CFG = "solutionFile";
     public final static String ENVIRONMENT_PATH_CFG = "environment_path";
 
-    private HashMap<String, Vector<String>> StringArraySettings = new HashMap<String,Vector<String>>();
+    private HashMap<String, Vector<String>> stringArraySettings = new HashMap<String,Vector<String>>();
 
     public Configuration()
     {
@@ -21,7 +21,7 @@ public class Configuration
 
     public String getString(String setting)
     {
-        Vector<String> curVector = StringArraySettings.get(setting);
+        Vector<String> curVector = stringArraySettings.get(setting);
         if(null == curVector)
         {
             return "";
@@ -34,19 +34,19 @@ public class Configuration
 
     public void setString(String name, String value)
     {
-        Vector<String> curVector = StringArraySettings.get(name);
+        Vector<String> curVector = stringArraySettings.get(name);
         if(null == curVector)
         {
             // first String for this setting
             curVector = new Vector<String>();
-            StringArraySettings.put(name, curVector);
+            stringArraySettings.put(name, curVector);
         }
         curVector.add(value);
     }
 
     public String[] getStringsOf(String setting)
     {
-        Vector<String> curVector = StringArraySettings.get(setting);
+        Vector<String> curVector = stringArraySettings.get(setting);
         if(null == curVector)
         {
             return new String[0];

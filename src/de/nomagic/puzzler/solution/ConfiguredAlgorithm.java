@@ -28,8 +28,8 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     private final static Logger LOG = LoggerFactory.getLogger("ConfiguredAlgorithm");
 
-    private final String Name;
-    private final Algorithm AlgorithmDefinition;
+    private final String name;
+    private final Algorithm algorithmDefinition;
     private final HashMap<String, Attribute> cfgAttributes = new HashMap<String, Attribute>();
     private final HashMap<String, ConfiguredAlgorithm> cfgAlgorithms = new HashMap<String, ConfiguredAlgorithm>();
 
@@ -39,21 +39,21 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     private HashMap<String, String> parameters = new  HashMap<String, String>();
     private ConfiguredAlgorithm parent;
 
-    public ConfiguredAlgorithm(String Name,
-                               Algorithm AlgorithmDefinition,
+    public ConfiguredAlgorithm(String name,
+                               Algorithm algorithmDefinition,
                                Context ctx,
                                ConfiguredAlgorithm parent)
     {
         super(ctx);
-        this.Name = Name;
-        this.AlgorithmDefinition = AlgorithmDefinition;
+        this.name = name;
+        this.algorithmDefinition = algorithmDefinition;
         this.parent = parent;
         condiEval = new ConditionEvaluator(ctx);
     }
 
     public String getName()
     {
-        return Name;
+        return name;
     }
 
     public static ConfiguredAlgorithm getTreeFrom(Context ctx, ConfiguredAlgorithm parent)
@@ -222,17 +222,17 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     {
         addProvidedData();
 
-        Element Requirements = AlgorithmDefinition.getChild(ALGORITHM_REQUIREMENTS_CHILD_NAME);
-        if(null == Requirements)
+        Element requirements = algorithmDefinition.getChild(ALGORITHM_REQUIREMENTS_CHILD_NAME);
+        if(null == requirements)
         {
-            LOG.trace("{} has no requirements!", AlgorithmDefinition);
+            LOG.trace("{} has no requirements!", algorithmDefinition);
             return true;
         }
         // else :
 
         // required configuration parameters
-        List<Element> cfgReq = Requirements.getChildren(REQUIRED_CFG_NAME);
-        LOG.trace("{} has {} required parameters.", AlgorithmDefinition, cfgReq.size());
+        List<Element> cfgReq = requirements.getChildren(REQUIRED_CFG_NAME);
+        LOG.trace("{} has {} required parameters.", algorithmDefinition, cfgReq.size());
         for(int i = 0; i < cfgReq.size(); i++)
         {
             Element curE = cfgReq.get(i);
@@ -269,8 +269,8 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         }
 
         // required children(algorithms)
-        List<Element> algoReq = Requirements.getChildren(REQUIRED_ALGORITHM_NAME);
-        LOG.trace("{} has {} required children.", AlgorithmDefinition, algoReq.size());
+        List<Element> algoReq = requirements.getChildren(REQUIRED_ALGORITHM_NAME);
+        LOG.trace("{} has {} required children.", algorithmDefinition, algoReq.size());
         for(int i = 0; i < algoReq.size(); i++)
         {
             Element curE = algoReq.get(i);
@@ -306,7 +306,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     private void addProvidedData()
     {
-        Element provides = AlgorithmDefinition.getChild(ALGORITHM_PROVIDES_CHILD_NAME);
+        Element provides = algorithmDefinition.getChild(ALGORITHM_PROVIDES_CHILD_NAME);
         if(null != provides)
         {
             // this algorithm provides some informations
@@ -325,22 +325,22 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         // else this algorithm provides nothing and that might be OK.
     }
 
-    public boolean hasApi(String Api)
+    public boolean hasApi(String api)
     {
-        if(null == AlgorithmDefinition)
+        if(null == algorithmDefinition)
         {
             return false;
         }
         else
         {
-            return AlgorithmDefinition.hasApi(Api);
+            return algorithmDefinition.hasApi(api);
         }
     }
 
     @Override
     public String toString()
     {
-        return Name + "(" + AlgorithmDefinition + ")";
+        return name + "(" + algorithmDefinition + ")";
     }
 
     private void addConfiguration(Attribute curAttribute)
@@ -356,9 +356,9 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         }
     }
 
-    public ConfiguredAlgorithm getChild(String Name)
+    public ConfiguredAlgorithm getChild(String name)
     {
-        return cfgAlgorithms.get(Name);
+        return cfgAlgorithms.get(name);
     }
 
     public Iterator<String> getAllChildren()
@@ -433,27 +433,27 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         return null;
     }
 
-    public Element getAlgorithmElement(String ElementName)
+    public Element getAlgorithmElement(String elementName)
     {
-        if(null == AlgorithmDefinition)
+        if(null == algorithmDefinition)
         {
             return null;
         }
         else
         {
-            return AlgorithmDefinition.getChild(ElementName);
+            return algorithmDefinition.getChild(elementName);
         }
     }
 
-    public List<Element> getAlgorithmElements(String ElementName)
+    public List<Element> getAlgorithmElements(String elementName)
     {
-        if(null == AlgorithmDefinition)
+        if(null == algorithmDefinition)
         {
             return null;
         }
         else
         {
-            return AlgorithmDefinition.getChildren(ElementName);
+            return algorithmDefinition.getChildren(elementName);
         }
     }
 

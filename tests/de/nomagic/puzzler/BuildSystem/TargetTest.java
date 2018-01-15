@@ -16,7 +16,7 @@ public class TargetTest
     }
 
     @Test
-    public void testGetSource_xml_null()
+    public void testGetSourceXmlNull()
     {
         Element xml = null;
         Target dut = new Target(xml);
@@ -24,7 +24,7 @@ public class TargetTest
     }
 
     @Test
-    public void testGetSource_xml_invalid()
+    public void testGetSourceXmlInvalid()
     {
         Element xml = new Element("bla");
         Target dut = new Target(xml);

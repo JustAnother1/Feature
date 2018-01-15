@@ -13,7 +13,7 @@ public class Project extends Base
     public final static String SOLUTION_ELEMENT_NAME = "solution";
 
     private Document doc = null;
-    private Element ProjectRoot = null;
+    private Element projectRoot = null;
 
     public Project(Context ctx)
     {
@@ -39,16 +39,16 @@ public class Project extends Base
             return false;
         }
 
-        ProjectRoot  = doc.getRootElement();
-        if(null == ProjectRoot)
+        projectRoot  = doc.getRootElement();
+        if(null == projectRoot)
         {
             ctx.addError(this, "Could not read Root Element from " + fileName);
             return false;
         }
 
-        if(false == PROJECT_ROOT_ELEMENT_NAME.equals(ProjectRoot.getName()))
+        if(false == PROJECT_ROOT_ELEMENT_NAME.equals(projectRoot.getName()))
         {
-            ctx.addError(this, "Project File " + fileName + " has an invalid root tag (" + ProjectRoot.getName() + ") !");
+            ctx.addError(this, "Project File " + fileName + " has an invalid root tag (" + projectRoot.getName() + ") !");
             return false;
         }
 
@@ -57,20 +57,20 @@ public class Project extends Base
 
     public Element getEnvironmentElement()
     {
-        if(null == ProjectRoot)
+        if(null == projectRoot)
         {
             return null;
         }
-        return ProjectRoot.getChild(ENVIRONMENT_ELEMENT_NAME);
+        return projectRoot.getChild(ENVIRONMENT_ELEMENT_NAME);
     }
 
     public Element getSolutionElement()
     {
-        if(null == ProjectRoot)
+        if(null == projectRoot)
         {
             return null;
         }
-        return ProjectRoot.getChild(SOLUTION_ELEMENT_NAME);
+        return projectRoot.getChild(SOLUTION_ELEMENT_NAME);
     }
 
 }

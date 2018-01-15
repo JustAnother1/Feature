@@ -22,14 +22,14 @@ public class SolutionImplTest
     }
 
     @Test
-    public void testGetFromProject_null()
+    public void testGetFromProjectNull()
     {
         SolutionImpl dut = new SolutionImpl(null);
         assertFalse(dut.getFromProject(null));
     }
 
     @Test
-    public void testCheckAndTestAgainstEnvironment_null()
+    public void testCheckAndTestAgainstEnvironmentNull()
     {
         SolutionImpl dut = new SolutionImpl(null);
         assertFalse(dut.checkAndTestAgainstEnvironment());

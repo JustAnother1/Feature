@@ -100,7 +100,7 @@ public class TextFile extends AbstractFile
         }
     }
 
-    public void addContentsOf(C_File otherFile)
+    public void addContentsOf(CFile otherFile)
     {
         if(null == otherFile)
         {

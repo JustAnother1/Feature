@@ -4,7 +4,7 @@ import de.nomagic.puzzler.FileGroup.AbstractFile;
 
 public interface BuildSystemAddApi
 {
-    boolean hasTargetFor(String Source);
+    boolean hasTargetFor(String source);
     void addTarget(Target aTarget);
     void extendListVariable(String list, String newElement);
     void addRequiredVariable(String string);

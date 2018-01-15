@@ -37,11 +37,11 @@ public class Algorithm extends Base
         }
         else
         {
-            String Apis = root.getAttributeValue(ALGORITHM_API_ATTRIBUTE_NAME);
-            if(null != Apis)
+            String apis = root.getAttributeValue(ALGORITHM_API_ATTRIBUTE_NAME);
+            if(null != apis)
             {
                 return "Algorithm " + root.getAttributeValue(ALGORITHM_NAME_ATTRIBUTE_NAME)
-                    + " implementing " + Apis;
+                    + " implementing " + apis;
             }
             else
             {
