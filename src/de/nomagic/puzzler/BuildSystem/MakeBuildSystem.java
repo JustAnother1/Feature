@@ -123,6 +123,7 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         // PHONY
         it = targets.keySet().iterator();
         sb = new StringBuffer();
+        sb.append("clean ");
         while(it.hasNext())
         {
             Target curentTarget = targets.get(it.next());
