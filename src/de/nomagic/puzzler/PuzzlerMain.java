@@ -370,7 +370,7 @@ public class PuzzlerMain
 
         if(false ==files.saveToFolder(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
         {
-            log.error("Failed to save the egnerated files!");
+            log.error("Failed to save the generated files!");
             ctx.close();
             return;
         }
