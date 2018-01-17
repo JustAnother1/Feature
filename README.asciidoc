@@ -11,7 +11,7 @@ Defining your software in abstract algorithms with clear separation to the imple
 
 Feature tries to split the different parts of a software solution up into very small files. Each small part should be easily understandable. Instead of one big project file, feature projects consists of many very small files. This enhances the flexibility and makes configuration management and splitting up task to different people much easier.
 
-To explain the process further an link:res/doc/example.html[example] is provided.
+To explain the process further an link:res/doc/example.asciidoc[example] is provided.
 
 How to use
 ---------
