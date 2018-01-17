@@ -12,10 +12,10 @@ This document defines the software development process using puzzler. puzzler is
 
 The usual environment for a software development project ususally starts with a customer. The customer has a very specific need for a software. He needs the software to execute a function in his process. The customer has usually only limited knowleadge of the software development process, but has a very detailed knowleadge of the feature he needs. All other peolpe involved do not share this knowleadge. It is therefore important to establish a common understanding of the needed functionality.
 
-The usual approcah for this is to collect use cases / stories and requirements. This customer input is then used to create a design. The design should be a complete desctription of all functionality needed by the customer. In most cases it is not a complete description and that causes many issues.
+The usual approach for this is to collect use cases / stories and requirements. This customer input is then used to create a design. The design should be a complete desctription of all functionality needed by the customer. In most cases it is not a complete description and that causes many issues.
 The design is then used to create an implementation. In most cases the step from design to implementation is a manual one. A programmer looks at the design and creates source code that matches his understanding of the design. This is another step that can create issues.
 A problem is that the step of going from design to implementation needs to solve all the implementtation details. Discussing these implementation details with the customer is not efficient, as the customer does not have the in deepth knowleadge of software development to be able to make an informed decision.
-The implementation is then testsed against the requirements. In this step soem of the mis understanding happened in the earlier steps can be eliminated. Especially if the tester is not the sae person as the implementer.
+The implementation is then tested against the requirements. In this step some of the misunderstanding happened in the earlier steps can be eliminated. Especially if the tester is not the same person as the implementer.
 In the end the customer receives the tested implemtnation.
 
 == How puzzler fits into the process

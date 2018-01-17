@@ -1,0 +1,414 @@
+== Example of the Feature development process
+
+This example shows the process at a very simple project. All this example does is let a led blink. This example explains every step needed and every data file included to get to that result. The description also tries to give an idea of how a software development for an embedded firmware could be spread out to different people that hold different roles.
+
+All files needed to create the project are in this description with there complete content.
+
+To understand this example you need to have a basic understanding of XML files and C source code.
+
+=== Requirements
+
+At the beginning of every software project there are the requirements of the customer of the new software that define the design of the new software.
+
+In this example the requirements are:
+- An arduino 2560 board should be used.
+- a green led connected to the board should blink.
+
+=== Solution
+
+To define the software for these requirements we start with the project file.
+
+.project.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<project>
+  <environment ref="arduino2560.xml" />
+  <solution ref="solution.xml" />
+</project>
+----
+
+All we see in there are two refernces. The one is to the "arduino2560.xml" that will define the environment the software needs to work in. We will come back to that a bit later.
+The other reference is to "solution.xml". Instead of a reference it would also be possible to define the solution in the project file. For small projects like this that might be a better option.
+
+Ideally the project and solution file and in some scenarios also the environment file should be created in a discussion with the customer. The reason is that requirements are never complete and many misunderstanding happen. Clearing this up at the earliest possible moment helps getting to a better solution faster.
+
+In this example the implementer looks at the requirements and notices some vital information missing. "blinking" is not very precise. After discussing this with the customer these new requirements are added:
+- The led shall be on once per second.
+- the led should be on for 60% of the time.
+
+With this we have the solution for this software project.
+
+.solution.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<solution>
+  <os algorithm="super_loop">
+    <blink algorithm="pwm_task" frequency_Hz="1" dutyCycle_percent="60" >
+      <greenLed />
+    </blink>
+  </os>
+</solution>
+----
+
+Due to the very limited activity in this software it was decided to not have an operating system, but to use a simple loop in the main function. ( <os algorithm="super_loop">)
+The implementer knows that blinking is a PWM signal. (<blink algorithm="pwm_task" frequency_Hz="1" dutyCycle_percent="60" >)
+And this signal then gets applied to the green LED. (<greenLed />)
+
+With a nice tool to help creating this it should not be a problem to create such a solution in a discussion between implementer and customer.
+
+So now that we have the solution we are done, right?
+
+As in some many cases: It depends.
+
+If you have been using Feature for many similar projects on the arduino2560 then it might be that you can just run puzzler and it creates a C sources and a makefile that you can compile and flash to the arduino and have the LED blinking.
+
+As this is an example we assume that you have nothing from public libraries or previous projects and need to start with nothing. The following chapters describe all the environment and library files that are needed to create the defined solution.
+
+=== APIs
+
+Application Programming Interfaces or short APIs define the functionality of a block of software. We will use different software blocks or algorithms to create the software so we nned some APIs to be able to link the algorithms together.
+
+.program_entry_point.api.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="program_entry_point" >
+  <function name="main" type="required" />
+</api>
+----
+
+The "program_entry_point" API is the only API that must be present in every solution. It is the connection point from which we can start building the software.
+
+.run.api.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="run" >
+    <function name="execute" type="required" />
+    <function  name="initialize" type="optional" />
+</api>
+----
+
+The things we want to do in the software happens in tasks. This run-API specifies very basic task interface. It can only be initialized and then executed. The initialize function is optional. That means that if a task does not need to get initialized then it does not need to implement the initialize function.
+
+.delay.api.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="delay" >
+  <function name="delay_ms"  type="required" param="int" />
+</api>
+----
+
+To keep this simple the PWM algorithm uses delays to create the PWM signal. We therefore need a delay functionality and a delay API.
+
+
+.binaryOutput.api.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="binaryOut" >
+  <function  name="initialize" type="optional" />
+  <function name="setValue"  type="required" param="bool" />
+</api>
+----
+
+And finally to do the real work we need an output pin that can be controlled and that then drives the LED.
+
+
+=== Algorithms
+
+With the APIs in place we now need some logic.
+
+.super_loop.algorithm.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="super_loop" api="program_entry_point">
+  <required>
+    <childElement type="run" />
+  </required>
+  <provides>
+    <singleTask value="numOfChilds equals 1"/>
+  </provides>
+  <c_code>
+    <function name="main">
+      <![CDATA[{
+  $$$initialize()$$$
+  for(;;)
+  {
+    $$$execute()$$$
+  }
+}]]>
+    </function>
+  </c_code>
+</algorithm>
+----
+
+This super_loop algorithm takes tasks as child (<childElement type="run" />) It also provides the information if only one task is run. (singleTask)
+Informations like that and other parameter data can be used to provide alternative implementations. Feature will then use the appropriate implementation for the situation.
+As this algorithm is a program_entry_point it needs to provide a main function. To implement the main function is is necessary to "call" the functions of the child tasks. This is done by the $$$<child function name>(<optinal parameters>)$$$ block.
+
+
+.pwm_task.algorithm.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="pwm_task" api="run">
+    <configurationAttribute name="frequency_Hz"/>
+    <configurationAttribute name="dutyCycle_percent"/>
+    <required>
+        <parameter ref="dutyCycle_percent" />
+        <parameter ref="frequency_Hz" />
+        <childElement type="binaryOut"/>
+    </required>
+    <c_code>
+        <required>
+            <libraryAlgorithm type="delay"/>
+        </required>
+        <function  name="initialize">
+            <![CDATA[$$$binaryOut:initialize()$$$]]>
+        </function>
+        <function name="execute">
+            <![CDATA[
+    $$$binaryOut:setValue(true)$$$
+    $$$delay:delay_ms(10 / frequency_Hz * dutyCycle_percent)$$$ // Delay
+    $$$binaryOut:setValue(false)$$$
+    $$$delay:delay_ms(10 / frequency_Hz * (100 - dutyCycle_percent))$$$ // Delay]]>
+        </function>
+    </c_code>
+</algorithm>
+----
+
+The pwm_task algorithm implements the switching pattern. It does this by switching the LED on (binaryOut:setValue(true)) waiting for some time (delay:delay_ms(10 / frequency_Hz * dutyCycle_percent) ) then switching it off again and waiting some more time.
+
+We have seen in the super_loop algorithm that this will then be "called" again and again.
+
+=== Environment
+
+So far we have only defined the logic that the new software shall implement. But to get a working thing that blinks we also need to specify the environment this software schall run in and interact with.
+
+If the customer has specific needs regarding the layout of the environment of the environment file should be discussed with him.
+
+.arduino2560.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<environment>
+    <cpu>
+        <architecture name="avr" device="atmega2560"/>>
+    </cpu>
+    <pinMapping>
+        <greenLed algorithm="gpio" port="B" pin="7" />
+    </pinMapping>
+    <lib>
+        <delay algorithm="delay" />
+    </lib>
+</environment>
+----
+
+For this example we define that the green LED is connected to the Port B7. Then we also define some general things for this board. The board has an AVR chip. The AVR chip is a atmega2560. And the AVR library provides a delay functionality.
+
+The definition of delay and greenLed is necessary as the solution refers to them. Without them declared it would not be possible to generate C-code.
+
+.delay.algorithm.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="delay" api="delay">
+  <c_code>
+    <additional>
+      <include>util/delay.h</include>
+    </additional>
+
+    <function  name="delay_ms" param0_type="int" param0_name="time">
+      <![CDATA[_delay_ms($$$time$$$);]]>
+    </function>
+
+  </c_code>
+</algorithm>
+----
+
+As the delay functionality is provided by the avr-libc it is very easy to create a delay algorithm. All it has to do is to make sure that an "#include <util/delay.h>" line exists and to then call "_delay_ms(time);" with time being the milliseconds that the delay shall last.
+
+.gpio.algorithm.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="gpio" api="binaryOut,binaryIn">
+  <configurationAttribute name="port" type="character"/>
+  <configurationAttribute name="pin" type="unsigned integer"/>
+  <required>
+    <parameter ref="port" />
+    <parameter ref="pin" />
+  </required>
+
+  <c_code>
+    <additional>
+      <include>avr/io.h</include>
+    </additional>
+
+    <function  name="initialize">
+      <![CDATA[DDR$$$port$$$ |= (1<<DD$$$port$$$$$$pin$$$); //Set the pin $$$pin$$$ on Port$$$port$$$ to output]]>
+    </function>
+
+    <function  name="setValue" param0_type="bool" param0_name="on">
+      <if cond="true equals param(on)">
+        <![CDATA[PORT$$$port$$$ |= (1<<PORT$$$port$$$$$$pin$$$);    // Turn bit $$$pin$$$ on Port$$$port$$$ to 1 => on]]>
+      </if>
+      <if cond="false equals param(on)">
+        <![CDATA[PORT$$$port$$$ &= ~(1<<PORT$$$port$$$$$$pin$$$);    // Turn bit $$$pin$$$ on Port$$$port$$$ to 0 => off]]>
+      </if>
+    </function>
+
+    <function  name="getValue" result="bool">
+      <![CDATA[(PORT$$$port$$$ & 1<<$$$pin$$$);]]>
+    </function>
+
+  </c_code>
+</algorithm>
+----
+
+This gpio algorithm shows that it is also possible for an algorithm to implement more than one interface. It also uses the parameter value to choose between two alternative implementations.
+
+To create a makefile some more details need to be specified.
+
+.common_cfg_build.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<build_cfg>
+  <required>
+    <variables>
+      <CC>avr-gcc</CC>
+      <LD>avr-ld</LD>
+      <CFLAGS> -c -fno-common -O3 -g </CFLAGS>
+      <CPFLAGS>-Obinary</CPFLAGS>
+    </variables>
+    <targets>
+      <!-- link: *.o -> elf -->
+      <target>
+        <source>$(OBJS)</source>
+        <output>$(project).elf</output>
+        <rule>$(LD) $(LFLAGS) main.o -o $(project).elf
+              avr-size -x $(project).elf</rule>
+      </target>
+
+      <!-- elf -> hex -->
+      <target>
+        <source>$(project).elf</source>
+        <output>$(project).hex</output>
+        <rule> avr-objcopy -j .text -j .data -O ihex $(project).elf $(project).hex
+               avr-objcopy -j .eeprom --change-section-lma .eeprom=0 -O ihex $(project).elf $(project)_eeprom.hex</rule>
+      </target>
+
+    </targets>
+  </required>
+  <variables>
+  </variables>
+</build_cfg>
+----
+
+The "common_cfg_build.xml" specifies things that are common to all avr chips.
+
+.atmega2560_cfg_build.xml
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<build_cfg>
+  <required>
+    <variables>
+      <CFLAGS> -DF_CPU=16000000UL -mmcu=atmega2560 </CFLAGS>
+      <LFLAGS> -mavr6 </LFLAGS>
+    </variables>
+    <targets>
+        <!-- program to chip: avrdude hex -> flash -->
+        <target>
+            <source>$(project).hex</source>
+            <output>flash</output>
+            <rule>avrdude -pm2560 -cwiring -P/dev/ttyACM0 -D -U"flash:w:$(project).hex:i"</rule>
+        </target>
+    </targets>
+  </required>
+</build_cfg>
+----
+
+The "atmega2560_cfg_build.xml" then specifies the makefile variables and targets that are specific to the atmega2560 chip.
+
+=== created code
+
+Now that we have completely defined the software we want we can create the source call by invoking this command:
+
+----
+java -jar Puzzler.jar project.xml
+----
+
+Depending on where you have placed your API and Algorithm files some more parameters might be needed.
+
+The result will be this:
+
+.Makefile
+----
+# automatically created makefile
+# created at: 2018-01-17 23:49:00
+# created from solution.xml
+
+CC = avr-gcc
+C_SRC = main.c
+LFLAGS = -mavr6
+CFLAGS = -c -fno-common -O3 -g -DF_CPU=16000000UL -mmcu=atmega2560
+OBJS = main.o
+LD = avr-ld
+project = blinkyProject_avr
+CPFLAGS = -Obinary
+
+flash: $(project).hex
+    avrdude -pm2560 -cwiring -P/dev/ttyACM0 -D -U"flash:w:$(project).hex:i"
+
+$(project).elf: $(OBJS)
+    $(LD) $(LFLAGS) main.o -o $(project).elf
+                  avr-size -x $(project).elf
+
+$(project).hex: $(project).elf
+     avr-objcopy -j .text -j .data -O ihex $(project).elf $(project).hex
+                   avr-objcopy -j .eeprom --change-section-lma .eeprom=0 -O ihex $(project).elf $(project)_eeprom.hex
+
+%.o: %.c
+     $(CC) -c $(CFLAGS) $< -o $@
+
+clean:
+    rm flash $(project).elf $(project).hex *.o
+.PHONY: clean
+
+----
+
+The makefile specifies how to build the code and how to download it onto the arduino2560 board using avrdude. With the board connected calling make will build and download the software and the LED at B7 should start blinking.
+
+
+.main.c
+----
+/*
+  automatically created main.c
+  created at: 2018-01-15 01:12:34
+  created from solution.xml
+*/
+
+#include <avr/io.h>
+#include <util/delay.h>
+
+void main(void);
+
+void main(void)
+{
+  DDRB |= (1<<DDB7); //Set the pin 7 on PortB to output
+  for(;;)
+  {
+    PORTB |= (1<<PORTB7);    // Turn bit 7 on PortB to 1 => on
+    _delay_ms(600); // Delay
+    PORTB &= ~(1<<PORTB7);    // Turn bit 7 on PortB to 0 => off
+    _delay_ms(400); // Delay
+  }
+}
+
+----
+
+This very short main file shows that despite the very generic way of programming used with feature the resulting code is very efficient.
+
+=== migrating to different environment
+
+We all know that requirements change. So what happens if the customer suddenly decides that he does not want to use the arduino board anymore. He now wants to use the STM32 F4 Discovery board. The ST board features an 32bit ARM Cortex-m4 processor (avr = 8bit). So we not only have a different vendor but also a different bus width and different instruction set. This also mean different tools (arm-gcc instead of avr-gcc and no avrdude anymore)
+
+Many C programmers will probably throw all code away and start new from scratch. But with Feature that is not necessary. As the logic stays the same we can reuse everything except the environment. There is still some work involved. Feature does not promise silver bullet solutions. But it should be significantly less effort than a rewrite.
+
+In this repository there is also the environment to run the solution on the STM32 F4 Discovery board.
+
+
