@@ -86,9 +86,10 @@ public class Environment extends Base
                     return false;
                 }
                 // read external Reference
-                externalReferenceDocument = FileGetter.getXmlFile(ctx.cfg().getString(Configuration.ROOT_PATH_CFG),
-                                                                  externalReferenceFileName,
-                                                                  ctx);
+                externalReferenceDocument = FileGetter.getXmlFile(
+                        ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG),
+                        externalReferenceFileName,
+                        ctx);
                 if(null == externalReferenceDocument)
                 {
                     ctx.addError(this, "Could not read referenced File " + externalReferenceFileName);

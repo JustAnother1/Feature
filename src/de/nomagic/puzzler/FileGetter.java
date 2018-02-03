@@ -56,7 +56,14 @@ public final class FileGetter
         }
         else
         {
-            xmlSource = path + File.separator + name;
+            if(false == path.endsWith(File.separator))
+            {
+                xmlSource = path + File.separator + name;
+            }
+            else
+            {
+                xmlSource = path + name;
+            }
         }
         SAXBuilder jdomBuilder = new SAXBuilder();
         Document jdomDocument = null;
