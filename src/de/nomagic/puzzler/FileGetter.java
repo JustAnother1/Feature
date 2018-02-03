@@ -50,6 +50,10 @@ public final class FileGetter
         {
             xmlSource = name;
         }
+        else if(1 > path.length())
+        {
+            xmlSource = name;
+        }
         else
         {
             xmlSource = path + File.separator + name;
@@ -64,6 +68,8 @@ public final class FileGetter
         {
             if(true == failureIsError)
             {
+                LOG.trace("path = " + path);
+                LOG.trace("name = " + name);
                 ctx.addError("FileGetter", "File not found: " + xmlSource);
             }
             jdomDocument = null;
