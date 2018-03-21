@@ -188,7 +188,7 @@ public final class FileGetter
             LOG.trace("No root tag in the File {} ", fileName);
             return null;
         }
-
+        LOG.trace("Loaded the Element({}) from the file {}", root.getName(), path + fileName);
         return root;
     }
 
@@ -263,7 +263,19 @@ public final class FileGetter
                 root = getFromFile(ctx.cfg().getStringsOf(Configuration.LIB_PATH_CFG), fileName, ctx);
                 if(null == root)
                 {
-                    ctx.addError("static:Algorithm", "Could not find the " + type + " " + Name);
+                    ctx.addError("FileGetter", "Could not find the " + type + " " + Name);
+                    LOG.info("FileGetter", "Searched for a file named  " + fileName);
+                    LOG.info("in the folders:");
+                 
+                    String[] searched_paths = ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG);
+                    for(int i = 0; i < searched_paths.length; i++)
+                    {
+                        LOG.info(searched_paths[i]);
+                    }
+                    for(int i = 0; i < paths.length; i++)
+                    {
+                        LOG.info(paths[i]);
+                    }
                     return null;
                 }
             }
