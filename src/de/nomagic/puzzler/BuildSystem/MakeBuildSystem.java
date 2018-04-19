@@ -118,7 +118,7 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         }
         makeFile.addLines(MAKEFILE_FILE_TARGET_SECTION_NAME,
                 new String[] {"clean:",
-                              "\trm " + sb.toString() });
+                              "\trm -rf " + sb.toString() });
 
         // PHONY
         it = targets.keySet().iterator();
