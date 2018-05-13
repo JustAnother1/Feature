@@ -18,4 +18,6 @@ public abstract class Generator extends Base
 
     public abstract void configure(Configuration cfg);
 
+    public abstract String getLanguageName();
+
 }
