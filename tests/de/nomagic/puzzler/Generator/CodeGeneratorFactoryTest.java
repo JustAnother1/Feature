@@ -20,7 +20,7 @@ public class CodeGeneratorFactoryTest {
     }
 
     @Test
-    public void testOK()
+    public void testNotC()
     {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
         ContextStub ctx = new ContextStub();
@@ -28,5 +28,19 @@ public class CodeGeneratorFactoryTest {
         assertNotNull(genFactory);
         Generator[] res = genFactory.getGeneratorFor(algo, ctx);
         assertNotNull(res);
+        assertEquals(0, res.length);
+    }
+
+    @Test
+    public void testC()
+    {
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        algo.setApi(CCodeGenerator.REQUIRED_ROOT_API);
+        ContextStub ctx = new ContextStub();
+        CodeGeneratorFactory genFactory = new CodeGeneratorFactory();
+        assertNotNull(genFactory);
+        Generator[] res = genFactory.getGeneratorFor(algo, ctx);
+        assertNotNull(res);
+        assertEquals(1, res.length);
     }
 }
