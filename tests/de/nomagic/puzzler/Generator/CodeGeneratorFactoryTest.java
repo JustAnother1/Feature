@@ -27,6 +27,6 @@ public class CodeGeneratorFactoryTest {
         CodeGeneratorFactory genFactory = new CodeGeneratorFactory();
         assertNotNull(genFactory);
         Generator[] res = genFactory.getGeneratorFor(algo, ctx);
-        assertNull(res);
+        assertNotNull(res);
     }
 }
