@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
+import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 
 public class CodeGeneratorFactory
 {
@@ -20,7 +20,7 @@ public class CodeGeneratorFactory
     }
 
 
-    public Generator[] getGeneratorFor(ConfiguredAlgorithm algoTree,
+    public Generator[] getGeneratorFor(AlgorithmInstanceInterface algoTree,
             Context ctx)
     {
         if(null == algoTree)

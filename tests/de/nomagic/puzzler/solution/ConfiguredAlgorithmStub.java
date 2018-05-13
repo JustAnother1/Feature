@@ -55,4 +55,11 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
         return null;
     }
 
+    @Override
+    public boolean hasApi(String api)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }
