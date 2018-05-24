@@ -521,5 +521,11 @@ public class CCodeGenerator extends Generator
         return aFile;
     }
 
+    @Override
+    public String getLanguageName()
+    {
+        return "C";
+    }
+
 }
 ;

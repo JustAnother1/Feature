@@ -35,6 +35,7 @@ import de.nomagic.puzzler.BuildSystem.MakeBuildSystem;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.Generator.CCodeGenerator;
+import de.nomagic.puzzler.Generator.CodeGeneratorFactory;
 import de.nomagic.puzzler.Generator.Generator;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
@@ -347,28 +348,49 @@ public class PuzzlerMain
         }
         ctx.addSolution(s);
 
-        // create "code creator" back end (creates the C Source Code)
-        Generator gen = new CCodeGenerator(ctx);
-        gen.configure(cfg);
-        // give solution to code creator to create code project
-        FileGroup files = gen.generateFor(ConfiguredAlgorithm.getTreeFrom(ctx, null));
-        if(null == files)
+        // create "code creator" back end (creates the Source Code in C or other languages)
+        CodeGeneratorFactory genFactory = new CodeGeneratorFactory();
+        ConfiguredAlgorithm algoTree = ConfiguredAlgorithm.getTreeFrom(ctx, null);
+        Generator[] gen = genFactory.getGeneratorFor(algoTree, ctx);
+        if(null == gen)
         {
-            log.error("Failed to generate c source code!");
+            log.error("Could not cretae code generators !");
             ctx.close();
             return;
         }
+        if(1 > gen.length)
+        {
+            log.error("Could not get the needed code generator !");
+            ctx.close();
+            return;
+        }
+        FileGroup allFiles = new FileGroup();
+        for(int i = 0; i < gen.length; i++)
+        {
+            Generator curGen = gen[i];
+            curGen.configure(cfg);
+            // give solution to code creator to create code project
+            FileGroup files = curGen.generateFor(algoTree);
+            if(null == files)
+            {
+                log.error("Failed to generate " + curGen.getLanguageName() + " source code!");
+                ctx.close();
+                return;
+            }
+            allFiles.addAll(files);
+        }
+
         // check tool chain to create makefile
         BuildSystem make = new MakeBuildSystem(ctx);
-        files = make.createBuildFor(files);
-        if(null == files)
+        allFiles = make.createBuildFor(allFiles);
+        if(null == allFiles)
         {
             log.error("Failed to generate build environment!");
             ctx.close();
             return;
         }
 
-        if(false ==files.saveToFolder(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
+        if(false ==allFiles.saveToFolder(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
         {
             log.error("Failed to save the generated files!");
             ctx.close();

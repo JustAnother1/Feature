@@ -1,6 +1,7 @@
 
 package de.nomagic.puzzler.BuildSystem;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -69,7 +70,14 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         }
 
         // add generic stuff:
-        listVariables.put("project", ctx.cfg().getString(Configuration.PROJECT_FILE_CFG));
+
+        String projectName = ctx.cfg().getString(Configuration.PROJECT_FILE_CFG);
+        if(true == projectName.contains(File.separator))
+        {
+            // remove path
+            projectName = projectName.substring(projectName.lastIndexOf(File.separator) + 1);
+        }
+        listVariables.put("project", projectName);
 
         // get hardware configuration
         // add the stuff required by the hardware (targets, variables, files)
@@ -118,7 +126,7 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         }
         makeFile.addLines(MAKEFILE_FILE_TARGET_SECTION_NAME,
                 new String[] {"clean:",
-                              "\trm " + sb.toString() });
+                              "\trm -rf " + sb.toString() });
 
         // PHONY
         it = targets.keySet().iterator();

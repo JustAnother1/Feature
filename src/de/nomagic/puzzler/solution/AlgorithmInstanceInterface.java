@@ -7,4 +7,5 @@ public interface AlgorithmInstanceInterface
     String getParameter(String name);
     String dumpParameter();
     String getBuildIn(String word);
+    boolean hasApi(String api);
 }

@@ -6,6 +6,7 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
 {
     private HashMap<String, String> properties = new HashMap<String, String>();
     private HashMap<String, String> parameters = new HashMap<String, String>();
+    private String api = "";
 
     public ConfiguredAlgorithmStub()
     {
@@ -53,6 +54,17 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public boolean hasApi(String searchedApi)
+    {
+        return api.contains(searchedApi);
+    }
+
+    public void setApi(String enabledApi)
+    {
+        api = api + enabledApi;
     }
 
 }
