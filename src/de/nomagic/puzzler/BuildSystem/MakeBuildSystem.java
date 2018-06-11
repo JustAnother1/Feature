@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
+import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.FileGroup.TextFile;
@@ -50,11 +51,6 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
                                      "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
 
         Iterator<String> fileIt = files.getFileIterator();
-        if(null == fileIt)
-        {
-            ctx.addError(this, "No source files provided !");
-            return null;
-        }
         if(false == fileIt.hasNext())
         {
             ctx.addError(this, "No source files provided !");
@@ -72,6 +68,16 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         // add generic stuff:
 
         String projectName = ctx.cfg().getString(Configuration.PROJECT_FILE_CFG);
+        if(null == projectName)
+        {
+            ctx.addError(this, "No project name provided !");
+            return null;
+        }
+        if(1 > projectName.length())
+        {
+            ctx.addError(this, "Empty project name provided !");
+            return null;
+        }
         if(true == projectName.contains(File.separator))
         {
             // remove path
@@ -81,6 +87,12 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
 
         // get hardware configuration
         // add the stuff required by the hardware (targets, variables, files)
+        Environment e = ctx.getEnvironment();
+        if(null == e)
+        {
+            ctx.addError(this, "No Environment available !");
+            return null;
+        }
         if(false == ctx.getEnvironment().configureBuild(this, requiredEnvironmentVariables))
         {
             ctx.addError(this, "Could not get configuration from environment !");

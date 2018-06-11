@@ -47,5 +47,33 @@ public class TargetTest
         dut.setRule("rule");
         assertEquals("blubb: bla\n\trule", dut.getAsMakeFileTarget());
     }
-
+    
+    @Test
+    public void testPhony_yes()
+    {
+        Element xml = new Element("bla");
+        xml.setAttribute("phony", "TRUE");
+        Target dut = new Target(xml);
+        assertTrue(dut.isPhony());
+    }
+    
+    @Test
+    public void testPhony_no()
+    {
+        Element xml = new Element("bla");
+        xml.setAttribute("phony", "False");
+        Target dut = new Target(xml);
+        assertFalse(dut.isPhony());
+    }
+    
+    @Test
+    public void testPhony_set()
+    {
+        Element xml = new Element("bla");
+        Target dut = new Target(xml);
+        dut.setPhony(false);
+        assertFalse(dut.isPhony());
+        dut.setPhony(true);
+        assertTrue(dut.isPhony());
+    }
 }

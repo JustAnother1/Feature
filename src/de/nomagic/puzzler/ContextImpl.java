@@ -8,7 +8,7 @@ import de.nomagic.puzzler.solution.Solution;
 
 public class ContextImpl implements Context
 {
-    private final Configuration cfg;
+    private Configuration cfg;
     private final ProgressReport report;
     private Environment e;
     private Solution s;
@@ -36,6 +36,10 @@ public class ContextImpl implements Context
 
     public Configuration cfg()
     {
+        if(null == cfg)
+        {
+            cfg = new Configuration();
+        }
         return cfg;
     }
 
