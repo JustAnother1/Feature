@@ -18,7 +18,10 @@ public class ProjectImpl extends Base implements Project
 
     public boolean getFromFiles()
     {
-
+        if(null == ctx)
+        {
+            return false;
+        }
         String fileName = ctx.cfg().getString(Configuration.PROJECT_FILE_CFG);
         if(null == fileName)
         {
