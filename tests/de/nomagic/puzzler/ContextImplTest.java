@@ -22,7 +22,7 @@ public class ContextImplTest
     {
         ContextImpl dut = new ContextImpl(null);
         assertNotNull(dut);
-        assertNull(dut.cfg());
+        assertNotNull(dut.cfg());
     }
 
     @Test

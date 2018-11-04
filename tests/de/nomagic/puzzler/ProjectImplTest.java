@@ -8,17 +8,24 @@ public class ProjectImplTest
 {
 
     @Test
-    public void testGetEnvironmentElement()
+    public void testGetEnvironmentElementNull()
     {
         Project dut = new ProjectImpl(null);
         assertNull(dut.getEnvironmentElement());
     }
 
     @Test
-    public void testGetSolutionElement()
+    public void testGetSolutionElementNull()
     {
         Project dut = new ProjectImpl(null);
         assertNull(dut.getSolutionElement());
+    }
+
+    @Test
+    public void testGetFromFiles()
+    {
+        Project dut = new ProjectImpl(null);
+        assertFalse(dut.getFromFiles());
     }
 
 }
