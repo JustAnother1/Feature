@@ -63,9 +63,9 @@ public class PuzzlerMainTest
     }
 
     @Test
-    public void testhelpParameterOneV()
+    public void testhParameterOneV()
     {
-        String[] args = {"-h", "-v"};
+        String[] args = {"-v"};
         exit.expectSystemExitWithStatus(1);
         PuzzlerMain.main(args);
         String help = outContent.toString();
@@ -75,9 +75,9 @@ public class PuzzlerMainTest
     }
 
     @Test
-    public void testhelpParameterTwoV()
+    public void testParameterTwoV()
     {
-        String[] args = {"-h", "-v", "-v"};
+        String[] args = {"-v", "-v"};
         exit.expectSystemExitWithStatus(1);
         PuzzlerMain.main(args);
         String help = outContent.toString();
@@ -87,9 +87,9 @@ public class PuzzlerMainTest
     }
 
     @Test
-    public void testhelpParameterConfiguration()
+    public void testParameterConfiguration()
     {
-        String[] args = {"-h", "-Dbar=foo", "-e", "env", "-l", "lib", "-o", "out", "-w", "work", "noproject.xml"};
+        String[] args = {"-Dbar=foo", "-e", "env", "-l", "lib", "-o", "out", "-w", "work", "noproject.xml"};
         exit.expectSystemExitWithStatus(1);
         PuzzlerMain.main(args);
         String help = outContent.toString();
