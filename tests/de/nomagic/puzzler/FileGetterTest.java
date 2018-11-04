@@ -34,4 +34,17 @@ public class FileGetterTest {
         assertNull(FileGetter.tryToGetXmlFile(noStrings, null, false, null));
     }
 
+    @Test
+    public void tesTtryToGetXmlFileNoPathButName()
+    {
+        String noString = null;
+        assertNull(FileGetter.tryToGetXmlFile(noString, "", false, null));
+    }
+
+    @Test
+    public void tesTtryToGetXmlFileEmptyPathBut()
+    {
+        assertNull(FileGetter.tryToGetXmlFile("", "", false, null));
+    }
+
 }

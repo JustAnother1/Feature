@@ -62,4 +62,40 @@ public class PuzzlerMainTest
         assertEquals("", errContent.toString());
     }
 
+    @Test
+    public void testhelpParameterOneV()
+    {
+        String[] args = {"-h", "-v"};
+        exit.expectSystemExitWithStatus(1);
+        PuzzlerMain.main(args);
+        String help = outContent.toString();
+        System.out.println(help);
+        assertTrue(5 < help.length());
+        assertEquals("", errContent.toString());
+    }
+
+    @Test
+    public void testhelpParameterTwoV()
+    {
+        String[] args = {"-h", "-v", "-v"};
+        exit.expectSystemExitWithStatus(1);
+        PuzzlerMain.main(args);
+        String help = outContent.toString();
+        System.out.println(help);
+        assertTrue(5 < help.length());
+        assertEquals("", errContent.toString());
+    }
+
+    @Test
+    public void testhelpParameterConfiguration()
+    {
+        String[] args = {"-h", "-Dbar=foo", "-e", "env", "-l", "lib", "-o", "out", "-w", "work", "noproject.xml"};
+        exit.expectSystemExitWithStatus(1);
+        PuzzlerMain.main(args);
+        String help = outContent.toString();
+        System.out.println(help);
+        assertTrue(5 < help.length());
+        assertEquals("", errContent.toString());
+    }
+
 }
