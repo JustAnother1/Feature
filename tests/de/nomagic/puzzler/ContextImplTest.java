@@ -14,7 +14,7 @@ public class ContextImplTest
     {
         ContextImpl dut = new ContextImpl(null);
         assertNotNull(dut);
-        assertFalse(dut.wasSucessful());
+        assertTrue(dut.wasSucessful()); // no failure registered yet.
     }
 
     public void testCfg()
