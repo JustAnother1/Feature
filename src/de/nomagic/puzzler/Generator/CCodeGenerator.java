@@ -17,6 +17,7 @@ import de.nomagic.puzzler.FileGroup.CFile;
 import de.nomagic.puzzler.FileGroup.FileFactory;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
+import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 import de.nomagic.puzzler.solution.Api;
 import de.nomagic.puzzler.solution.ConditionEvaluator;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
@@ -71,7 +72,7 @@ public class CCodeGenerator extends Generator
         }
     }
 
-    public FileGroup generateFor(ConfiguredAlgorithm logic)
+    public FileGroup generateFor(AlgorithmInstanceInterface logic)
     {
         codeGroup = new FileGroup();
 
@@ -106,7 +107,7 @@ public class CCodeGenerator extends Generator
         return codeGroup;
     }
 
-    private CFile getImplementationFor(Api api, ConfiguredAlgorithm logic)
+    private CFile getImplementationFor(Api api, AlgorithmInstanceInterface logic)
     {
         log.trace("getting implementation of the {} from {}", api, logic);
         CFile aFile = new CFile("noname.c");
@@ -132,7 +133,7 @@ public class CCodeGenerator extends Generator
         return aFile;
     }
 
-    private String getCImplementationOf(CFunctionCall functionToCall, ConfiguredAlgorithm logic)
+    private String getCImplementationOf(CFunctionCall functionToCall, AlgorithmInstanceInterface logic)
     {
         log.trace("getting the c implemention of the function {} from {}",
                 functionToCall, logic);
@@ -187,7 +188,7 @@ public class CCodeGenerator extends Generator
         return implementation;
     }
 
-    private String getImplementationFromFunctionElment(Element function, String FunctionArguments, ConfiguredAlgorithm logic)
+    private String getImplementationFromFunctionElment(Element function, String FunctionArguments, AlgorithmInstanceInterface logic)
     {
         // the algorithm might have the functions wrapped into if condition tags.
         List<Element> cond = function.getChildren(ALGORITHM_IF_CHILD_NAME);
@@ -218,7 +219,7 @@ public class CCodeGenerator extends Generator
         }
     }
 
-    private Element getFunctionElement(String searchedFunctionName, String FunctionArguments, ConfiguredAlgorithm logic)
+    private Element getFunctionElement(String searchedFunctionName, String FunctionArguments, AlgorithmInstanceInterface logic)
     {
         if(null == logic)
         {
@@ -255,7 +256,7 @@ public class CCodeGenerator extends Generator
         return null;
     }
 
-    private String fillInFunctionCall(String functionName, ConfiguredAlgorithm logic)
+    private String fillInFunctionCall(String functionName, AlgorithmInstanceInterface logic)
     {
         // we now need to make sure that that function exists an can be called.
         // we therefore need to extract the function out of the children of this algorithm
@@ -335,7 +336,7 @@ public class CCodeGenerator extends Generator
 
     private String replacePlaceholders(String implementation,
             String FunctionParameters,
-            ConfiguredAlgorithm logic,
+            AlgorithmInstanceInterface logic,
             Element functionElement)
     {
         StringBuffer res = new StringBuffer();
@@ -439,7 +440,7 @@ public class CCodeGenerator extends Generator
         }
     }
 
-    private void getAdditionalsFrom(ConfiguredAlgorithm logic)
+    private void getAdditionalsFrom(AlgorithmInstanceInterface logic)
     {
         Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
         if(null == cCode)

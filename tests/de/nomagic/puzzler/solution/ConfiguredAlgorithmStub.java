@@ -1,6 +1,9 @@
 package de.nomagic.puzzler.solution;
 
 import java.util.HashMap;
+import java.util.Iterator;
+
+import org.jdom2.Element;
 
 public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
 {
@@ -65,6 +68,27 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     public void setApi(String enabledApi)
     {
         api = api + enabledApi;
+    }
+
+    @Override
+    public Element getAlgorithmElement(String elementName) 
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Iterator<String> getAllChildren() 
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ConfiguredAlgorithm getChild(String name) 
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -311,7 +311,7 @@ public class PuzzlerMain
         }
         Context ctx = new ContextImpl(cfg);
         // open Project file
-        Project pro = new Project(ctx);
+        Project pro = new ProjectImpl(ctx);
         if(false == pro.getFromFiles())
         {
             log.error("Failed to open project!");

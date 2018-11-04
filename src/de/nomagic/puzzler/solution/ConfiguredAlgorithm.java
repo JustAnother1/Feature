@@ -37,12 +37,12 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     private ConditionEvaluator condiEval;
     private HashMap<String, String> properties = new  HashMap<String, String>();
     private HashMap<String, String> parameters = new  HashMap<String, String>();
-    private ConfiguredAlgorithm parent;
+    private AlgorithmInstanceInterface parent;
 
     public ConfiguredAlgorithm(String name,
                                Algorithm algorithmDefinition,
                                Context ctx,
-                               ConfiguredAlgorithm parent)
+                               AlgorithmInstanceInterface parent)
     {
         super(ctx);
         this.name = name;
@@ -100,13 +100,13 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         return getTreeFor(configElement, ctx, parent);
     }
 
-    private static ConfiguredAlgorithm getTreeFromEnvironment(Element cfgElement, Context ctx, ConfiguredAlgorithm parent)
+    private static ConfiguredAlgorithm getTreeFromEnvironment(Element cfgElement, Context ctx, AlgorithmInstanceInterface parent)
     {
         String tagName = cfgElement.getName();
         return getTreeFromEnvironment(tagName, ctx, parent);
     }
 
-    public static ConfiguredAlgorithm getTreeFromEnvironment(String name, Context ctx, ConfiguredAlgorithm parent)
+    public static ConfiguredAlgorithm getTreeFromEnvironment(String name, Context ctx, AlgorithmInstanceInterface parent)
     {
         Element evnElement = ctx.getEnvironment().getAlgorithmCfg(name);
         if(null == evnElement)
@@ -162,7 +162,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         }
     }
 
-    private static ConfiguredAlgorithm getTreeFor(Element cfgElement, Context ctx, ConfiguredAlgorithm parent)
+    private static ConfiguredAlgorithm getTreeFor(Element cfgElement, Context ctx, AlgorithmInstanceInterface parent)
     {
         String algoName = cfgElement.getAttributeValue(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         if(null == algoName)

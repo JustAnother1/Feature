@@ -4,7 +4,7 @@ import java.util.Vector;
 
 import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
 import de.nomagic.puzzler.BuildSystem.Target;
-import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
+import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 import de.nomagic.puzzler.solution.Function;
 
 public class CFile extends TextFile
@@ -111,7 +111,7 @@ public class CFile extends TextFile
 
     }
 
-    public void addFunction(Function func, ConfiguredAlgorithm logic)
+    public void addFunction(Function func, AlgorithmInstanceInterface logic)
     {
         func.addComment(logic.toString());
         functions.add(func);
