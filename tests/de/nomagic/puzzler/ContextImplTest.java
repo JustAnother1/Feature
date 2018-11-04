@@ -17,6 +17,7 @@ public class ContextImplTest
         assertTrue(dut.wasSucessful()); // no failure registered yet.
     }
 
+    @Test
     public void testCfg()
     {
         ContextImpl dut = new ContextImpl(null);
@@ -24,6 +25,7 @@ public class ContextImplTest
         assertNull(dut.cfg());
     }
 
+    @Test
     public void testClose()
     {
         ContextImpl dut = new ContextImpl(null);
@@ -31,6 +33,7 @@ public class ContextImplTest
         dut.close();
     }
 
+    @Test
     public void testSolution()
     {
         ContextImpl dut = new ContextImpl(null);
