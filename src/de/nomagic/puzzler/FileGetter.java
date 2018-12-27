@@ -244,7 +244,7 @@ public final class FileGetter
             {
                 // if a family is given then the family has additional folders that are preferred to the general directories.
                 String[] famPaths = new String[2 * paths.length];
-                
+
                 for(int i = 0; i < paths.length; i++)
                 {
                     famPaths[i] = (paths[i] + familyName + File.separator);
@@ -263,13 +263,13 @@ public final class FileGetter
                 if(null == root)
                 {
                     ctx.addError("FileGetter", "Could not find the " + type + " " + Name);
-                    LOG.info("FileGetter", "Searched for a file named  " + fileName);
+                    LOG.info("Searched for a file named  " + fileName);
                     LOG.info("in the folders:");
-                 
-                    String[] searched_paths = ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG);
-                    for(int i = 0; i < searched_paths.length; i++)
+
+                    String[] searchedPaths = ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG);
+                    for(int i = 0; i < searchedPaths.length; i++)
                     {
-                        LOG.info(searched_paths[i]);
+                        LOG.info(searchedPaths[i]);
                     }
                     for(int i = 0; i < paths.length; i++)
                     {

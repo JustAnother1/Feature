@@ -62,6 +62,10 @@ public class Algorithm extends Base
             return null;
         }
         Element root = FileGetter.getAlgorithmElement(algoAttr.getValue(), ctx);
+        if(null == root)
+        {
+            return null;
+        }
         Algorithm res = new Algorithm(root, ctx);
 
         // TODO check required configuration
