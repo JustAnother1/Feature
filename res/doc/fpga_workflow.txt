@@ -1,0 +1,26 @@
+top.v - source code
+pins.pcf - hardware description
+
+1.)
+
+yosys -p "synth_ice40 -blif hardware.blif" -q top.v 
+
+-> creates a hardware.blif file
+
+2.)
+
+/home/lars/bin/arachne-pnr -d 8k -P cm81 -p pins.pcf -o hardware.asc -q hardware.blif
+
+-> creates hardware.asc file
+
+3.)
+
+icepack hardware.asc hardware.bin
+
+-> creates hardware.bin file
+
+4.)
+
+tinyprog -p hardware.bin
+
+-> flashes the board with the new firmware

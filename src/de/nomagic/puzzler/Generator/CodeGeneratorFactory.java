@@ -34,7 +34,7 @@ public class CodeGeneratorFactory
         // check for C Code
         if(false == algoTree.hasApi(CCodeGenerator.REQUIRED_ROOT_API))
         {
-            log.trace(" Is not a C- Code Tree");
+            log.trace("Is not a C-Code Tree");
         }
         else
         {

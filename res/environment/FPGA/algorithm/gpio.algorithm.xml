@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="gpio" api="binaryOut,binaryIn">
+    <configurationAttribute name="port" type="character"/>
+    <configurationAttribute name="pin" type="unsigned integer"/>
+    <required>
+        <parameter ref="port" />
+        <parameter ref="pin" />
+    </required>
+
+    <c_code>
+    <function  name="initialize">
+      <![CDATA[$$$st_gpio:enablePort(port)$$$
+    // Moder: 00=Input; 01=Output;10=AlternateFunction;11=Analog Mode
+    GPIO$$$port$$$->MODER   |=  1<<(2*$$$pin$$$);
+    // Typer: 0= PushPull; 1=OpenDrain
+    // reset state GPIO$$$port$$$->OTYPER  &= ~1<<$$$pin$$$;
+    // OSpeedR 00=low speed; 01= medium speed; 10=high speed; 11=very high speed
+    // GPIO$$$port$$$->OSPEEDR &= ~(0<<(2*$$$pin$$$));
+    // PuPdR: 00=no pull up, no pull down; 01= pull-up; 10=pull-down
+    // GPIO$$$port$$$->PUPDR   &= ~(0<<(2*$$$pin$$$));]]>
+    </function>
+
+    <function  name="setValue"  param0_type="bool" param0_name="on">
+      <if cond="true equals param(on)">
+        <![CDATA[GPIO$$$port$$$->ODR |= 1<<$$$pin$$$;]]>
+      </if>
+      <if cond="false equals param(on)">
+        <![CDATA[GPIO$$$port$$$->ODR &= ~1<<$$$pin$$$;]]>
+      </if>
+    </function>
+
+    <function  name="getValue" result="bool">
+      <![CDATA[if(0 !=(GPIO$$$port$$$->IDR & 1<<$$$pin$$$)) {return DIN_HIGH;} else {return DIN_LOW;}]]>
+    </function>
+
+  </c_code>
+</algorithm>

@@ -354,7 +354,7 @@ public class PuzzlerMain
         Generator[] gen = genFactory.getGeneratorFor(algoTree, ctx);
         if(null == gen)
         {
-            log.error("Could not cretae code generators !");
+            log.error("Could not create code generators !");
             ctx.close();
             return;
         }

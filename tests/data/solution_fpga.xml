@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<solution>
+  <blink algorithm="pwm" frequency_Hz="1" dutyCycle_percent="60" >
+    <greenLed />
+  </blink>
+</solution>

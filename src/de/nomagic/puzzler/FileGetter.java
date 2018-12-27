@@ -4,7 +4,6 @@ package de.nomagic.puzzler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Vector;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -244,17 +243,17 @@ public final class FileGetter
             if(0 < familyName.length())
             {
                 // if a family is given then the family has additional folders that are preferred to the general directories.
-                Vector<String> famPaths = new Vector<String>();
-
+                String[] famPaths = new String[2 * paths.length];
+                
                 for(int i = 0; i < paths.length; i++)
                 {
-                    famPaths.add(paths[i] + familyName + File.separator);
+                    famPaths[i] = (paths[i] + familyName + File.separator);
                 }
                 for(int i = 0; i < paths.length; i++)
                 {
-                    famPaths.add(paths[i]);
+                    famPaths[paths.length + i] = paths[i];
                 }
-                paths = (String[]) famPaths.toArray();
+                paths = famPaths;
             }
             root = getFromFile(paths, fileName, ctx);
             if(null == root)
