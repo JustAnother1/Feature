@@ -3,7 +3,7 @@ pins.pcf - hardware description
 
 1.)
 
-yosys -p "synth_ice40 -blif hardware.blif" -q top.v 
+/home/lars/bin/yosys -p "synth_ice40 -blif hardware.blif" -q top.v
 
 -> creates a hardware.blif file
 

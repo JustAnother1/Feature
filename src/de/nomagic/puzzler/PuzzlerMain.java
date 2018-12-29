@@ -399,6 +399,7 @@ public class PuzzlerMain
         // success ?
         successful = ctx.wasSucessful();
         log.trace("successful = {}", successful);
+        System.out.println(ctx.getErrors());
         ctx.close();
     }
 

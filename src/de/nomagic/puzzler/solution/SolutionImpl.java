@@ -111,7 +111,7 @@ public class SolutionImpl extends Base implements Solution
         if(null == algoAttr)
         {
             // no reference to algorithm -> Failure !
-            log.trace("Element does not have an algorithm attribute!");
+            log.trace("Element " + cfgElement.getName() + " does not have an algorithm attribute!");
             return false;
         }
         else
