@@ -41,7 +41,7 @@ public class ConfiguredAlgorithmTest
         ctx.addSolution(s);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         String err = ctx.getErrors();
-        assertEquals(1, err.length());
+        assertEquals(72, err.length());
         assertEquals("ConfiguredAlgorithm.getTree : No root element in the provided solution !", err);
     }
 
@@ -55,7 +55,7 @@ public class ConfiguredAlgorithmTest
         s.setRootElement(badRoot);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         String err = ctx.getErrors();
-        assertEquals(1, err.length());
+        assertEquals(54, err.length());
         assertEquals("ConfiguredAlgorithm.getTree : invalid root tag (bad) !", err);
     }
 
@@ -69,7 +69,7 @@ public class ConfiguredAlgorithmTest
         s.setRootElement(badRoot);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         String err = ctx.getErrors();
-        assertEquals(1, err.length());
+        assertEquals(78, err.length());
         assertEquals("ConfiguredAlgorithm.getTree : No algorithm elements in the provided solution !", err);
     }
 
@@ -85,7 +85,7 @@ public class ConfiguredAlgorithmTest
         s.setRootElement(badRoot);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         String err = ctx.getErrors();
-        assertEquals(1, err.length());
+        assertEquals(64, err.length());
         assertEquals("ConfiguredAlgorithm.getTree : Failed to get Algorithm for null !", err);
     }
 
@@ -102,7 +102,7 @@ public class ConfiguredAlgorithmTest
         s.setRootElement(root);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         String err = ctx.getErrors();
-        assertEquals(1, err.length());
+        assertEquals(64, err.length());
         assertEquals("ConfiguredAlgorithm.getTree : Failed to get Algorithm for algo !", err);
     }
 

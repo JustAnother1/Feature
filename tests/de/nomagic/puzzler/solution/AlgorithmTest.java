@@ -79,8 +79,7 @@ public class AlgorithmTest {
         Element root = new Element("good");
         root.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, "bla");
         Algorithm res = Algorithm.getFromFile(root, null);
-        assertNotNull(res);
-        assertSame("ERROR: unconfigured Algorithm", res.toString());
+        assertNull(res);
     }
 
     @Test
