@@ -24,6 +24,18 @@ public class ContextImpl implements Context
         return report.wasSucessful();
     }
 
+    public String getErrors()
+    {
+        if(true == wasSucessful())
+        {
+            return "Context has no Errors!";
+        }
+        else
+        {
+            return "Context saw theses errors:\n" + report.getAllReports();
+        }
+    }
+
     public void close()
     {
         report.close();

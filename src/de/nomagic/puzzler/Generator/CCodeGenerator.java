@@ -67,7 +67,7 @@ public class CCodeGenerator extends Generator
         }
         if("true".equals(cfg.getString(CFG_DOC_CODE_SRC)))
         {
-            log.trace("Switching on documentation of code source");
+            log.trace("Switching on documentation of source code");
             documentCodeSource = true;
         }
     }

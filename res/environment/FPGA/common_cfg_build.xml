@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<build_cfg>
+  <required>
+    <variables>
+      <SYN>yosys</SYN>
+      <SYN_FLAGS> -p "synth_ice40 -blif $(project).blif"</SYN_FLAGS>
+      <PNR>arachne-pnr</PNR>
+      <PNR_FLAGS>-d 8k -P cm81 -p pins.pcf</PNR_FLAGS>
+      <PACK>icepack</PACK>
+      <PACK_FLAGS></PACK_FLAGS>
+      <SRC>top.v</SRC>
+    </variables>
+    <targets>
+      <target>
+        <source>$(SRC)</source>
+        <output>$(project).blif</output>
+        <rule>$(SYN) $(SYN_FLAGS) -q $(SRC)</rule>
+      </target>
+      <target>
+        <source>$(project).blif</source>
+        <output>$(project).asc</output>
+        <rule>$(PNR) $(PNR_FLAGS) -q $(project).blif -o $(project).asc</rule>
+      </target>
+      <target>
+        <source>$(project).asc</source>
+        <output>$(project).bin</output>
+        <rule>$(PACK) $(PACK_FLAGS) $(project).asc $(project).bin</rule>
+      </target>
+      <target phony="true">
+        <source>$(project).bin</source>
+        <output>flash</output>
+        <rule>tinyprog -p $(project).bin</rule>
+      </target>
+    </targets>
+  </required>
+</build_cfg>

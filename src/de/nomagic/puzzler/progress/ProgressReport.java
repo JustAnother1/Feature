@@ -1,6 +1,8 @@
 
 package de.nomagic.puzzler.progress;
 
+import java.util.Vector;
+
 /** Reports the progress to System.out and System.err
  *
  *
@@ -8,6 +10,7 @@ package de.nomagic.puzzler.progress;
 public class ProgressReport
 {
     private boolean sawAnError = false;
+    private Vector<String> reports = new Vector<String>();
 
     public ProgressReport()
     {
@@ -38,19 +41,36 @@ public class ProgressReport
         if(ref instanceof String)
         {
             String name = (String)ref;
-            System.err.println("ERROR(" + name + ") : " + msg);
+            String report = "ERROR(" + name + ") : " + msg;
+            reports.add(report);
+            System.err.println(report);
         }
         else
         {
+            String report = null;
             if(null == ref)
             {
-                System.err.println("ERROR(null) : " + msg);
+                report = "ERROR(null) : " + msg;
+
             }
             else
             {
-                System.err.println("ERROR(" + ref.getClass().getName() + ") : " + msg);
+                report = "ERROR(" + ref.getClass().getName() + ") : " + msg;
             }
+            reports.add(report);
+            System.err.println(report);
         }
+    }
+
+    public String getAllReports()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < reports.size(); i++)
+        {
+            sb.append(reports.get(i));
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
 }

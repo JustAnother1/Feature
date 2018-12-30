@@ -37,15 +37,20 @@ public class ContextStub implements Context
         errors.add(error);
     }
 
-    public String[] getErrors()
+    public String getErrors()
     {
         if(null == errors)
         {
-            return new String[0];
+            return "";
         }
         else
         {
-            return errors.toArray(new String[0]);
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < errors.size(); i++)
+            {
+                sb.append(errors.get(i));
+            }
+            return sb.toString();
         }
     }
 

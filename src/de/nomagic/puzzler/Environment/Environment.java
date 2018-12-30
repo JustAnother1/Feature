@@ -225,7 +225,7 @@ public class Environment extends Base
 
     private Element getConfigurationElementFrom(String Path, String FileName)
     {
-        Document comCfgDoc = FileGetter.getXmlFile(Path, FileName, ctx);
+        Document comCfgDoc = FileGetter.tryToGetXmlFile(Path, FileName, false, ctx);
         if(null != comCfgDoc)
         {
             Element root = comCfgDoc.getRootElement();
@@ -351,8 +351,21 @@ public class Environment extends Base
                     + architectureName;
         }
 
+        // search in family folder
         Element commonElement = getConfigurationElementFrom(commonCfgFolder, "common_" + "cfg_build.xml");
         Element deviceElement = getConfigurationElementFrom(commonCfgFolder, deviceName + "_cfg_build.xml");
+
+        // if not found then search in Architecture folder
+        if(null == commonElement)
+        {
+            commonElement = getConfigurationElementFrom(ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) + architectureName,
+                    "common_" + "cfg_build.xml");
+        }
+        if(null == deviceElement)
+        {
+            deviceElement = getConfigurationElementFrom(ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) + architectureName,
+                    deviceName + "_cfg_build.xml");
+        }
 
         if((null == commonElement) && (null == deviceElement))
         {

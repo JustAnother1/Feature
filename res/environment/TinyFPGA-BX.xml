@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<environment>
+    <cpu>
+        <architecture name="FPGA" family="ice40" device="ICE40LP8K"/>>
+    </cpu>
+    <pinMapping>
+        <greenLed algorithm="gpio" pin="LED" />
+    </pinMapping>
+</environment>

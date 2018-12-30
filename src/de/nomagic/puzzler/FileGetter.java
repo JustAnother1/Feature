@@ -4,7 +4,6 @@ package de.nomagic.puzzler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Vector;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -67,6 +66,7 @@ public final class FileGetter
         }
         SAXBuilder jdomBuilder = new SAXBuilder();
         Document jdomDocument = null;
+        LOG.trace("trying to open {}.", xmlSource);
         try
         {
             jdomDocument = jdomBuilder.build(xmlSource);
@@ -135,6 +135,7 @@ public final class FileGetter
             {
                 xmlSource = paths[i] + File.separator + name;
             }
+            LOG.trace("trying to open {}.", xmlSource);
             File f = new File(xmlSource);
             if(true == f.exists())
             {
@@ -244,17 +245,17 @@ public final class FileGetter
             if(0 < familyName.length())
             {
                 // if a family is given then the family has additional folders that are preferred to the general directories.
-                Vector<String> famPaths = new Vector<String>();
+                String[] famPaths = new String[2 * paths.length];
 
                 for(int i = 0; i < paths.length; i++)
                 {
-                    famPaths.add(paths[i] + familyName + File.separator);
+                    famPaths[i] = (paths[i] + familyName + File.separator);
                 }
                 for(int i = 0; i < paths.length; i++)
                 {
-                    famPaths.add(paths[i]);
+                    famPaths[paths.length + i] = paths[i];
                 }
-                paths = (String[]) famPaths.toArray();
+                paths = famPaths;
             }
             root = getFromFile(paths, fileName, ctx);
             if(null == root)
@@ -264,13 +265,13 @@ public final class FileGetter
                 if(null == root)
                 {
                     ctx.addError("FileGetter", "Could not find the " + type + " " + Name);
-                    LOG.info("FileGetter", "Searched for a file named  " + fileName);
+                    LOG.info("Searched for a file named  " + fileName);
                     LOG.info("in the folders:");
-                 
-                    String[] searched_paths = ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG);
-                    for(int i = 0; i < searched_paths.length; i++)
+
+                    String[] searchedPaths = ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG);
+                    for(int i = 0; i < searchedPaths.length; i++)
                     {
-                        LOG.info(searched_paths[i]);
+                        LOG.info(searchedPaths[i]);
                     }
                     for(int i = 0; i < paths.length; i++)
                     {
