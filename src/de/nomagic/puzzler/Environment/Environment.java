@@ -1,4 +1,17 @@
-
+/*
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, see <http://www.gnu.org/licenses/>
+ *
+ */
 package de.nomagic.puzzler.Environment;
 
 import java.io.File;
@@ -6,7 +19,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.slf4j.Logger;
@@ -15,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGetter;
-import de.nomagic.puzzler.Project;
 import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
 import de.nomagic.puzzler.BuildSystem.Target;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
@@ -24,152 +35,74 @@ import de.nomagic.puzzler.configuration.Configuration;
 
 public class Environment extends Base
 {
-    public final static String EXTERNAL_REFFERENCE_ATTRIBUTE_NAME = "ref";
-    public final static String ROOT_ELEMENT_NAME = "environment";
-    public final static String PIN_MAPPING_ELEMENT_NAME = "pinMapping";
-    public final static String LIBRARIES_ELEMENT_NAME = "lib";
-    public final static String CPU_ELEMENT_NAME = "cpu";
-    public final static String ARCHITECTURE_ELEMENT_NAME = "architecture";
-    public final static String ARCHITECTURE_TYPE_ATTRIBUTE_NAME = "name";
-    public final static String ARCHITECTURE_FAMILY_ATTRIBUTE_NAME = "family";
-    public final static String ARCHITECTURE_DEVICE_ATTRIBUTE_NAME = "device";
-    public final static String BUILD_CFG_ROOT_ELEMENT_NAME = "build_cfg";
+    public static final String ROOT_ELEMENT_NAME = "environment";
+    public static final String TOOL_ELEMENT_NAME = "tool";
+    public static final String TOOL_NAME_ATTRIBUTE_NAME = "name";
+    public static final String PIN_MAPPING_ELEMENT_NAME = "resources";
+    public static final String LIBRARIES_ELEMENT_NAME = "lib";
+    public static final String BUILD_CFG_ROOT_ELEMENT_NAME = "build_cfg";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-
-    private Element environmentRoot = null;
-    private Document externalReferenceDocument = null;
+    
     private Element xmlTreeRoot = null;
-    private String architectureName = "";
-    private String familyName = "";
-    private String deviceName = "";
-
+    private String platformName = "";
+    private String[] platformParts = new String[0];
+    
     public Environment(Context ctx)
     {
         super(ctx);
     }
 
-    public String getArchitectureName()
-    {
-        return architectureName;
-    }
-
-    public String getFamilyName()
-    {
-        return familyName;
-    }
-
-    public boolean getFromProject(Project pro)
-    {
-        if(null == pro)
-        {
-            ctx.addError(this, "No Project provided !");
-            return false;
-        }
-
-        environmentRoot = pro.getEnvironmentElement();
+    public boolean loadFromElement(Element environmentRoot)
+    {    
         if(null == environmentRoot)
         {
             ctx.addError(this, "No Environment Tag in Project !");
             return false;
         }
-
-        if(true == environmentRoot.hasAttributes())
-        {
-            Attribute attr = environmentRoot.getAttribute(EXTERNAL_REFFERENCE_ATTRIBUTE_NAME);
-            if(null != attr)
-            {
-                String externalReferenceFileName = attr.getValue();
-                if(null == externalReferenceFileName)
-                {
-                    ctx.addError(this, "Invalid external reference !");
-                    return false;
-                }
-                // read external Reference
-                externalReferenceDocument = FileGetter.getXmlFile(
-                        ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG),
-                        externalReferenceFileName,
-                        ctx);
-                if(null == externalReferenceDocument)
-                {
-                    ctx.addError(this, "Could not read referenced File " + externalReferenceFileName);
-                    return false;
-                }
-
-                Element extRefEleemnt  = externalReferenceDocument.getRootElement();
-                if(null == extRefEleemnt)
-                {
-                    ctx.addError(this, "Could not read Root Element from " + externalReferenceFileName);
-                    return false;
-                }
-
-                if(false == ROOT_ELEMENT_NAME.equals(extRefEleemnt.getName()))
-                {
-                    ctx.addError(this, "Environment File " + externalReferenceFileName
-                            + " has an invalid root tag (" + extRefEleemnt.getName() + ") !");
-                    return false;
-                }
-                xmlTreeRoot = extRefEleemnt;
-            }
-            else
-            {
-                // no external Reference - all data in this node
-                xmlTreeRoot = environmentRoot;
-            }
-        }
-        else
-        {
-            xmlTreeRoot = environmentRoot;
-        }
-
+        xmlTreeRoot = environmentRoot;
         return parseEnvironmentXmlTree();
     }
 
     private boolean parseEnvironmentXmlTree()
     {
-        Element cpu = xmlTreeRoot.getChild(CPU_ELEMENT_NAME);
+        Element cpu = xmlTreeRoot.getChild(TOOL_ELEMENT_NAME);
         if(null == cpu)
         {
-            ctx.addError(this, "Environment did not specify the cpu used.");
+            ctx.addError(this, "Environment did not specify the platform / environment type / tool chain to use.");
             return false;
         }
-        Element architecture = cpu.getChild(ARCHITECTURE_ELEMENT_NAME);
-        if(null == architecture)
+        platformName = cpu.getAttributeValue(TOOL_NAME_ATTRIBUTE_NAME);
+        log.trace("type : {}", platformName);
+        if(null == platformName)
         {
-            ctx.addError(this, "Environment did not specify the cpu architecture used.");
+            ctx.addError(this, "Environment did not specify the type.");
+            platformName = "";
+            platformParts = new String[0];
             return false;
         }
-        architectureName = architecture.getAttributeValue(ARCHITECTURE_TYPE_ATTRIBUTE_NAME);
-        log.trace("Architecture : {}", architectureName);
-        familyName = architecture.getAttributeValue(ARCHITECTURE_FAMILY_ATTRIBUTE_NAME);
-        if(null == familyName)
-        {
-            familyName = "";
-        }
-        log.trace("Family name : {}", familyName);
-        deviceName = architecture.getAttributeValue(ARCHITECTURE_DEVICE_ATTRIBUTE_NAME);
-        log.trace("Device name : {}", deviceName);
-        if((null == architectureName) || (null == deviceName))
-        {
-            ctx.addError(this, "Environment did not specify the cpu Device/architecture name.");
-            return false;
-        }
+        platformParts = platformName.split("/");
         return true;
+    }
+    
+    public String[] getPlatformParts()
+    {
+        return platformParts;
     }
 
 
     public boolean provides(String name)
     {
-        // the environment provides pins,...
+        // the environment provides resources,...
         if(null != xmlTreeRoot)
         {
-            Element cpu = xmlTreeRoot.getChild(CPU_ELEMENT_NAME);
+            Element cpu = xmlTreeRoot.getChild(TOOL_ELEMENT_NAME);
             if(null != cpu)
             {
-                Element pinMap = xmlTreeRoot.getChild(PIN_MAPPING_ELEMENT_NAME);
-                if(null != pinMap)
+                Element resMap = xmlTreeRoot.getChild(PIN_MAPPING_ELEMENT_NAME);
+                if(null != resMap)
                 {
-                    Element pin = pinMap.getChild(name);
+                    Element pin = resMap.getChild(name);
                     if(null != pin)
                     {
                         return true;
@@ -181,7 +114,7 @@ public class Environment extends Base
         // maybe more ???
 
         // the searched thing is not in the environment,..
-        ctx.addError(this, "The device " + name + " could not be found in the environment !");
+        ctx.addError(this, "The ressource " + name + " could not be found in the environment !");
         return false;
     }
 
@@ -190,18 +123,18 @@ public class Environment extends Base
         // the environment provides pins,...
         if(null != xmlTreeRoot)
         {
-            Element pinMap = xmlTreeRoot.getChild(PIN_MAPPING_ELEMENT_NAME);
-            if(null != pinMap)
+            Element resMap = xmlTreeRoot.getChild(PIN_MAPPING_ELEMENT_NAME);
+            if(null != resMap)
             {
-                Element pin = pinMap.getChild(algoName);
-                if(null != pin)
+                Element res = resMap.getChild(algoName);
+                if(null != res)
                 {
-                    return pin;
+                    return res;
                 }
                 // else continue search
             }
         }
-        log.trace("No pin with the name {} !", algoName);
+        log.trace("No ressource with the name {} !", algoName);
 
         // ... and libraries,...
         if(null != xmlTreeRoot)
@@ -337,19 +270,17 @@ public class Environment extends Base
             ctx.addError(this, "Environment path not configured !");
             return false;
         }
-        if(0 < familyName.length())
+        
+        String deviceName = platformParts[platformParts.length -1]; // last element
+        StringBuilder architectureName = new StringBuilder();
+        
+        for(int i = 0; i < platformParts.length -1; i++)
         {
-            // family provided -> common configuration is in family folder
-            commonCfgFolder = ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) // Path is guaranteed to end with File.separator !
-                    + architectureName + File.separator
-                    + familyName;
+            architectureName.append(platformParts[i]);
+            architectureName.append(File.separator);
         }
-        else
-        {
-            // no family provided -> common configuration is in architecture folder
-            commonCfgFolder = ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) // Path is guaranteed to end with File.separator !
-                    + architectureName;
-        }
+        commonCfgFolder = ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) // Path is guaranteed to end with File.separator !
+                + architectureName.toString();
 
         // search in family folder
         Element commonElement = getConfigurationElementFrom(commonCfgFolder, "common_" + "cfg_build.xml");

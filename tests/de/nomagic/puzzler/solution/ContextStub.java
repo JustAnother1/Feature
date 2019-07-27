@@ -2,6 +2,8 @@ package de.nomagic.puzzler.solution;
 
 import java.util.Vector;
 
+import org.jdom2.Element;
+
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.configuration.Configuration;
@@ -81,6 +83,20 @@ public class ContextStub implements Context
     public Solution getSolution()
     {
         return s;
+    }
+
+    @Override
+    public Element getElementfrom(String fileName, String path,
+            String elementName) 
+    {
+        return null;
+    }
+
+    @Override
+    public Element loadElementFrom(Element uncheckedElement, String path,
+            String elementName) 
+    {
+        return null;
     }
 
 }

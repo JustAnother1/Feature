@@ -14,6 +14,7 @@ build system configuration files are xml files. The root element is a "build_cfg
 === build_cfg element
 ==== Attributes
 None.
+
 ==== child elements
 The build_cfg element can have a exactly one "required" element. The required tag list all the information that needs to go into the build system.
 The build_cfg element can have a exactly one "variables" element. The variables tag can have additional variables that can go into the build system if needed.
@@ -21,6 +22,7 @@ The build_cfg element can have a exactly one "variables" element. The variables 
 === required element
 ==== Attributes
 None.
+
 ==== child elements
 The required element can have a exactly one "targets" element.
 The required element can have a exactly one "variables" element.
@@ -29,12 +31,14 @@ The required element can have a exactly one "files" element.
 === targets element
 ==== Attributes
 None.
+
 ==== child elements
 The targets element can have "target" elements.
 
 === target element
 ==== Attributes
 None.
+
 ==== child elements
 The target element must have exactly one "source" element.
 The target element must have exactly one "output" element.
@@ -43,6 +47,7 @@ The target element must have exactly one "rule" element.
 === files element
 ==== Attributes
 None.
+
 ==== child elements
 The files element can have "unstructured" elements.
 
@@ -50,13 +55,16 @@ The files element can have "unstructured" elements.
 === variables element
 ==== Attributes
 None.
+
 ==== child elements
 All child elements have to comply with the "variable_definition" element style.
 
 === variable_definition element
 the tag name is the name of the variable.
+
 ==== Attributes
 None.
+
 ==== child elements
 The content is the value of the variable.
 

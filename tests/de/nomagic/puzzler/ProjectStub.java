@@ -7,13 +7,6 @@ public class ProjectStub implements Project
     private Element environmentEle = null;
 
     @Override
-    public boolean getFromFiles() 
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public Element getEnvironmentElement() 
     {
         return environmentEle;
@@ -29,6 +22,13 @@ public class ProjectStub implements Project
     public void setEnvironmentElement(Element rootEle) 
     {
         environmentEle = rootEle;
+    }
+
+    @Override
+    public boolean loadFromElement(Element root) 
+    {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

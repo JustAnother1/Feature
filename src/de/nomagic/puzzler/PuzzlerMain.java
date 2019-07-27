@@ -12,9 +12,6 @@
  * with this program; if not, see <http://www.gnu.org/licenses/>
  *
  */
-/** puzzler "compiles" solutions into binaries.
- *
- */
 package de.nomagic.puzzler;
 
 import java.io.BufferedReader;
@@ -30,6 +27,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+
+import org.jdom2.Element;
+
 import de.nomagic.puzzler.BuildSystem.BuildSystem;
 import de.nomagic.puzzler.BuildSystem.MakeBuildSystem;
 import de.nomagic.puzzler.Environment.Environment;
@@ -311,8 +311,13 @@ public class PuzzlerMain
         }
         Context ctx = new ContextImpl(cfg);
         // open Project file
+
+        Element proElement = ctx.getElementfrom(
+                ctx.cfg().getString(Configuration.PROJECT_FILE_CFG) + ".xml",
+                ctx.cfg().getString(Configuration.PROJECT_PATH_CFG),
+                Project.PROJECT_ROOT_ELEMENT_NAME);
         Project pro = new ProjectImpl(ctx);
-        if(false == pro.getFromFiles())
+        if(false == pro.loadFromElement(proElement))
         {
             log.error("Failed to open project!");
             ctx.close();
@@ -321,7 +326,10 @@ public class PuzzlerMain
 
         // Find environment
         Environment e = new Environment(ctx);
-        if(false == e.getFromProject(pro))
+        Element envEleemnt = ctx.loadElementFrom(pro.getEnvironmentElement(), 
+                ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG),
+                Environment.ROOT_ELEMENT_NAME);
+        if(false == e.loadFromElement(envEleemnt))
         {
             log.error("Failed to open environment!");
             ctx.close();

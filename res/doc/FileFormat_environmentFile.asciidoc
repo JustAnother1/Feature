@@ -12,45 +12,61 @@ Environment files describe the environment that the solution should execute in.
 Environment files are xml files. The root element is a "environment" element.
 
 === environment element
+Is the root element.
+
 ==== Attributes
 None.
+
 ==== child elements
-The environment element must have a exactly one "cpu" element.
+The environment element must have a exactly one "tool" element.
+The environment element can have a maximum of one "resources" element.
+The environment element can have a maximum of one "lib" element.
 
-=== cpu element
+=== tool element
+This defines the platform / type of environment. This information is then used to select the right tool chain for the project.
+
 ==== Attributes
-None.
-==== child elements
-The cpu element must have a exactly one "architecture" element.
-The cpu element can have a maximum of one "pinMapping" element.
-
-=== architecture element
-==== Attributes
-the "name" attribute contains the name of the cpu architecture. This is needed to generate the correct binary code for that machine. Examples for Architectures are "x86", "x86-64", "ARM_Cortex-M3", "ARM_Cortex-M4F"..
-
-the "device" attribute contains the full name of the used device.
-
-the optional "family" attribute can name a family of devices that this device belongs to.
+the "name" attribute contains the name of the platform. The platform is a string that can be used as a name for a directory in the file system. It may also contain the slash('/') character. The slash then splits the platform name into separate parts. That can be used to organize platform variants.  
 
 ==== child elements
 None.
 
-=== pinMapping element
+=== resources element
+This element contains all resources that are available in the environment.
+
 ==== Attributes
-None
+None.
+
 ==== child elements
-All child elements have to comply with the pin element style.
+It can have zero, one or many child elements. All child elements have to comply with the resource style.
 
-=== pin element style
+=== resource style
+The tag of elements that comply to this style is the name of the resource that the element defines.
+
 ==== Attributes
-The element needs to have the "type" attribute. The type attribute defines the usage of the pin. Allowed types are : "digital out", "digital in", "analog in", "special function"
-
-The element needs to have a "port" attribute. The port attribute defines the port that the pin belongs to. If the ports are named "PA", "PB", "PC", .. then the port attribute only defines the varying part. For example "A" instead of "PA".
-
-The element needs to have a "pin" attribute. The pin attribute defines the index of the pin in the port. The lowest index is 0.
+The element needs to have the "type" attribute. The type attribute defines the API that the resource implements. It can have further attributes to provide configuration information to the algorithm implementing the resource.
 
 ==== child elements
 None.
+
+=== lib element
+Sometimes it might be necessary to provide some algorithms that are not directly referred to by the solution. These are usually algorithms that are just expected to be available by the implementations of the algorithms used in the solution. examples are functionality provided by standard libraries. 
+
+==== Attributes
+None.
+
+==== child elements
+It can have zero, one or many child elements. All child elements have to comply with the algorithm reference style.
+
+=== algorithm reference style
+The tag of elements that comply to this style is the name of the algorithm that the element defines.
+
+==== Attributes
+None.
+
+==== child elements
+None.
+
 
 == Example
 
@@ -58,11 +74,9 @@ None.
 ----
 <?xml version="1.0" encoding="utf-8" ?>
 <environment>
-  <cpu>
-    <architecture name="AVR" device="atmega2560"/>>
-    <pinMapping>
+  <tool name="AVR/atmega2560"/>>
+  <resources>
       <greenLed type="digital out" port="A" pin="3" />
-    </pinMapping>
-  </cpu>
+  </resources>
 </environment>
 ----

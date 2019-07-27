@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <environment>
-    <cpu>
-        <architecture name="avr" device="atmega2560"/>>
-    </cpu>
-    <pinMapping>
+    <tool name="avr/atmega2560"/>>
+    <resources>
         <greenLed algorithm="gpio" port="B" pin="7" />
-    </pinMapping>
+    </resources>
     <lib>
         <delay algorithm="delay" />
     </lib>

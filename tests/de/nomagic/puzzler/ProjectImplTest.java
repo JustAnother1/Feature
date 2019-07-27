@@ -21,11 +21,4 @@ public class ProjectImplTest
         assertNull(dut.getSolutionElement());
     }
 
-    @Test
-    public void testGetFromFiles()
-    {
-        Project dut = new ProjectImpl(null);
-        assertFalse(dut.getFromFiles());
-    }
-
 }

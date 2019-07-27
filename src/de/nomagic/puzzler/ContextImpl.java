@@ -1,4 +1,22 @@
+/*
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, see <http://www.gnu.org/licenses/>
+ *
+ */
 package de.nomagic.puzzler;
+
+import org.jdom2.Element;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
 
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.configuration.Configuration;
@@ -8,6 +26,8 @@ import de.nomagic.puzzler.solution.Solution;
 
 public class ContextImpl implements Context
 {
+    public static final String EXTERNAL_REFFERENCE_ATTRIBUTE_NAME = "ref";
+    
     private Configuration cfg;
     private final ProgressReport report;
     private Environment e;
@@ -73,6 +93,91 @@ public class ContextImpl implements Context
     public Solution getSolution()
     {
         return s;
+    }
+    
+    public Element getElementfrom(String fileName, String path, String elementName)
+    {
+        if(null == elementName)
+        {
+            addError(this, "Invalid request! tag name missing!");
+            return null;
+        }
+        Document doc = FileGetter.getXmlFile(path, fileName, this);
+        if(null == doc)
+        {
+            addError(this, "Could not read Project File " + fileName);
+            return null;
+        }
+        Element root  = doc.getRootElement();
+        if(null == root)
+        {
+            addError(this, "Could not read Root Element from " + fileName);
+            return null;
+        }
+        if(false == elementName.equals(root.getName()))
+        {
+            addError(this, "File " + fileName + " has an invalid root tag (expected: " + elementName + ", found:  " + root.getName() + ") !");
+            return null;
+        }
+        return loadElementFrom(root, path, elementName);
+    }
+    
+    private Element resolveExternalReference(String path, String externalReferenceFileName, String elementName)
+    {
+        // read external Reference
+        Document externalReferenceDocument = FileGetter.getXmlFile(
+                path,
+                externalReferenceFileName,
+                this);
+        if(null == externalReferenceDocument)
+        {
+            addError(this, "Could not read referenced File " + externalReferenceFileName);
+            return null;
+        }
+
+        Element extRefEleemnt  = externalReferenceDocument.getRootElement();
+        if(null == extRefEleemnt)
+        {
+            addError(this, "Could not read Root Element(" + elementName + ") from " + externalReferenceFileName);
+            return null;
+        }
+
+        if(false == elementName.equals(extRefEleemnt.getName()))
+        {
+            addError(this, "Environment File " + externalReferenceFileName
+                    + " has an invalid root tag (expected : " + elementName + ", found : " + extRefEleemnt.getName() + ") !");
+            return null;
+        }
+        return extRefEleemnt;
+    }
+    
+    public Element loadElementFrom(Element uncheckedElement, String path, String elementName)
+    {
+        if(true == uncheckedElement.hasAttributes())
+        {
+            Attribute attr = uncheckedElement.getAttribute(EXTERNAL_REFFERENCE_ATTRIBUTE_NAME);
+            if(null != attr)
+            {
+                String externalReferenceFileName = attr.getValue();
+                if(null == externalReferenceFileName)
+                {
+                    addError(this, "Invalid external reference !");
+                    return null;
+                }
+
+                return resolveExternalReference(path, externalReferenceFileName, elementName);
+            }
+            else
+            {
+                // no external Reference - all data in this node
+             // nothing to do
+            }
+        }
+        else
+        {
+            // nothing to do
+        }
+        return uncheckedElement;
     }
 
 }

@@ -16,10 +16,11 @@ import de.nomagic.puzzler.configuration.Configuration;
 
 public final class FileGetter
 {
-    public final static String ALGORITHM_ROOT_ELEMENT_NAME = "algorithm";
-    public final static String API_ROOT_ELEMENT_NAME = "api";
+    public static final String ALGORITHM_ROOT_ELEMENT_NAME = "algorithm";
+    public static final String API_ROOT_ELEMENT_NAME = "api";
+    private static final String CLASS_NAME = "FileGetter";
 
-    private static final Logger LOG = LoggerFactory.getLogger("FileGetter");
+    private static final Logger LOG = LoggerFactory.getLogger(CLASS_NAME);
 
     private FileGetter()
     {
@@ -75,9 +76,9 @@ public final class FileGetter
         {
             if(true == failureIsError)
             {
-                LOG.trace("path = " + path);
-                LOG.trace("name = " + name);
-                ctx.addError("FileGetter", "File not found: " + xmlSource);
+                LOG.trace("path = {}", path);
+                LOG.trace("name = {}", name);
+                ctx.addError(CLASS_NAME, "File not found: " + xmlSource);
             }
             jdomDocument = null;
         }
@@ -85,7 +86,7 @@ public final class FileGetter
         {
             if(true == failureIsError)
             {
-                ctx.addError("FileGetter", "JDOM Exception");
+                ctx.addError(CLASS_NAME, "JDOM Exception");
             }
             LOG.trace(Tool.fromExceptionToString(e));
             jdomDocument = null;
@@ -94,8 +95,8 @@ public final class FileGetter
         {
             if(true == failureIsError)
             {
-                ctx.addError("FileGetter", "IOException for file " + xmlSource);
-                ctx.addError("FileGetter", e.getMessage());
+                ctx.addError(CLASS_NAME, "IOException for file " + xmlSource);
+                ctx.addError(CLASS_NAME, e.getMessage());
             }
             LOG.trace(Tool.fromExceptionToString(e));
             jdomDocument = null;
@@ -115,11 +116,11 @@ public final class FileGetter
             {
                 if(null != ctx)
                 {
-                    ctx.addError("FileGetter", "no paths supplied");
+                    ctx.addError(CLASS_NAME, "no paths supplied");
                 }
                 else
                 {
-                    System.out.println("ERROR: FileGetter : no paths supplied");
+                    System.out.println("ERROR: " + CLASS_NAME + " : no paths supplied");
                 }
             }
             return null;
@@ -151,6 +152,35 @@ public final class FileGetter
         return null;
     }
 
+    public static Element getFromFile(String[] paths, String[] subpaths, String fileName, Context ctx)
+    {
+        if((null == paths) ||(null == subpaths))
+        {
+            LOG.trace("no paths supplied");
+            return null;
+        }
+        Element res = null;
+        for (int i = 0; i < paths.length; i++) // check in all paths
+        {
+            for(int j = 0; j < subpaths.length; j++) // heck with all subpaths
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append(paths[i]);
+                for(int k = 0; k < (subpaths.length - j); k++) // start with the deepest path
+                {
+                    sb.append(subpaths[k]);
+                    sb.append(File.separator);
+                }            
+                res = getFromFile(sb.toString(), fileName, ctx);
+                if(null != res)
+                {
+                    return res;
+                }
+            }
+        }
+        return res;
+    }
+    
     public static Element getFromFile(String[] paths, String fileName, Context ctx)
     {
         if(null == paths)
@@ -222,10 +252,10 @@ public final class FileGetter
            || (null == ctx) )
         {
             LOG.warn("Invalid parameters!");
-            LOG.warn("Name: " + Name);
-            LOG.warn("type: " + type);
-            LOG.warn("root name: " + rootElementName);
-            LOG.warn("context: " + ctx);
+            LOG.warn("Name: {}", Name);
+            LOG.warn("type: {}", type);
+            LOG.warn("root name: {}", rootElementName);
+            LOG.warn("context: {}", ctx);
             return null;
         }
 
@@ -236,36 +266,18 @@ public final class FileGetter
         {
             // if that failed then the architecture specific
             String[] paths = ctx.cfg().getStringsOf(Configuration.ENVIRONMENT_PATH_CFG);
-            String architecture = ctx.getEnvironment().getArchitectureName();
-            for(int i = 0; i < paths.length; i++)
-            {
-                paths[i] = paths[i] + architecture + File.separator;
-            }
-            String familyName = ctx.getEnvironment().getFamilyName();
-            if(0 < familyName.length())
-            {
-                // if a family is given then the family has additional folders that are preferred to the general directories.
-                String[] famPaths = new String[2 * paths.length];
+            String[] subPaths = ctx.getEnvironment().getPlatformParts();
 
-                for(int i = 0; i < paths.length; i++)
-                {
-                    famPaths[i] = (paths[i] + familyName + File.separator);
-                }
-                for(int i = 0; i < paths.length; i++)
-                {
-                    famPaths[paths.length + i] = paths[i];
-                }
-                paths = famPaths;
-            }
-            root = getFromFile(paths, fileName, ctx);
+            root = getFromFile(paths, subPaths, fileName, ctx);
+            
             if(null == root)
             {
                 // if that also failed then the common one from the library
                 root = getFromFile(ctx.cfg().getStringsOf(Configuration.LIB_PATH_CFG), fileName, ctx);
                 if(null == root)
                 {
-                    ctx.addError("FileGetter", "Could not find the " + type + " " + Name);
-                    LOG.info("Searched for a file named  " + fileName);
+                    ctx.addError(CLASS_NAME, "Could not find the " + type + " " + Name);
+                    LOG.info("Searched for a file named  {}", fileName);
                     LOG.info("in the folders:");
 
                     String[] searchedPaths = ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG);

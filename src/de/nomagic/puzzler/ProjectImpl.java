@@ -1,14 +1,23 @@
-
+/*
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, see <http://www.gnu.org/licenses/>
+ *
+ */
 package de.nomagic.puzzler;
 
-import org.jdom2.Document;
 import org.jdom2.Element;
-
-import de.nomagic.puzzler.configuration.Configuration;
 
 public class ProjectImpl extends Base implements Project
 {
-    private Document doc = null;
     private Element projectRoot = null;
 
     public ProjectImpl(Context ctx)
@@ -16,42 +25,14 @@ public class ProjectImpl extends Base implements Project
         super(ctx);
     }
 
-    public boolean getFromFiles()
+    public boolean loadFromElement(Element root)
     {
-        if(null == ctx)
+        if(null != root)
         {
-            return false;
+            projectRoot = root;
+            return true;
         }
-        String fileName = ctx.cfg().getString(Configuration.PROJECT_FILE_CFG);
-        if(null == fileName)
-        {
-            ctx.addError(this, "No Project File provided");
-            return false;
-        }
-
-        fileName = fileName + ".xml";
-
-        doc = FileGetter.getXmlFile(ctx.cfg().getString(Configuration.PROJECT_PATH_CFG), fileName, ctx);
-        if(null == doc)
-        {
-            ctx.addError(this, "Could not read Project File " + fileName);
-            return false;
-        }
-
-        projectRoot  = doc.getRootElement();
-        if(null == projectRoot)
-        {
-            ctx.addError(this, "Could not read Root Element from " + fileName);
-            return false;
-        }
-
-        if(false == PROJECT_ROOT_ELEMENT_NAME.equals(projectRoot.getName()))
-        {
-            ctx.addError(this, "Project File " + fileName + " has an invalid root tag (" + projectRoot.getName() + ") !");
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     public Element getEnvironmentElement()

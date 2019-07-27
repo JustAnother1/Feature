@@ -3,11 +3,11 @@ Feature
 
 Feature allows you to define your software in a new way. It covers the only a part of the process of software creation. Feature is starting with high level algorithms down to the smallest implementation details.
 
-Feature does not hide any magic silver bullet behind the curtain. The principles are all out in the open. The complexity of the project has to be handles to come to a working solution. Feature just gives you a different approach to handling the complexity of your problem.
+Feature does not hide any magic silver bullet behind the curtain. The principles are all out in the open. The complexity of the project has to be handled to come to a working solution. Feature just gives you a different approach to handling the complexity of your problem.
 
 Feature helps you split the design up into very small and therefore easy to handle bits. These bits can then be very specific to the problem at hand. Feature therefore does not need complicated modules that adopt to all the different application environments and can therefore create very efficient solutions.
 
-Defining your software in abstract algorithms with clear separation to the implementation details. This allows easy porting of existing Feature solution into new environments.
+You can define your software in abstract algorithms with clear separation to the implementation details. This allows easy porting of existing Feature solution into new environments.
 
 Feature tries to split the different parts of a software solution up into very small files. Each small part should be easily understandable. Instead of one big project file, feature projects consists of many very small files. This enhances the flexibility and makes configuration management and splitting up task to different people much easier.
 
