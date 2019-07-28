@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<build_cfg>
+  <required>
+    <variables>
+      <CC>arm-none-eabi-gcc</CC>
+      <LD>arm-none-eabi-gcc</LD>
+      <AS>arm-none-eabi-as</AS>
+      <LKR_SCRIPT>$(device).ld</LKR_SCRIPT>
+      <CFLAGS>-c -fno-common -ffreestanding -nostdlib -nostdinc -O0 -g -mcpu=cortex-m0plus -mthumb -I.</CFLAGS>
+      <LFLAGS>-nostartfiles -nostdlib -nostdinc -g -T$(LKR_SCRIPT)</LFLAGS>
+      <CPFLAGS>-Obinary</CPFLAGS>
+      <ASFLAGS> -g -Wall -gdwarf-2 -mthumb -mcpu=cortex-m0plus </ASFLAGS>
+    </variables>
+    <targets>
+      <target>
+        <source>$(OBJS)</source>
+        <output>$(project).elf</output>
+        <rule>$(LD) $(LFLAGS) -o $(project).elf $(OBJS)</rule>
+      </target>
+      <target phony="true">
+        <source>$(project).elf</source>
+        <output>flash</output>
+        <rule>arm-none-eabi-objcopy -O binary -S $(project).elf $(project).bin
+        openocd -f $(device).cfg -c "program $(project).elf verify reset exit"</rule>
+      </target>
+    </targets>
+  </required>
+  <variables>
+    <CP>arm-none-eabi-objcopy</CP>
+  </variables>
+</build_cfg>

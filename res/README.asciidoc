@@ -1,0 +1,7 @@
+feature-std-lib
+---------------
+standard library for feature
+
+To use this library point your Feature library folder (-l) to the lib folder.
+To use the environments point your Feature environment folder (-e) to the "environment" folder.
+

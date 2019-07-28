@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="delay" api="delay">
+  <c_code>
+    <additional>
+      <include>stdint.h</include>
+      <function name="uDelay"  param0_type="int" param0_name="usec"><![CDATA[{
+  uint32_t count = 0;
+  const uint32_t utime = (4 * usec / 7);
+  do
+  {
+    if ( ++count > utime )
+    {
+      return ;
+    }
+  }
+  while(1);
+}]]> </function>
+      <function name="mDelay" result="void" param0_type="int" param0_name="msec"><![CDATA[{
+  uDelay(msec * 1000);
+}]]> </function>
+    </additional>
+
+    <function  name="delay_ms" param0_type="int" param0_name="time">
+      <![CDATA[mDelay($$$time$$$);]]>
+    </function>
+
+  </c_code>
+</algorithm>
