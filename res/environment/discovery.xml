@@ -5,7 +5,7 @@
         <greenLed algorithm="gpio" port="D" pin="12" />
     </resources>
     <lib>
-        <delay algorithm="delay" />
-        <st_gpio algorithm="st_gpio" />
+        <delay />
+        <st_gpio  />
     </lib>
 </environment>

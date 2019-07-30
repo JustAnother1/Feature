@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <environment>
-    <cpu>
-        <architecture name="ARM_Cortex-M0+" device="ATSAMD11D14A"/>>
-    </cpu>
-    <pinMapping>
+    <tool name="ARM_Cortex-M0+" device="ATSAMD11D14A"/>>
+    <resources>
         <greenLed algorithm="gpio" port="A" pin="16" />
-    </pinMapping>
+    </resources>
     <lib>
-    	<delay algorithm="delay" />
+    	<delay />
     </lib>
 </environment>
