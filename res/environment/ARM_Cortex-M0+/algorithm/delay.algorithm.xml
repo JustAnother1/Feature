@@ -21,7 +21,7 @@
     </additional>
 
     <function  name="delay_ms" param0_type="int" param0_name="time">
-      <![CDATA[mDelay($$$time$$$);]]>
+      <![CDATA[mDelay(€time€);]]>
     </function>
 
   </c_code>

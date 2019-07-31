@@ -1,5 +1,5 @@
 File Format Specification - Algorithm File
-========================================
+==========================================
 :toc:
 :numbered:
 :showcomments:

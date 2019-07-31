@@ -25,19 +25,19 @@ import de.nomagic.puzzler.solution.Function;
 
 public class CCodeGenerator extends Generator
 {
-    public final static String REQUIRED_ROOT_API = "program_entry_point";
-    public final static String IMPLEMENTATION_PLACEHOLDER_REGEX = "\\$\\$\\$";
-    public final static String ALGORITHM_C_CODE_CHILD_NAME = "c_code";
+    public static final String REQUIRED_ROOT_API = "program_entry_point";
+    public static final String IMPLEMENTATION_PLACEHOLDER_REGEX = "€";
+    public static final String ALGORITHM_C_CODE_CHILD_NAME = "c_code";
 
-    public final static String ALGORITHM_IF_CHILD_NAME = "if";
-    public final static String ALGORITHM_FUNCTION_CHILD_NAME = "function";
-    public final static String ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME = "name";
-    public final static String ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME = "additional";
-    public final static String ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME = "include";
-    public final static String ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME = "function";
-    public final static String ALGORITHM_ADDITIONAL_FILE_CHILD_NAME = "file";
+    public static final String ALGORITHM_IF_CHILD_NAME = "if";
+    public static final String ALGORITHM_FUNCTION_CHILD_NAME = "function";
+    public static final String ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME = "name";
+    public static final String ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME = "additional";
+    public static final String ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME = "include";
+    public static final String ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME = "function";
+    public static final String ALGORITHM_ADDITIONAL_FILE_CHILD_NAME = "file";
 
-    public final static String CFG_DOC_CODE_SRC = "document_code_source";
+    public static final String CFG_DOC_CODE_SRC = "document_code_source";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -45,12 +45,8 @@ public class CCodeGenerator extends Generator
     private FileGroup codeGroup;
     private CFile sourceFile;
 
-    // if this is true then all code sniplets will be wrapped into comment lines explaining where they came from.
+    // if this is true then all code snippets will be wrapped into comment lines explaining where they came from.
     private boolean documentCodeSource = false;
-
-
-
-    // TODO: right now all code is inlined! Add support for functions (called from different places and distribution of code into separate files.
 
     public CCodeGenerator(Context ctx)
     {
@@ -167,7 +163,7 @@ public class CCodeGenerator extends Generator
 
         if(true == documentCodeSource)
         {
-            implementation =  "// from " + logic + "\n" // TODO aFile.getLineSperator()
+            implementation =  "// from " + logic + System.getProperty("line.separator")
                    + getImplementationFromFunctionElment(functionElement, functionToCall.getArguments(), logic)
                    + "// end of " + logic;
         }
@@ -283,9 +279,9 @@ public class CCodeGenerator extends Generator
             if(true == documentCodeSource)
             {
                 res.append(
-                        "// from " + logic + "\n" // TODO aFile.getLineSperator()
-                        + impl + ";" + "\n" // TODO aFile.getLineSperator()
-                        + "// end of " + logic +  "\n"); // TODO aFile.getLineSperator()
+                        "// from " + logic + System.getProperty("line.separator")
+                        + impl + ";" + System.getProperty("line.separator")
+                        + "// end of " + logic +  System.getProperty("line.separator"));
             }
             else
             {
@@ -316,9 +312,9 @@ public class CCodeGenerator extends Generator
                 if(true == documentCodeSource)
                 {
                     res.append(
-                            "// from " + logic + "\n" // TODO aFile.getLineSperator()
-                            + impl + ";" + "\n" // TODO aFile.getLineSperator()
-                            + "// end of " + logic +  "\n"); // TODO aFile.getLineSperator()
+                            "// from " + logic + System.getProperty("line.separator")
+                            + impl + ";" + System.getProperty("line.separator")
+                            + "// end of " + logic +  System.getProperty("line.separator"));
                 }
                 else
                 {

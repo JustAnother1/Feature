@@ -120,7 +120,7 @@ public class TextFile extends AbstractFile
 
     public String getLineSperator()
     {
-        return "\n";
+        return System.getProperty("line.separator");
     }
 
 }

@@ -14,20 +14,20 @@
         
 	    <function  name="initialize">
 	      <![CDATA[
-	    GPIO$$$port$$$->DIRSET   |=  1<<$$$pin$$$;]]>
+	    GPIO€port€->DIRSET   |=  1<<€pin€;]]>
 	    </function>
 	
 	    <function  name="setValue"  param0_type="bool" param0_name="on">
 	      <if cond="true equals param(on)">
-	        <![CDATA[GPIO$$$port$$$->OUTSET |= 1<<$$$pin$$$;]]>
+	        <![CDATA[GPIO€port€->OUTSET |= 1<<€pin€;]]>
 	      </if>
 	      <if cond="false equals param(on)">
-	        <![CDATA[GPIO$$$port$$$->OUTCLR |= 1<<$$$pin$$$;]]>
+	        <![CDATA[GPIO€port€->OUTCLR |= 1<<€pin€;]]>
 	      </if>
 	    </function>
 	
 	    <function  name="getValue" result="bool">
-	      <![CDATA[if(0 !=(GPIO$$$port$$$->IN & 1<<$$$pin$$$)) {return DIN_HIGH;} else {return DIN_LOW;}]]>
+	      <![CDATA[if(0 !=(GPIO€port€->IN & 1<<€pin€)) {return DIN_HIGH;} else {return DIN_LOW;}]]>
 	    </function>
     </c_code>
 </algorithm>
