@@ -162,7 +162,7 @@ public final class FileGetter
         Element res = null;
         for (int i = 0; i < paths.length; i++) // check in all paths
         {
-            for(int j = 0; j < subpaths.length; j++) // heck with all subpaths
+            for(int j = 0; j < subpaths.length; j++) // Check with all sub paths
             {
                 StringBuilder sb = new StringBuilder();
                 sb.append(paths[i]);

@@ -1,4 +1,17 @@
-
+/*
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, see <http://www.gnu.org/licenses/>
+ *
+ */
 package de.nomagic.puzzler.BuildSystem;
 
 import java.io.File;
@@ -15,9 +28,9 @@ import de.nomagic.puzzler.configuration.Configuration;
 
 public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
 {
-    public final static String MAKEFILE_FILE_COMMENT_SECTION_NAME        = "FileHeader";
-    public final static String MAKEFILE_FILE_VARIABLES_SECTION_NAME        = "Variables";
-    public final static String MAKEFILE_FILE_TARGET_SECTION_NAME        = "targets";
+    public static final String MAKEFILE_FILE_COMMENT_SECTION_NAME = "FileHeader";
+    public static final String MAKEFILE_FILE_VARIABLES_SECTION_NAME = "Variables";
+    public static final String MAKEFILE_FILE_TARGET_SECTION_NAME = "targets";
     private HashMap<String, Target> targets = new HashMap<String, Target>();
     private HashMap<String, String> requiredEnvironmentVariables = new HashMap<String, String>();
     private HashMap<String, String> listVariables = new HashMap<String, String>();

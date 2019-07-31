@@ -15,9 +15,9 @@
 package de.nomagic.puzzler.Environment;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -185,7 +185,10 @@ public class Environment extends Base
         }
     }
 
-    private void addConfigurationFromTo(Element cfgElement, BuildSystemAddApi BuildSystem, HashMap<String, String> requiredEnvironmentVariables)
+    private void addConfigurationFromTo(
+            Element cfgElement, 
+            BuildSystemAddApi BuildSystem, 
+            Map<String, String> requiredEnvironmentVariables)
     {
         // extract all "needed" stuff
         Element required = cfgElement.getChild("required");
@@ -260,9 +263,11 @@ public class Environment extends Base
         }
     }
 
-    public boolean configureBuild(BuildSystemAddApi buildSystem, HashMap<String, String> requiredEnvironmentVariables)
+    public boolean configureBuild(
+            BuildSystemAddApi buildSystem, 
+            Map<String, String> requiredEnvironmentVariables)
     {
-        // Find configuration file for architecture
+        // Find configuration file for environment
         String commonCfgFolder;
         String envPath = ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG);
         if(1 > envPath.length())
@@ -279,21 +284,39 @@ public class Environment extends Base
             architectureName.append(platformParts[i]);
             architectureName.append(File.separator);
         }
-        commonCfgFolder = ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) // Path is guaranteed to end with File.separator !
+        commonCfgFolder = ctx.cfg().getString(Configuration.PROJECT_PATH_CFG) // Path is guaranteed to end with File.separator !
                 + architectureName.toString();
 
-        // search in family folder
+        // search in project folder
         Element commonElement = getConfigurationElementFrom(commonCfgFolder, "common_" + "cfg_build.xml");
         Element deviceElement = getConfigurationElementFrom(commonCfgFolder, deviceName + "_cfg_build.xml");
 
-        // if not found then search in Architecture folder
+        // if not found then search in environment folder
         if(null == commonElement)
         {
-            commonElement = getConfigurationElementFrom(ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) + architectureName,
-                    "common_" + "cfg_build.xml");
+            // search whole tree
+            for(int i = 0; i < platformParts.length; i++)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append(ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG));
+                for(int k = 0; k < (platformParts.length - (i + 1)); k++) // start with the deepest path
+                {
+                    sb.append(platformParts[k]);
+                    sb.append(File.separator);
+                }   
+                commonElement = getConfigurationElementFrom(
+                        sb.toString(),
+                        "common_" + "cfg_build.xml");
+                if(null != commonElement)
+                {
+                    break;
+                }
+            }
+            
         }
         if(null == deviceElement)
         {
+            // only in the device sub folder
             deviceElement = getConfigurationElementFrom(ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) + architectureName,
                     deviceName + "_cfg_build.xml");
         }
