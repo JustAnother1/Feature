@@ -9,10 +9,10 @@
   <c_code>
     <function name="main">
       <![CDATA[{
-  $$$initialize()$$$
+  €initialize()€
   for(;;)
   {
-    $$$execute()$$$
+    €execute()€
   }
 }]]>
     </function>

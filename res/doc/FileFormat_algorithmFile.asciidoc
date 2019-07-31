@@ -1,5 +1,5 @@
 File Format Specification - Algorithm File
-========================================
+==========================================
 :toc:
 :numbered:
 :showcomments:
@@ -110,19 +110,19 @@ The content is a CDATA section that contains C-Code that implement the function.
     <function name="main">
      <if cond="true equals singleTask">
       <![CDATA[{
-  $$$initialize$$$
+  €initialize€
   for(;;)
   {
-    $$$execute$$$
+    €execute€
   }
 }]]>
       </if>
       <if cond="false equals singleTask">
         <![CDATA[{
-  $$$initialize$$$
+  €initialize€
   for(;;)
   {
-    $$$execute$$$
+    €execute€
   }
 }]]>
       </if>

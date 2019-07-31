@@ -13,20 +13,20 @@
     </additional>
 
     <function  name="initialize">
-      <![CDATA[DDR$$$port$$$ |= (1<<DD$$$port$$$$$$pin$$$); //Set the pin $$$pin$$$ on Port$$$port$$$ to output]]>
+      <![CDATA[DDR€port€ |= (1<<DD€port€€pin€); //Set the pin €pin€ on Port€port€ to output]]>
     </function>
 
     <function  name="setValue" param0_type="bool" param0_name="on">
       <if cond="true equals param(on)">
-        <![CDATA[PORT$$$port$$$ |= (1<<PORT$$$port$$$$$$pin$$$);    // Turn bit $$$pin$$$ on Port$$$port$$$ to 1 => on]]>
+        <![CDATA[PORT€port€ |= (1<<PORT€port€€pin€);    // Turn bit €pin€ on Port€port€ to 1 => on]]>
       </if>
       <if cond="false equals param(on)">
-        <![CDATA[PORT$$$port$$$ &= ~(1<<PORT$$$port$$$$$$pin$$$);    // Turn bit $$$pin$$$ on Port$$$port$$$ to 0 => off]]>
+        <![CDATA[PORT€port€ &= ~(1<<PORT€port€€pin€);    // Turn bit €pin€ on Port€port€ to 0 => off]]>
       </if>
     </function>
 
     <function  name="getValue" result="bool">
-      <![CDATA[(PORT$$$port$$$ & 1<<$$$pin$$$);]]>
+      <![CDATA[(PORT€port€ & 1<<€pin€);]]>
     </function>
 
   </c_code>
