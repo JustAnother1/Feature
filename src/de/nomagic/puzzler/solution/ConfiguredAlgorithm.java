@@ -70,20 +70,20 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         Element root = s.getRootElement();
         if(null == root)
         {
-            ctx.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTreeFrom",
                             "No root element in the provided solution !");
             return null;
         }
         if(false == Project.SOLUTION_ELEMENT_NAME.equals(root.getName()))
         {
-            ctx.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTreeFrom.1",
                             "invalid root tag (" + root.getName() + ") !");
             return null;
         }
         List<Element> children = root.getChildren();
         if(0 == children.size())
         {
-            ctx.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTreeFrom.2",
                     "No algorithm elements in the provided solution !");
             return null;
         }
@@ -93,7 +93,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         Algorithm algo = s.getAlgorithm(algoName);
         if(null == algo)
         {
-            ctx.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTreeFrom.3",
                             "Failed to get Algorithm for " + algoName + " !");
             return null;
         }
@@ -111,7 +111,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         Element evnElement = ctx.getEnvironment().getAlgorithmCfg(name);
         if(null == evnElement)
         {
-            ctx.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTreeFromEnvironment",
                             "Failed to get Configuration for " + name + " from the environment !");
             return null;
         }
@@ -119,7 +119,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         String algoName = evnElement.getAttributeValue(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
         if(null == algoName)
         {
-            ctx.addError("ConfiguredAlgorithm.getTree",
+            ctx.addError("ConfiguredAlgorithm.getTreeFromEnvironment.1",
                             "Failed to get the algorithm for " + name
                             + " from the environment (" + evnElement + ")!");
             return null;
@@ -132,7 +132,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             algo = Algorithm.getFromFile(evnElement, ctx);
             if(null == algo)
             {
-                ctx.addError("ConfiguredAlgorithm.getTree",
+                ctx.addError("ConfiguredAlgorithm.getTreeFromEnvironment.2",
                                 "Failed to get Algorithm for " + algoName + " !");
                 return null;
             }
@@ -152,7 +152,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
         if(false == res.allRequiredDataAvailable())
         {
-            ctx.addError("ConfiguredAlgorithm.getTree.Env",
+            ctx.addError("ConfiguredAlgorithm.getTreeFromEnvironment.3",
                             "Data missing for " + res.toString() + " !");
             return null;
         }
