@@ -97,18 +97,13 @@ public class PuzzlerMain
         System.out.println("                           : currently supported:");
         System.out.println("                           : " + CCodeGenerator.CFG_DOC_CODE_SRC + "=true  : code source in code");
         System.out.println("-e /--environment_dirctory : directory with environment configuration.");
-
         System.out.println("-h / --help                : print this message.");
-
         System.out.println("-l /--library_dirctory     : directory for library of Algorithms and APIs.");
         System.out.println("                           : This parameter can be specified multiple times.");
-
         System.out.println("-o /--output_dirctory      : directory for created data.");
-
         System.out.println("-v                         : verbose output for even more messages use -v -v");
-
         System.out.println("-w / --work_dirctory       : root directory for file search.");
-
+        System.out.println("-z / --zip_out             : zip created data.");
         System.out.println("<Projectfile>.xml          : define the project to process.");
     }
 
@@ -236,6 +231,22 @@ public class PuzzlerMain
                     foundOutputDirectory = true;
                     log.trace("command Line config: output Directory {}", outputDirectory);
                 }
+                else if( (true == "-z".equals(args[i])) || (true == "--zip_out".equals(args[i])))
+                {
+                    // zip output 
+                    i++;
+                    String outputDirectory = Tool.validatePath(args[i]);
+                    if(1 > outputDirectory.length())
+                    {
+                        System.err.println("Invalid Parameter : " + args[i]);
+                        return false;
+                    }
+                    cfg.setString(Configuration.OUTPUT_PATH_CFG, outputDirectory);
+                    cfg.setBool(Configuration.ZIP_OUTPUT, true);
+                    foundOutputDirectory = true;
+                    log.trace("command Line config: zip output");
+                    log.trace("command Line config: output zip file name {}", outputDirectory);
+                }                
                 else if( (true == "-e".equals(args[i])) || (true == "--environment_dirctory".equals(args[i])))
                 {
                     // environment directory
@@ -289,7 +300,7 @@ public class PuzzlerMain
         // check parameters
         if(false == foundOutputDirectory)
         {
-            System.err.println("ERROR: You need to provide the output directory");
+            System.err.println("ERROR: You need to provide the output directory or zip file name");
             return false;
         }
         // TODO give them command line parameters
@@ -398,11 +409,23 @@ public class PuzzlerMain
             return;
         }
 
-        if(false ==allFiles.saveToFolder(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
+        if(true == ctx.cfg().getBool(Configuration.ZIP_OUTPUT))
         {
-            log.error("Failed to save the generated files!");
-            ctx.close();
-            return;
+            if(false ==allFiles.saveToZip(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
+            {
+                log.error("Failed to create the zip file!");
+                ctx.close();
+                return;
+            }            
+        }
+        else
+        {
+            if(false ==allFiles.saveToFolder(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
+            {
+                log.error("Failed to save the generated files!");
+                ctx.close();
+                return;
+            }
         }
         // success ?
         successful = ctx.wasSucessful();

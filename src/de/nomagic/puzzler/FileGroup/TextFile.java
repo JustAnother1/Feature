@@ -58,7 +58,7 @@ public class TextFile extends AbstractFile
         }
     }
 
-    protected void writeToStream(OutputStream out) throws IOException
+    public void writeToStream(OutputStream out) throws IOException
     {
         for(int sec = 0; sec < sections.size(); sec++)
         {

@@ -52,7 +52,7 @@ public abstract class AbstractFile
         return false;
     }
 
-    protected abstract void writeToStream(OutputStream out) throws IOException;
+    public abstract void writeToStream(OutputStream out) throws IOException;
 
     public void addToBuild(BuildSystemAddApi buildSystem)
     {
