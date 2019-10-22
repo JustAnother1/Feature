@@ -39,7 +39,6 @@ public class Environment extends Base
     public static final String TOOL_ELEMENT_NAME = "tool";
     public static final String TOOL_NAME_ATTRIBUTE_NAME = "name";
     public static final String PIN_MAPPING_ELEMENT_NAME = "resources";
-    public static final String LIBRARIES_ELEMENT_NAME = "lib";
     public static final String BUILD_CFG_ROOT_ELEMENT_NAME = "build_cfg";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
@@ -133,26 +132,10 @@ public class Environment extends Base
                 }
                 // else continue search
             }
+            log.trace("No ressource with the name {} !", algoName);
         }
-        log.trace("No ressource with the name {} !", algoName);
-
-        // ... and libraries,...
-        if(null != xmlTreeRoot)
-        {
-            Element libraries = xmlTreeRoot.getChild(LIBRARIES_ELEMENT_NAME);
-            if(null != libraries)
-            {
-                Element lib = libraries.getChild(algoName);
-                if(null != lib)
-                {
-                    return lib;
-                }
-                // else continue search
-            }
-        }
-        log.trace("No lib with the name {} !", algoName);
-
         // ...maybe more ???
+        log.trace("could find nothing with the name {} !", algoName);
         return null;
     }
 

@@ -13,9 +13,7 @@ public class CodeGeneratorFactoryTest {
     public void testNoAlgos()
     {
         ContextStub ctx = new ContextStub();
-        CodeGeneratorFactory genFactory = new CodeGeneratorFactory();
-        assertNotNull(genFactory);
-        Generator[] res = genFactory.getGeneratorFor(null, ctx);
+        Generator[] res = CodeGeneratorFactory.getGeneratorFor(null, ctx);
         assertNull(res);
     }
 
@@ -24,9 +22,7 @@ public class CodeGeneratorFactoryTest {
     {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
         ContextStub ctx = new ContextStub();
-        CodeGeneratorFactory genFactory = new CodeGeneratorFactory();
-        assertNotNull(genFactory);
-        Generator[] res = genFactory.getGeneratorFor(algo, ctx);
+        Generator[] res = CodeGeneratorFactory.getGeneratorFor(algo, ctx);
         assertNotNull(res);
         assertEquals(0, res.length);
     }
@@ -37,9 +33,7 @@ public class CodeGeneratorFactoryTest {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
         algo.setApi(CCodeGenerator.REQUIRED_ROOT_API);
         ContextStub ctx = new ContextStub();
-        CodeGeneratorFactory genFactory = new CodeGeneratorFactory();
-        assertNotNull(genFactory);
-        Generator[] res = genFactory.getGeneratorFor(algo, ctx);
+        Generator[] res = CodeGeneratorFactory.getGeneratorFor(algo, ctx);
         assertNotNull(res);
         assertEquals(1, res.length);
     }

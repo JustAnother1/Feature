@@ -56,7 +56,7 @@ public class PuzzlerMain
 
     public PuzzlerMain()
     {
-
+        // nothing to do here
     }
 
     public static String getCommitID()
@@ -143,7 +143,7 @@ public class PuzzlerMain
             "<configuration>" +
               "<appender name='STDOUT' class='ch.qos.logback.core.ConsoleAppender'>" +
                 "<encoder>" +
-                  "<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>" +
+                  "<pattern>%-5level [%logger{36}] %msg%n</pattern>" +
                 "</encoder>" +
               "</appender>" +
               "<root level='" + LogLevel + "'>" +
@@ -303,7 +303,7 @@ public class PuzzlerMain
             System.err.println("ERROR: You need to provide the output directory or zip file name");
             return false;
         }
-        // TODO give them command line parameters
+
         cfg.setString(Configuration.PROJECT_PATH_CFG, cfg.getString(Configuration.ROOT_PATH_CFG));
         if(false == foundLibDirectory)
         {
@@ -368,9 +368,8 @@ public class PuzzlerMain
         ctx.addSolution(s);
 
         // create "code creator" back end (creates the Source Code in C or other languages)
-        CodeGeneratorFactory genFactory = new CodeGeneratorFactory();
         ConfiguredAlgorithm algoTree = ConfiguredAlgorithm.getTreeFrom(ctx, null);
-        Generator[] gen = genFactory.getGeneratorFor(algoTree, ctx);
+        Generator[] gen = CodeGeneratorFactory.getGeneratorFor(algoTree, ctx);
         if(null == gen)
         {
             log.error("Could not create code generators !");
@@ -392,7 +391,7 @@ public class PuzzlerMain
             FileGroup files = curGen.generateFor(algoTree);
             if(null == files)
             {
-                log.error("Failed to generate " + curGen.getLanguageName() + " source code!");
+                log.error("Failed to generate {} source code!", curGen.getLanguageName());
                 ctx.close();
                 return;
             }

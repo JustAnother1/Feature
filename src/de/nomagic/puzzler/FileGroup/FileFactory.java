@@ -17,8 +17,26 @@ public final class FileFactory
         {
             return null;
         }
-
-        TextFile addFile = new TextFile(xml.getAttributeValue(ALGORITHM_ADDITIONAL_FILE_NAME_ATTRIBUTE));
+        
+        String name = xml.getAttributeValue(ALGORITHM_ADDITIONAL_FILE_NAME_ATTRIBUTE);
+        TextFile addFile;
+        
+        if(true == name.endsWith(".c"))
+        {
+            // C-File            
+            addFile = new CFile(name);
+            
+        }
+        else if(true == name.endsWith(".v"))
+        {
+            // Verilog-File            
+            addFile = new VerilogFile(name);
+        }
+        else
+        {
+            addFile = new TextFile(name);
+        }
+        
         addFile.createSection(UNSTRUCTURED_TEXT_SECTION);
         addFile.addLine(UNSTRUCTURED_TEXT_SECTION, xml.getText());
         return addFile;

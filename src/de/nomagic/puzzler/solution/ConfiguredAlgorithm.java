@@ -15,18 +15,18 @@ import de.nomagic.puzzler.Project;
 
 public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface
 {
-    public final static String REQUIRED_CFG_NAME = "parameter";
-    public final static String REQUIRED_CFG_ATTRIBUTE_NAME = "ref";
-    public final static String REQUIRED_ALGORITHM_NAME = "childElement";
-    public final static String REQUIRED_ALGORITHM_ATTRIBUTE_NAME = "type";
+    public static final String REQUIRED_CFG_NAME = "parameter";
+    public static final String REQUIRED_CFG_ATTRIBUTE_NAME = "ref";
+    public static final String REQUIRED_ALGORITHM_NAME = "childElement";
+    public static final String REQUIRED_ALGORITHM_ATTRIBUTE_NAME = "type";
 
-    public final static String ALGORITHM_REQUIREMENTS_CHILD_NAME = "required";
-    public final static String ALGORITHM_PROVIDES_CHILD_NAME = "provides";
-    public final static String ALGORITHM_PROVIDES_PROPERTY_VALUE = "value";
+    public static final String ALGORITHM_REQUIREMENTS_CHILD_NAME = "required";
+    public static final String ALGORITHM_PROVIDES_CHILD_NAME = "provides";
+    public static final String ALGORITHM_PROVIDES_PROPERTY_VALUE = "value";
 
-    public final static String BUILD_IN_NUM_OF_CHILDS = "numOfChilds";
+    public static final String BUILD_IN_NUM_OF_CHILDS = "numOfChilds";
 
-    private final static Logger LOG = LoggerFactory.getLogger("ConfiguredAlgorithm");
+    private static final Logger LOG = LoggerFactory.getLogger("ConfiguredAlgorithm");
 
     private final String name;
     private final Algorithm algorithmDefinition;
@@ -55,6 +55,18 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     {
         return name;
     }
+    
+    public String getDescription()
+    {
+        if(null != algorithmDefinition)
+        {
+            return name + " (" + algorithmDefinition.toString() + ")";
+        }
+        else
+        {
+            return name + "(no algorithm attached)";
+        }
+    }
 
     public static ConfiguredAlgorithm getTreeFrom(Context ctx, ConfiguredAlgorithm parent)
     {
@@ -81,7 +93,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             return null;
         }
         List<Element> children = root.getChildren();
-        if(0 == children.size())
+        if(true == children.isEmpty())
         {
             ctx.addError("ConfiguredAlgorithm.getTreeFrom.2",
                     "No algorithm elements in the provided solution !");
@@ -111,9 +123,18 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         Element evnElement = ctx.getEnvironment().getAlgorithmCfg(name);
         if(null == evnElement)
         {
+            // Some implementations might need additional algorithms.
+            // we then have no configurations for them, but that is OK as they are "libraries"
+            //as long as we find the Algorithm for this then it is OK.
+            evnElement = new Element(name);
+            evnElement.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, name);
+            /*
             ctx.addError("ConfiguredAlgorithm.getTreeFromEnvironment",
-                            "Failed to get Configuration for " + name + " from the environment !");
-            return null;
+                            "Failed to get Configuration for " + name 
+                            + " required by " + parent.getDescription()
+                            + " from the environment !");
+            return null;            
+            */
         }
         // else OK
         String algoName = evnElement.getAttributeValue(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);

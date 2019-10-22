@@ -13,7 +13,6 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
 
     public ConfiguredAlgorithmStub()
     {
-        // TODO Auto-generated constructor stub
     }
 
     @Override
@@ -25,7 +24,6 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     @Override
     public String dumpProperty()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -38,7 +36,6 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     @Override
     public String dumpParameter()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -55,7 +52,6 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     @Override
     public String getBuildIn(String word)
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -71,23 +67,32 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     }
 
     @Override
-    public Element getAlgorithmElement(String elementName) 
+    public Element getAlgorithmElement(String elementName)
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Iterator<String> getAllChildren() 
+    public Iterator<String> getAllChildren()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public ConfiguredAlgorithm getChild(String name) 
+    public ConfiguredAlgorithm getChild(String name)
     {
-        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getName()
+    {
+        return null;
+    }
+
+    @Override
+    public String getDescription()
+    {
         return null;
     }
 

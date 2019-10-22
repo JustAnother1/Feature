@@ -1,6 +1,6 @@
 package de.nomagic.puzzler.Generator;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.jdom2.Element;
 import org.slf4j.Logger;
@@ -12,25 +12,25 @@ import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 public class CodeGeneratorFactory
 {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
+    private static final Logger log = LoggerFactory.getLogger("CodeGeneratorFactory");
 
 
-    public CodeGeneratorFactory()
+    private CodeGeneratorFactory()
     {
-
+        // not used
     }
 
 
-    public Generator[] getGeneratorFor(AlgorithmInstanceInterface algoTree,
+    public static Generator[] getGeneratorFor(AlgorithmInstanceInterface algoTree,
             Context ctx)
     {
         if(null == algoTree)
         {
-            ctx.addError(this, "algorithm tree is null !");
+            ctx.addError("CodeGeneratorFactory", "algorithm tree is null !");
             return null;
         }
 
-        Vector<Generator> resVec = new Vector<Generator>();
+        ArrayList<Generator> resVec = new ArrayList<Generator>();
 
         // check for C Code
         if(false == algoTree.hasApi(CCodeGenerator.REQUIRED_ROOT_API))
@@ -44,7 +44,6 @@ public class CodeGeneratorFactory
         }
 
         // check for Verilog code
-        // TODO: search whole three for Verilog code elements in the algorithms
         Element res = algoTree.getAlgorithmElement(VerilogCodeGenerator.ALGORITHM_VERILOG_CODE_CHILD_NAME);
         if(null != res)
         {

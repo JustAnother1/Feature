@@ -56,7 +56,8 @@ public class AlgorithmTest {
     @Test
     public void testGetFromFileNull()
     {
-        assertNull(Algorithm.getFromFile(null, null));
+        assertNull(Algorithm.getFromFile((Element)null, null));
+        assertNull(Algorithm.getFromFile((String)null, null));
     }
 
     @Test

@@ -295,6 +295,7 @@ public class CCodeGenerator extends Generator
             if(true == functionName.contains(":"))
             {
                 String libAlgoName = functionName.substring(0, functionName.indexOf(":"));
+                // include the library
                 ConfiguredAlgorithm libAlgo = ConfiguredAlgorithm.getTreeFromEnvironment(libAlgoName, ctx, logic);
                 if(null == libAlgo)
                 {
@@ -500,7 +501,6 @@ public class CCodeGenerator extends Generator
                 break;
             }
         }
-        return;
     }
 
 

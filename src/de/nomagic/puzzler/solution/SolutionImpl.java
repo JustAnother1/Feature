@@ -17,7 +17,7 @@ import de.nomagic.puzzler.configuration.Configuration;
 
 public class SolutionImpl extends Base implements Solution
 {
-    public final static String EXTERNAL_REFFERENCE_ATTRIBUTE_NAME = "ref";
+    public static final String EXTERNAL_REFFERENCE_ATTRIBUTE_NAME = "ref";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -44,7 +44,7 @@ public class SolutionImpl extends Base implements Solution
     {
         if(null == ctx)
         {
-            System.out.println("ERROR: no Context !");
+            log.error("no Context !");
             return false;
         }
         if(null == pro)
@@ -111,7 +111,7 @@ public class SolutionImpl extends Base implements Solution
         if(null == algoAttr)
         {
             // no reference to algorithm -> Failure !
-            log.trace("Element " + cfgElement.getName() + " does not have an algorithm attribute!");
+            log.trace("Element {} does not have an algorithm attribute!", cfgElement.getName());
             return false;
         }
         else
@@ -181,7 +181,7 @@ public class SolutionImpl extends Base implements Solution
     {
         if(null == ctx)
         {
-            System.out.println("ERROR: no Context !");
+            log.error("no Context !");
             return false;
         }
         if(null == ctx.getEnvironment())

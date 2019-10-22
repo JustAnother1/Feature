@@ -8,9 +8,6 @@
     </required>
 
     <c_code>
-        <required>
-            <libraryAlgorithm type="st_gpio"/>
-        </required>
     <function  name="initialize">
       <![CDATA[€st_gpio:enablePort(port)€
     // Moder: 00=Input; 01=Output;10=AlternateFunction;11=Analog Mode

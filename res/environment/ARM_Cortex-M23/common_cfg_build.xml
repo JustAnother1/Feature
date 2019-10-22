@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<build_cfg>
+  <required>
+    <variables>
+      <CC>arm-none-eabi-gcc</CC>
+      <LD>arm-none-eabi-gcc</LD>
+      <AS>arm-none-eabi-as</AS>
+      <CFLAGS>-Og -g3 -mcpu=cortex-m23 -std=gnu99 -mthumb -I. -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -flto -fno-move-loop-invariants -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal -Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast -Wno-padded -save-temps -mfloat-abi=soft -march=armv8-m.base</CFLAGS>
+      <LFLAGS>-nostartfiles -T$(LKR_SCRIPT) -mcpu=cortex-m23 -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -flto -fno-move-loop-invariants -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wpadded -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal  -g3 -Xlinker --gc-sections --specs=nano.specs</LFLAGS>
+      <CPFLAGS>-Obinary</CPFLAGS>
+    </variables>
+    <targets>
+      <target>
+        <source>$(OBJS)</source>
+        <output>$(project).elf</output>
+        <rule>$(LD) $(LFLAGS) -o $(project).elf $(OBJS)
+            arm-none-eabi-objcopy -O binary -S $(project).elf $(project).bin
+            arm-none-eabi-objcopy -O ihex -S $(project).elf $(project).hex
+        </rule>
+      </target>
+    </targets>
+  </required>
+  <variables>
+    <CP>arm-none-eabi-objcopy</CP>
+  </variables>
+</build_cfg>
+
+
+

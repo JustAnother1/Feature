@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="delay" api="delay">
+  <c_code>
+    <additional>
+      <include>delay.h</include>
+      <file name ="delay.h"><![CDATA[
+#ifndef SRC_DELAY_H_
+#define SRC_DELAY_H_
+
+#include <stdint.h>
+#include "clock.h"
+
+/** Available delay units for R_BSP_SoftwareDelay(). These are ultimately used to calculate a total # of microseconds */
+typedef enum
+{
+    BSP_DELAY_UNITS_SECONDS =      1000000,  ///< Requested delay amount is in seconds
+    BSP_DELAY_UNITS_MILLISECONDS = 1000,     ///< Requested delay amount is in milliseconds
+    BSP_DELAY_UNITS_MICROSECONDS = 1         ///< Requested delay amount is in microseconds
+} bsp_delay_units_t;
+
+void R_BSP_SoftwareDelay(uint32_t delay, bsp_delay_units_t units);
+void r_cgc_delay_cycles(cgc_clock_t clock, uint16_t cycles);
+
+#endif /* SRC_DELAY_H_ */
+]]></file>
+      <file name ="delay.c"><![CDATA[
+#include "delay.h"
+#include "clock.h"
+
+
+#define DELAY_LOOP_CYCLES 4     ///< 4 cycles per loop.
+
+__attribute__((naked)) static void software_delay_loop (uint32_t loop_cnt);
+
+
+/*******************************************************************************************************************//**
+* @brief       Delay the specified duration in units and return.
+* @param[in]   delay  The number of 'units' to delay.
+* @param[in]   units  The 'base' (bsp_delay_units_t) for the units specified. Valid values are:
+*              BSP_DELAY_UNITS_SECONDS, BSP_DELAY_UNITS_MILLISECONDS, BSP_DELAY_UNITS_MICROSECONDS.@n
+*              For example:@n
+*              At 1 MHz one cycle takes 1 microsecond (.000001 seconds).@n
+*              At 12 MHz one cycle takes 1/12 microsecond or 83 nanoseconds.@n
+*              Therefore one run through software_delay_loop() takes:
+*              ~ (83 * DELAY_LOOP_CYCLES) or 332 ns.
+*              A delay of 2 us therefore requires 2000ns/332ns or 6 loops.
+*
+*              The 'theoretical' maximum delay that may be obtained is determined by a full 32 bit loop count and the system clock rate.
+*              @240MHz:  ((0xFFFFFFFF loops * 4 cycles /loop) / 240000000) = 71 seconds.
+*              @32MHz:  ((0xFFFFFFFF loops * 4 cycles /loop) / 32000000) = 536 seconds
+*
+*              Note that requests for very large delays will be affected by rounding in the calculations and the actual delay
+*              achieved may be slightly less. @32 MHz, for example, a request for 532 seconds will be closer to 536 seconds.
+*
+*              Note also that if the calculations result in a loop_cnt of zero, the software_delay_loop() function is not called
+*              at all. In this case the requested delay is too small (nanoseconds) to be carried out by the loop itself, and the
+*              overhead associated with executing the code to just get to this point has certainly satisfied the requested delay.
+*
+* @retval        None.
+***********************************************************************************************************************/
+void R_BSP_SoftwareDelay(uint32_t delay, bsp_delay_units_t units)
+{
+    uint32_t iclk_hz = 0;
+    uint32_t cycles_requested;
+    uint32_t ns_per_cycle;
+    uint32_t loops_required = 0;
+    uint32_t total_us = (delay * units);  /** Convert the requested time to microseconds. */
+    uint64_t ns_64bits;
+
+    iclk_hz = r_cgc_clock_hzget(CGC_SYSTEM_CLOCKS_ICLK);
+
+    /* Running on the Sub-clock (32768 Hz) there are 30517 ns/cycle. This means one cycle takes 31 us. One execution
+     * loop of the delay_loop takes 6 cycles which at 32768 Hz is 180 us. That does not include the overhead below prior to even getting
+     * to the delay loop. Given this, at this frequency anything less then a delay request of 122 us will not even generate a single
+     * pass through the delay loop.  For this reason small delays (<=~200 us) at this slow clock rate will not be possible and such a request
+     * will generate a minimum delay of ~200 us.*/
+
+     ns_per_cycle = (1000000000)/iclk_hz;            /** Get the # of nanoseconds/cycle. */
+
+     /* We want to get the time in total nanoseconds but need to be conscious of overflowing 32 bits. We also do not want to do 64 bit */
+     /* division as that pulls in a division library. */
+     ns_64bits = (uint64_t)total_us * (uint64_t)1000;      // Convert to ns.
+
+     /* Have we overflowed 32 bits? */
+     if (ns_64bits <= 0xFFFFFFFFUL)
+     {
+         /* No, we will not overflow. */
+         cycles_requested =  ((uint32_t)ns_64bits / ns_per_cycle);
+         loops_required = cycles_requested / DELAY_LOOP_CYCLES;
+     }
+     else
+     {
+         /* We did overflow. Try dividing down first. */
+         total_us = (total_us / (ns_per_cycle * DELAY_LOOP_CYCLES));
+         ns_64bits = (uint64_t)total_us * (uint64_t)1000;      // Convert to ns.
+
+         /* Have we overflowed 32 bits? */
+          if (ns_64bits <= 0xFFFFFFFFUL)
+          {
+              /* No, we will not overflow. */
+              loops_required =  (uint32_t)ns_64bits;
+          }
+          else
+          {
+              /* We still overflowed, use the max count for cycles */
+              loops_required =  0xFFFFFFFFUL;
+          }
+     }
+
+     /** Only delay if the supplied parameters constitute a delay. */
+     if (loops_required > (uint32_t)0)
+     {
+         software_delay_loop(loops_required);
+     }
+}
+
+/*******************************************************************************************************************//**
+* @brief This assembly language routine takes roughly 4 cycles per loop. 2 additional cycles
+*        occur when the loop exits. The 'naked' attribute  indicates that the specified function does not need
+*        prologue/epilogue sequences generated by the compiler.
+* @param[in]     loop_cnt  The number of loops to iterate.
+* @retval        None.
+***********************************************************************************************************************/
+__attribute__((naked)) static void software_delay_loop (uint32_t loop_cnt)
+{
+        __asm volatile ("sw_delay_loop:         \n"
+                        "   sub r0, r0, #1      \n"     ///< 1 cycle
+                        "   cmp r0, #0          \n"     ///< 1 cycle
+                        "   bne sw_delay_loop   \n"     ///< 2 cycles
+                        "   bx lr               \n");   ///< 2 cycles
+
+    /** loop_cnt is used but since it is used in assembly an unused parameter warning can be generated. */
+        (void) (loop_cnt);
+}
+
+#define CGC_CLOCK_NUM_CLOCKS    ((uint8_t) CGC_CLOCK_SUBCLOCK + 1U)
+extern uint32_t           g_clock_freq[CGC_CLOCK_NUM_CLOCKS] __attribute__ ((section(".noinit")));
+
+/*******************************************************************************************************************//**
+ * @brief      This function delays for a specified number of clock cycles, of the selected clock
+ * @param[in]  p_system_reg  pointer to system register structure
+ * @param[in]  clock the clock to time
+ * @param[in]  cycles the number of cycles to delay
+ * @retval     none
+ **********************************************************************************************************************/
+void r_cgc_delay_cycles(cgc_clock_t clock, uint16_t cycles)
+{
+    /* delay for number of clock cycles specified */
+
+    uint32_t               delay_count;
+    uint32_t               clock_freq_in;
+    uint32_t               system_clock_freq;
+
+    system_clock_freq = r_cgc_clock_hzget(CGC_SYSTEM_CLOCKS_ICLK);
+    clock_freq_in     = g_clock_freq[clock];
+    if (clock_freq_in != 0U)             // ensure divide by zero doesn't happen
+    {
+        delay_count = ((system_clock_freq / clock_freq_in) * cycles);
+
+        while (delay_count > 0U)
+        {
+            delay_count--;
+        }
+    }
+}
+]]></file>        
+    </additional>
+
+    <function  name="delay_ms" param0_type="int" param0_name="time">
+      <![CDATA[R_BSP_SoftwareDelay(€time€, BSP_DELAY_UNITS_MILLISECONDS);]]>
+    </function>
+
+  </c_code>
+</algorithm>

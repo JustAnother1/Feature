@@ -23,7 +23,7 @@ public class Configuration
     {
     }
     
-    public Boolean getBool(String setting)
+    public boolean getBool(String setting)
     {
         Boolean res = boolArraySettings.get(setting);
         if(null == res)

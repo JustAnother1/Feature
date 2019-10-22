@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.jdom2.Attribute;
 import org.jdom2.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
@@ -14,11 +12,9 @@ import de.nomagic.puzzler.FileGetter;
 
 public class Algorithm extends Base
 {
-    public final static String ALGORITHM_REFFERENCE_ATTRIBUTE_NAME = "algorithm";
-    public final static String ALGORITHM_NAME_ATTRIBUTE_NAME = "name";
-    public final static String ALGORITHM_API_ATTRIBUTE_NAME = "api";
-
-    private final Logger log = LoggerFactory.getLogger("Algorithm");
+    public static final String ALGORITHM_REFFERENCE_ATTRIBUTE_NAME = "algorithm";
+    public static final String ALGORITHM_NAME_ATTRIBUTE_NAME = "name";
+    public static final String ALGORITHM_API_ATTRIBUTE_NAME = "api";
 
     private Element root = null;
 
@@ -50,6 +46,8 @@ public class Algorithm extends Base
         }
     }
 
+
+
     public static Algorithm getFromFile(Element curElement, Context ctx)
     {
         if(null == curElement)
@@ -61,7 +59,12 @@ public class Algorithm extends Base
         {
             return null;
         }
-        Element root = FileGetter.getAlgorithmElement(algoAttr.getValue(), ctx);
+        return getFromFile(algoAttr.getValue(), ctx);
+    }
+
+    public static Algorithm getFromFile(String Name, Context ctx)
+    {
+        Element root = FileGetter.getAlgorithmElement(Name, ctx);
         if(null == root)
         {
             return null;
@@ -96,8 +99,16 @@ public class Algorithm extends Base
                     return true;
                 }
             }
-            // TODO check if one of the apis implement the searched API
-            log.warn("Recursive API search not implemented!");
+            // check if one of the apis implement the searched API
+            for(int i = 0; i < apiArr.length; i++)
+            {
+                Api curApi = Api.getFromFile(apiArr[i], ctx);
+                if(true == curApi.alsoImplements(api))
+                {
+                    return true;
+                }
+                // else continue search
+            }
             return false;
         }
         else

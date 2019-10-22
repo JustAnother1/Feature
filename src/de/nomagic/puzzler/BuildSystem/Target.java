@@ -19,11 +19,13 @@ import org.jdom2.Element;
 public class Target
 {
     public static final String PHONY_ATTRIBUTE_NAME = "phony";
+    public static final String IS_DEFAULT_ATTRIBUTE_NAME = "default";
 
     private String source;
     private String output;
     private String rule;
     private boolean phony = false;
+    private boolean isDefault = false;
 
     public Target(String source)
     {
@@ -36,23 +38,30 @@ public class Target
         {
             source = xml.getChildText("source");
             output = xml.getChildText("output");
-            rule = xml.getChildText("rule");
+            setRule(xml.getChildText("rule"));
             String att = xml.getAttributeValue(PHONY_ATTRIBUTE_NAME);
-            if(null == att)
+            phony = getBooleanFromAttribute(att);
+            att = xml.getAttributeValue(IS_DEFAULT_ATTRIBUTE_NAME);
+            isDefault = getBooleanFromAttribute(att);
+        }
+    }
+
+    private boolean getBooleanFromAttribute(String att)
+    {
+        if(null == att)
+        {
+            return false;
+        }
+        else
+        {
+            att = att.toUpperCase();
+            if(true == "TRUE".equals(att))
             {
-                phony = false;
+                return true;
             }
             else
             {
-                att = att.toUpperCase();
-                if(true == "TRUE".equals(att))
-                {
-                    phony = true;
-                }
-                else
-                {
-                    phony = false;
-                }
+                return false;
             }
         }
     }
@@ -64,7 +73,30 @@ public class Target
 
     public void setRule(String rule)
     {
-        this.rule = rule;
+        if(null == rule)
+        {
+            this.rule = "";
+        }
+        else
+        {
+            rule = rule.trim();
+            if(true == rule.contains("\n"))
+            {
+                String[] lines = rule.split("\n");
+                StringBuilder sb = new StringBuilder();
+                sb.append(lines[0].trim());
+                for(int i = 1; i < lines.length; i++)
+                {
+                    sb.append("\n");
+                    sb.append(lines[i].trim());
+                }
+                this.rule = sb.toString();
+            }
+            else
+            {
+                this.rule = rule;
+            }
+        }
     }
 
     public String getAsMakeFileTarget()
@@ -91,6 +123,16 @@ public class Target
     public boolean isPhony()
     {
         return phony;
+    }
+
+    public void setDefault()
+    {
+        isDefault = true;
+    }
+
+    public boolean isDefault()
+    {
+        return isDefault;
     }
 
 }

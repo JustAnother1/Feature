@@ -26,6 +26,7 @@ echo "========"
 rm test_out -r 2> /dev/null
 # if this failes then we do not care
 
+# FPGA: ICE40
 echo ""
 echo "Test 2a:(FPGA)"
 echo "==============="
@@ -47,8 +48,9 @@ if [ $? -ne 0 ] ; then
     exit
 fi
 
+# ST STM32
 echo ""
-echo "Test 2a:(STM32)"
+echo "Test 2b:(STM32)"
 echo "==============="
 java -jar Puzzler.jar -v -v -o test_out/stm32 -l res/lib/ -w tests/data/ -e res/environment/ blinkyProject_stm32.xml
 if [ $? -ne 0 ] ; then
@@ -68,9 +70,19 @@ if [ $? -ne 0 ] ; then
     exit
 fi
 
-
 echo ""
-echo "Test 2a:(AVR)"
+echo ""
+echo ""
+java -jar Puzzler.jar -v -v -z test_out/stm32_doc.zip -l res/lib/ -w tests/data/ -e res/environment/ -Ddocument_code_source=true blinkyProject_stm32.xml
+if [ $? -ne 0 ] ; then
+    echo ""
+    echo "ERROR: Creating blinky project for STM32 with comments failed !"
+    exit
+fi
+
+# Microchip (Atmel) AVR
+echo ""
+echo "Test 2c:(AVR)"
 echo "============="
 java -jar Puzzler.jar -v -v -o test_out/avr   -l res/lib/ -w tests/data/ -e res/environment/ blinkyProject_avr.xml
 if [ $? -ne 0 ] ; then
@@ -89,6 +101,30 @@ if [ $? -ne 0 ] ; then
     echo "ERROR: Creating blinky project for AVR with comments failed !"
     exit
 fi
+
+
+# Renesas S1
+echo ""
+echo "Test 2d:(Renesas S1JA)"
+echo "============="
+java -jar Puzzler.jar -v -v -o test_out/renesas_s1ja   -l res/lib/ -w tests/data/ -e res/environment/ blinkyProject_renesas_s1ja.xml
+if [ $? -ne 0 ] ; then
+    echo ""
+    echo "ERROR: Creating blinky project for Renesas S1JA failed !"
+    exit
+fi
+
+
+echo ""
+echo ""
+echo ""
+java -jar Puzzler.jar -v -v -o test_out/renesas_s1ja_doc   -l res/lib/ -w tests/data/ -e res/environment/ -Ddocument_code_source=true blinkyProject_renesas_s1ja.xml
+if [ $? -ne 0 ] ; then
+    echo ""
+    echo "ERROR: Creating blinky project for Renesas S1JA with comments failed !"
+    exit
+fi
+
 
 
 echo " --- Test Finished ---"

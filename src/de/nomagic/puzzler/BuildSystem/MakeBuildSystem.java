@@ -18,6 +18,9 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.Environment.Environment;
@@ -31,10 +34,15 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
     public static final String MAKEFILE_FILE_COMMENT_SECTION_NAME = "FileHeader";
     public static final String MAKEFILE_FILE_VARIABLES_SECTION_NAME = "Variables";
     public static final String MAKEFILE_FILE_TARGET_SECTION_NAME = "targets";
+    
+    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
+    
     private HashMap<String, Target> targets = new HashMap<String, Target>();
     private HashMap<String, String> requiredEnvironmentVariables = new HashMap<String, String>();
     private HashMap<String, String> listVariables = new HashMap<String, String>();
     private FileGroup buildFiles = new FileGroup();
+    private int numDefaultTargets = 0;
+    private TextFile makeFile;
 
 
     public MakeBuildSystem(Context ctx)
@@ -42,15 +50,76 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         super(ctx);
     }
 
+    private void addGenericTargets()
+    {
+        // clean:
+        Iterator<String> it = targets.keySet().iterator();
+        StringBuilder sb = new StringBuilder();
+        while(it.hasNext())
+        {
+            Target curentTarget = targets.get(it.next());
+            if(false == curentTarget.isPhony())
+            {
+                String out =  curentTarget.getOutput();
+                if(null != out)
+                {
+                    out = out.replace("%", "*");
+                    sb.append(out + " ");
+                }
+            }
+            // else phony targets do not create files
+        }
+        makeFile.addLines(MAKEFILE_FILE_TARGET_SECTION_NAME,
+                new String[] {"clean:",
+                              "\trm -rf " + sb.toString().trim(),
+                              "" });
+
+        // PHONY
+        it = targets.keySet().iterator();
+        sb = new StringBuilder();
+        sb.append("clean ");
+        while(it.hasNext())
+        {
+            Target curentTarget = targets.get(it.next());
+            if(true == curentTarget.isPhony())
+            {
+                String out =  curentTarget.getOutput();
+                if(null != out)
+                {
+                    out = out.replace("%", "*");
+                    sb.append(out + " ");
+                }
+            }
+            // else phony targets do not create files
+        }
+        makeFile.addLines(MAKEFILE_FILE_TARGET_SECTION_NAME,
+                new String[] {".PHONY: " + sb.toString().trim() });
+
+    }
+    
     public FileGroup createBuildFor(FileGroup files)
     {
         if(null == files)
         {
             return null;
         }
-
+        // get hardware configuration
+        // add the stuff required by the hardware (targets, variables, files)
+        Environment e = ctx.getEnvironment();
+        if(null == e)
+        {
+            ctx.addError(this, "No Environment available !");
+            return null;
+        }
+        if(false == ctx.getEnvironment().configureBuild(this, requiredEnvironmentVariables))
+        {
+            ctx.addError(this, "Could not get configuration from environment !");
+            return null;
+        }        
+        files.addAll(buildFiles);
+        
         //create the Makefile
-        TextFile makeFile = new TextFile("Makefile");
+        makeFile = new TextFile("Makefile");
         makeFile.separateSectionWithEmptyLine(true);
         makeFile.createSections(new String[]
                 { MAKEFILE_FILE_COMMENT_SECTION_NAME,
@@ -98,20 +167,6 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         }
         listVariables.put("project", projectName);
 
-        // get hardware configuration
-        // add the stuff required by the hardware (targets, variables, files)
-        Environment e = ctx.getEnvironment();
-        if(null == e)
-        {
-            ctx.addError(this, "No Environment available !");
-            return null;
-        }
-        if(false == ctx.getEnvironment().configureBuild(this, requiredEnvironmentVariables))
-        {
-            ctx.addError(this, "Could not get configuration from environment !");
-            return null;
-        }
-
         Iterator<String> itVariables = listVariables.keySet().iterator();
         while(itVariables.hasNext())
         {
@@ -120,6 +175,19 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
                     name + " = " + listVariables.get(name));
         }
 
+        if(0 == numDefaultTargets)
+        {
+            log.warn("No target has been defined as beeing default!");
+        }
+        else if(1 == numDefaultTargets)
+        {
+            log.trace("Defauklt target has been defined!");
+        }
+        else if(1 < numDefaultTargets)
+        {
+            log.warn("More than one default target!");
+        }
+        
         Iterator<String> itTargets = targets.keySet().iterator();
         while(itTargets.hasNext())
         {
@@ -130,52 +198,10 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
             makeFile.addLine(MAKEFILE_FILE_TARGET_SECTION_NAME,
                     "");
         }
-        // add generic stuff:
 
-        // clean:
-        Iterator<String> it = targets.keySet().iterator();
-        StringBuffer sb = new StringBuffer();
-        while(it.hasNext())
-        {
-            Target curentTarget = targets.get(it.next());
-            if(false == curentTarget.isPhony())
-            {
-                String out =  curentTarget.getOutput();
-                if(null != out)
-                {
-                    out = out.replaceAll("%", "*");
-                    sb.append(out + " ");
-                }
-            }
-            // else phony targets do not create files
-        }
-        makeFile.addLines(MAKEFILE_FILE_TARGET_SECTION_NAME,
-                new String[] {"clean:",
-                              "\trm -rf " + sb.toString() });
-
-        // PHONY
-        it = targets.keySet().iterator();
-        sb = new StringBuffer();
-        sb.append("clean ");
-        while(it.hasNext())
-        {
-            Target curentTarget = targets.get(it.next());
-            if(true == curentTarget.isPhony())
-            {
-                String out =  curentTarget.getOutput();
-                if(null != out)
-                {
-                    out = out.replaceAll("%", "*");
-                    sb.append(out + " ");
-                }
-            }
-            // else phony targets do not create files
-        }
-        makeFile.addLines(MAKEFILE_FILE_TARGET_SECTION_NAME,
-                new String[] {".PHONY: " + sb.toString() });
+        addGenericTargets();
 
         files.add(makeFile);
-        files.addAll(buildFiles);
         return files;
     }
 
@@ -187,6 +213,11 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
 
     public void addTarget(Target aTarget)
     {
+        if(true == aTarget.isDefault())
+        {
+            listVariables.put(".DEFAULT_GOAL", aTarget.getOutput());
+            numDefaultTargets++;
+        }
         targets.put(aTarget.getSource(), aTarget);
     }
 

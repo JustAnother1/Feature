@@ -17,7 +17,7 @@
       </target>
 
       <!-- elf -> hex -->
-      <target>
+      <target default="true">
         <source>$(project).elf</source>
         <output>$(project).hex</output>
         <rule> avr-objcopy -j .text -j .data -O ihex $(project).elf $(project).hex

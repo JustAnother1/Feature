@@ -12,6 +12,7 @@ import de.nomagic.puzzler.FileGetter;
 public class Api extends Base
 {
     public final static String API_NAME_ATTRIBUTE_NAME = "name";
+    public final static String API_ALSO_IMPLEMENT_ATTRIBUTE_NAME = "implements";
     public final static String API_FUNCTION_ELEMENT_NAME = "function";
 
     private Element root = null;
@@ -64,6 +65,37 @@ public class Api extends Base
             // else ignore optional functions
         }
         return resVec.toArray(new Function[0]);
+    }
+
+    public boolean alsoImplements(String api) 
+    {
+        String res = root.getAttributeValue(API_ALSO_IMPLEMENT_ATTRIBUTE_NAME);
+        if(null == res)
+        {
+            return false;
+        }
+        if(1 > res.length())
+        {
+            return false;
+        }
+        // do we implement the API ?
+        if(true == res.contains(api)) 
+        {
+            return true;
+        }
+        // check each implemented API if that API implements the searched for API.
+        String[] apiArr = res.split(",");
+        for(int i = 0; i < apiArr.length; i++)
+        {
+            apiArr[i] = apiArr[i].trim();
+            Api curApi = Api.getFromFile(apiArr[i], ctx);
+            if(true == curApi.alsoImplements(api))
+            {
+                return true;
+            }
+            // else continue search
+        }
+        return false;
     }
 
 }

@@ -14,7 +14,7 @@
       <ASFLAGS> -g -Wall -gdwarf-2 -mthumb -mcpu=cortex-m4 -mfpu=vfpv4-d16 </ASFLAGS>
     </variables>
     <targets>
-      <target>
+      <target default="true">
         <source>$(OBJS) startup.o</source>
         <output>$(project).elf</output>
         <rule>$(LD) $(LFLAGS) -o $(project).elf $(OBJS)</rule>

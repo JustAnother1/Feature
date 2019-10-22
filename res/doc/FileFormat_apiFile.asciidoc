@@ -13,7 +13,8 @@ API files are xml files. The root element is a "api" element.
 
 === api element
 ==== Attributes
-the "name" attribute defines the name of the Interface. The name is also used in the filename.
+The "name" attribute defines the name of the Interface. The name is also used in the filename.
+The optional "implements" attribute defines other api that are also covered by this definition. 
 ==== child elements
 The API element can have many child elements of type function element.
 

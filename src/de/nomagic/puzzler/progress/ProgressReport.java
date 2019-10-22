@@ -1,16 +1,14 @@
 
 package de.nomagic.puzzler.progress;
 
-import java.util.Vector;
+import java.util.LinkedList;
 
 /** Reports the progress to System.out and System.err
- *
- *
  */
 public class ProgressReport
 {
     private boolean sawAnError = false;
-    private Vector<String> reports = new Vector<String>();
+    private LinkedList<String> reports = new LinkedList<String>();
 
     public ProgressReport()
     {
@@ -51,7 +49,6 @@ public class ProgressReport
             if(null == ref)
             {
                 report = "ERROR(null) : " + msg;
-
             }
             else
             {

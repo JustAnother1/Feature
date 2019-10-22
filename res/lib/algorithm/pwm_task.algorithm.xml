@@ -8,9 +8,6 @@
         <childElement type="binaryOut"/>
     </required>
     <c_code>
-        <required>
-            <libraryAlgorithm type="delay"/>
-        </required>
         <function  name="initialize">
             <![CDATA[€binaryOut:initialize()€]]>
         </function>
