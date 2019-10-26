@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <api name="run" >
-	<function name="execute" type="required" />
-	<function  name="initialize" type="optional" />
+    <function name="execute" type="required" />
 </api>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="event" >
+    <function  name="trigger" type="required" />
+</api>

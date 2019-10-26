@@ -55,7 +55,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     {
         return name;
     }
-    
+
     public String getDescription()
     {
         if(null != algorithmDefinition)
@@ -130,10 +130,10 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             evnElement.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, name);
             /*
             ctx.addError("ConfiguredAlgorithm.getTreeFromEnvironment",
-                            "Failed to get Configuration for " + name 
+                            "Failed to get Configuration for " + name
                             + " required by " + parent.getDescription()
                             + " from the environment !");
-            return null;            
+            return null;
             */
         }
         // else OK
@@ -396,6 +396,12 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             {
                 res = parent.getProperty(name);
             }
+        }
+        if(null == res)
+        {
+            // TODO fix propertioes
+            // LOG.warn("Did not find the property{}", name);
+            // LOG.warn(dumpProperty());
         }
         return res;
     }

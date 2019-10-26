@@ -1,5 +1,6 @@
 package de.nomagic.puzzler.solution;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -14,27 +15,27 @@ import de.nomagic.puzzler.Context;
 
 public class ConditionEvaluator extends Base
 {
-    public final static String CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME = "cond";
+    public static final String CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME = "cond";
 
     // constants
-    public final static String KEY_TRUE = "true";
-    public final static String KEY_FALSE = "false";
+    public static final String KEY_TRUE = "true";
+    public static final String KEY_FALSE = "false";
     // logic
-    public final static String KEY_AND = "and";
-    public final static String KEY_OR = "or";
-    public final static String KEY_IS_NOT_EQUAL_TO = "isNotEqualTo";
-    public final static String KEY_EQUALS = "equals";
-    public final static String KEY_SMALLER_THAN = "smallerThan";
-    public final static String KEY_GREATER_THAN = "greaterThan";
+    public static final String KEY_AND = "and";
+    public static final String KEY_OR = "or";
+    public static final String KEY_IS_NOT_EQUAL_TO = "isNotEqualTo";
+    public static final String KEY_EQUALS = "equals";
+    public static final String KEY_SMALLER_THAN = "smallerThan";
+    public static final String KEY_GREATER_THAN = "greaterThan";
     // functions
-    public final static String KEY_HAS = "has";
-    public final static String KEY_IS = "is";
-    public final static String KEY_PARAM = "param";
+    public static final String KEY_HAS = "has";
+    public static final String KEY_IS = "is";
+    public static final String KEY_PARAM = "param";
     // math
-    public final static String KEY_MINUS = "-";
-    public final static String KEY_PLUS = "+";
-    public final static String KEY_MULTIPLY = "*";
-    public final static String KEY_DEVIDE = "/";
+    public static final String KEY_MINUS = "-";
+    public static final String KEY_PLUS = "+";
+    public static final String KEY_MULTIPLY = "*";
+    public static final String KEY_DEVIDE = "/";
 
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
@@ -68,7 +69,7 @@ public class ConditionEvaluator extends Base
         this.algo = algo;
 
         // check condition
-        Vector<Element> valids = new Vector<Element>();
+        ArrayList<Element> valids = new ArrayList<Element>();
         Iterator<Element> it = conditions.iterator();
         while(it.hasNext() && (true == valid))
         {
@@ -99,6 +100,26 @@ public class ConditionEvaluator extends Base
         }
         // score the solutions TODO
         return conditions.get(0);
+    }
+
+    public Element getBest(
+            Element conditions,
+            AlgorithmInstanceInterface algo,
+            String functionArguments,
+            Element function)
+    {
+
+        String conditionText = conditions.getAttributeValue(CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME);
+        log.trace("evaluating condition {}", conditionText);
+        if(true == KEY_TRUE.equals(evaluateConditionParenthesis(conditionText, algo, functionArguments, function)))
+        {
+            return conditions;
+        }
+        else
+        {
+            log.trace("condition not met");
+            return null;
+        }
     }
 
     public String evaluateConditionParenthesis(
@@ -152,7 +173,7 @@ public class ConditionEvaluator extends Base
                     if(0 == numOpenP)
                     {
                         valid = false;
-                        ctx.addError("ConditionEvaluation",
+                        ctx.addError(this,
                                 "Parenthesis mismatch in condition : " + condition);
                         return KEY_FALSE;
                     }
@@ -175,14 +196,14 @@ public class ConditionEvaluator extends Base
             if(0 != numOpenP)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "Parenthesis mismatch at end of condition : " + condition);
                 return KEY_FALSE;
             }
             if(1 != sections.size())
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "Parenthesis Section mismatch at end of condition : " + condition);
                 return KEY_FALSE;
             }
@@ -217,7 +238,7 @@ public class ConditionEvaluator extends Base
             // If not then evaluate now
             if(true == parameter.contains("'"))
             {
-                parameter = parameter.substring(parameter.indexOf("'") + 1, parameter.lastIndexOf("'"));
+                parameter = parameter.substring(parameter.indexOf('\'') + 1, parameter.lastIndexOf('\''));
             }
             String test = algo.getProperty(parameter);
             if(null == test)
@@ -245,7 +266,7 @@ public class ConditionEvaluator extends Base
             {
                 // there is something wrong here
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "unknown property : " + parameter);
                 return KEY_FALSE;
             }
@@ -279,11 +300,11 @@ public class ConditionEvaluator extends Base
             {
                 // there is something wrong here
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "unknown parameter : " + parameter);
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         algo.dumpParameter());
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         algo.toString());
                 return KEY_FALSE;
             }
@@ -304,7 +325,7 @@ public class ConditionEvaluator extends Base
         default:
             // there is something wrong here
             valid = false;
-            ctx.addError("ConditionEvaluation",
+            ctx.addError(this,
                     "unknown function : '" + functionName  + "' in '" + Word + "'");
             return KEY_FALSE;
         }
@@ -331,7 +352,7 @@ public class ConditionEvaluator extends Base
         String paramName = null;
         do
         {
-            Attribute att = function.getAttribute("param" + i + "_name");
+            Attribute att = function.getAttribute(KEY_PARAM + i + "_name");
             if(null != att)
             {
                 paramName = att.getValue();
@@ -485,7 +506,7 @@ public class ConditionEvaluator extends Base
                 {
                     // last word missing
                     valid = false;
-                    ctx.addError("ConditionEvaluation",
+                    ctx.addError(this,
                             "last word missing in : " + conditionText);
                     return KEY_FALSE;
                 }
@@ -500,11 +521,11 @@ public class ConditionEvaluator extends Base
                 {
                     // there is something wrong here
                     valid = false;
-                    ctx.addError("ConditionEvaluation",
+                    ctx.addError(this,
                             "two non function words in : " + conditionText);
-                    ctx.addError("ConditionEvaluation", "Algorithm: " + algo.toString());
-                    ctx.addError("ConditionEvaluation", algo.dumpParameter());
-                    ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                    ctx.addError(this, "Algorithm: " + algo.toString());
+                    ctx.addError(this, algo.dumpParameter());
+                    ctx.addError(this, algo.dumpProperty());
                     return KEY_FALSE;
                 }
             }
@@ -570,11 +591,11 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "one invalid number : '" + valOne + "'");
-                ctx.addError("ConditionEvaluation", algo.toString());
-                ctx.addError("ConditionEvaluation", algo.dumpParameter());
-                ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                ctx.addError(this, algo.toString());
+                ctx.addError(this, algo.dumpParameter());
+                ctx.addError(this, algo.dumpProperty());
                 return KEY_FALSE;
             }
             try
@@ -584,7 +605,7 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "invalid number : '" + valTwo + "'");
                 return KEY_FALSE;
             }
@@ -605,7 +626,7 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "invalid number : '" + valOne + "'");
                 return KEY_FALSE;
             }
@@ -616,7 +637,7 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "invalid number : '" + valTwo + "'");
                 return KEY_FALSE;
             }
@@ -638,11 +659,11 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "one invalid number : '" + valOne + "'");
-                ctx.addError("ConditionEvaluation", algo.toString());
-                ctx.addError("ConditionEvaluation", algo.dumpParameter());
-                ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                ctx.addError(this, algo.toString());
+                ctx.addError(this, algo.dumpParameter());
+                ctx.addError(this, algo.dumpProperty());
                 return KEY_FALSE;
             }
             try
@@ -652,7 +673,7 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "invalid number : '" + valTwo + "'");
                 return KEY_FALSE;
             }
@@ -666,11 +687,11 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "one invalid number : '" + valOne + "'");
-                ctx.addError("ConditionEvaluation", algo.toString());
-                ctx.addError("ConditionEvaluation", algo.dumpParameter());
-                ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                ctx.addError(this, algo.toString());
+                ctx.addError(this, algo.dumpParameter());
+                ctx.addError(this, algo.dumpProperty());
                 return KEY_FALSE;
             }
             try
@@ -680,7 +701,7 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "invalid number : '" + valTwo + "'");
                 return KEY_FALSE;
             }
@@ -694,11 +715,11 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "one invalid number : '" + valOne + "'");
-                ctx.addError("ConditionEvaluation", algo.toString());
-                ctx.addError("ConditionEvaluation", algo.dumpParameter());
-                ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                ctx.addError(this, algo.toString());
+                ctx.addError(this, algo.dumpParameter());
+                ctx.addError(this, algo.dumpProperty());
                 return KEY_FALSE;
             }
             try
@@ -708,7 +729,7 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "invalid number : '" + valTwo + "'");
                 return KEY_FALSE;
             }
@@ -722,11 +743,11 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "one invalid number : '" + valOne + "'");
-                ctx.addError("ConditionEvaluation", algo.toString());
-                ctx.addError("ConditionEvaluation", algo.dumpParameter());
-                ctx.addError("ConditionEvaluation", algo.dumpProperty());
+                ctx.addError(this, algo.toString());
+                ctx.addError(this, algo.dumpParameter());
+                ctx.addError(this, algo.dumpProperty());
                 return KEY_FALSE;
             }
             try
@@ -736,7 +757,7 @@ public class ConditionEvaluator extends Base
             catch(NumberFormatException e)
             {
                 valid = false;
-                ctx.addError("ConditionEvaluation",
+                ctx.addError(this,
                         "invalid number : '" + valTwo + "'");
                 return KEY_FALSE;
             }
@@ -744,7 +765,7 @@ public class ConditionEvaluator extends Base
 
         default:
             valid = false;
-            ctx.addError("ConditionEvaluation",
+            ctx.addError(this,
                     "invalid function : " + function);
             return KEY_FALSE;
         }

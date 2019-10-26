@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="uart" >
+  <function name="hasNewByte"  type="required" result="bool" />
+  <function name="getReceivedByte"  type="required" result="byte" />
+</api>

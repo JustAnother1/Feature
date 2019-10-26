@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="event_counter" api="event">
+    <childElement type="uart"/>
+    <c_code>
+    <additional>
+      <include>stdint.h</include>
+      <variable><![CDATA[uint_fast8_t cnt;]]></variable>
+    </additional>
+        <function name="trigger">
+        <![CDATA[cnt++;
+    €uartTx:sendByte(cnt)€]]>
+        </function>
+    </c_code>
+</algorithm>

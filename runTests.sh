@@ -26,14 +26,14 @@ echo "========"
 rm test_out -r 2> /dev/null
 # if this failes then we do not care
 
-# FPGA: ICE40
+# Microchip (Atmel) AVR
 echo ""
-echo "Test 2a:(FPGA)"
-echo "==============="
-java -jar Puzzler.jar -v -v -o test_out/fpga -l res/lib/ -w tests/data/ -e res/environment/ blinkyProject_tinyFpga.xml
+echo "Test 2a:(AVR)"
+echo "============="
+java -jar Puzzler.jar -v -v -o test_out/avr   -l res/lib/ -w tests/data/ -e res/environment/ blinkyProject_avr.xml
 if [ $? -ne 0 ] ; then
     echo ""
-    echo "ERROR: Creating blinky project for FPGA failed !"
+    echo "ERROR: Creating blinky project for AVR failed !"
     exit
 fi
 
@@ -41,10 +41,10 @@ fi
 echo ""
 echo ""
 echo ""
-java -jar Puzzler.jar -v -v -o test_out/fpga_doc -l res/lib/ -w tests/data/ -e res/environment/ -Ddocument_code_source=true blinkyProject_tinyFpga.xml
+java -jar Puzzler.jar -v -v -o test_out/avr_doc   -l res/lib/ -w tests/data/ -e res/environment/ -Ddocument_code_source=true blinkyProject_avr.xml
 if [ $? -ne 0 ] ; then
     echo ""
-    echo "ERROR: Creating blinky project for FPGA with comments failed !"
+    echo "ERROR: Creating blinky project for AVR with comments failed !"
     exit
 fi
 
@@ -80,14 +80,14 @@ if [ $? -ne 0 ] ; then
     exit
 fi
 
-# Microchip (Atmel) AVR
+# FPGA: ICE40
 echo ""
-echo "Test 2c:(AVR)"
-echo "============="
-java -jar Puzzler.jar -v -v -o test_out/avr   -l res/lib/ -w tests/data/ -e res/environment/ blinkyProject_avr.xml
+echo "Test 2c:(FPGA)"
+echo "==============="
+java -jar Puzzler.jar -v -v -o test_out/fpga -l res/lib/ -w tests/data/ -e res/environment/ blinkyProject_tinyFpga.xml
 if [ $? -ne 0 ] ; then
     echo ""
-    echo "ERROR: Creating blinky project for AVR failed !"
+    echo "ERROR: Creating blinky project for FPGA failed !"
     exit
 fi
 
@@ -95,13 +95,12 @@ fi
 echo ""
 echo ""
 echo ""
-java -jar Puzzler.jar -v -v -o test_out/avr_doc   -l res/lib/ -w tests/data/ -e res/environment/ -Ddocument_code_source=true blinkyProject_avr.xml
+java -jar Puzzler.jar -v -v -o test_out/fpga_doc -l res/lib/ -w tests/data/ -e res/environment/ -Ddocument_code_source=true blinkyProject_tinyFpga.xml
 if [ $? -ne 0 ] ; then
     echo ""
-    echo "ERROR: Creating blinky project for AVR with comments failed !"
+    echo "ERROR: Creating blinky project for FPGA with comments failed !"
     exit
 fi
-
 
 # Renesas S1
 echo ""

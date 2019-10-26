@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <algorithm name="pwm_task" api="run">
-    <configurationAttribute name="frequency_Hz"/>
-    <configurationAttribute name="dutyCycle_percent"/>
+    <configurationAttribute name="frequency_Hz" type="unsigned integer" />
+    <configurationAttribute name="dutyCycle_percent" type="unsigned integer" />
     <required>
         <parameter ref="dutyCycle_percent" />
         <parameter ref="frequency_Hz" />
         <childElement type="binaryOut"/>
     </required>
     <c_code>
-        <function  name="initialize">
-            <![CDATA[€binaryOut:initialize()€]]>
-        </function>
         <function name="execute">
-            <![CDATA[
+          <![CDATA[
     €binaryOut:setValue(true)€
     €delay:delay_ms(10 / frequency_Hz * dutyCycle_percent)€ // Delay
     €binaryOut:setValue(false)€

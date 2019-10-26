@@ -8,13 +8,13 @@
   </provides>
   <c_code>
     <function name="main">
-      <![CDATA[{
-  €initialize()€
-  for(;;)
-  {
-    €execute()€
-  }
-}]]>
+      <![CDATA[
+    initialize();
+    for(;;)
+    {
+        €execute()€
+    }
+]]>
     </function>
   </c_code>
 </algorithm>

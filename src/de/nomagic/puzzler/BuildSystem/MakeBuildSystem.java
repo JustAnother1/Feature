@@ -15,6 +15,7 @@
 package de.nomagic.puzzler.BuildSystem;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -34,10 +35,10 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
     public static final String MAKEFILE_FILE_COMMENT_SECTION_NAME = "FileHeader";
     public static final String MAKEFILE_FILE_VARIABLES_SECTION_NAME = "Variables";
     public static final String MAKEFILE_FILE_TARGET_SECTION_NAME = "targets";
-    
+
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-    
-    private HashMap<String, Target> targets = new HashMap<String, Target>();
+
+    private ArrayList<Target> targets = new ArrayList<Target>();
     private HashMap<String, String> requiredEnvironmentVariables = new HashMap<String, String>();
     private HashMap<String, String> listVariables = new HashMap<String, String>();
     private FileGroup buildFiles = new FileGroup();
@@ -53,11 +54,10 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
     private void addGenericTargets()
     {
         // clean:
-        Iterator<String> it = targets.keySet().iterator();
         StringBuilder sb = new StringBuilder();
-        while(it.hasNext())
+        for(int i = 0; i < targets.size(); i++)
         {
-            Target curentTarget = targets.get(it.next());
+            Target curentTarget = targets.get(i);
             if(false == curentTarget.isPhony())
             {
                 String out =  curentTarget.getOutput();
@@ -75,12 +75,11 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
                               "" });
 
         // PHONY
-        it = targets.keySet().iterator();
         sb = new StringBuilder();
         sb.append("clean ");
-        while(it.hasNext())
+        for(int i = 0; i < targets.size(); i++)
         {
-            Target curentTarget = targets.get(it.next());
+            Target curentTarget = targets.get(i);
             if(true == curentTarget.isPhony())
             {
                 String out =  curentTarget.getOutput();
@@ -96,7 +95,7 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
                 new String[] {".PHONY: " + sb.toString().trim() });
 
     }
-    
+
     public FileGroup createBuildFor(FileGroup files)
     {
         if(null == files)
@@ -115,9 +114,9 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         {
             ctx.addError(this, "Could not get configuration from environment !");
             return null;
-        }        
+        }
         files.addAll(buildFiles);
-        
+
         //create the Makefile
         makeFile = new TextFile("Makefile");
         makeFile.separateSectionWithEmptyLine(true);
@@ -181,18 +180,16 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
         }
         else if(1 == numDefaultTargets)
         {
-            log.trace("Defauklt target has been defined!");
+            log.trace("Default target has been defined!");
         }
         else if(1 < numDefaultTargets)
         {
             log.warn("More than one default target!");
         }
-        
-        Iterator<String> itTargets = targets.keySet().iterator();
-        while(itTargets.hasNext())
+
+        for(int i = 0; i < targets.size(); i++)
         {
-            String name = itTargets.next();
-            Target t = targets.get(name);
+            Target t = targets.get(i);
             makeFile.addLine(MAKEFILE_FILE_TARGET_SECTION_NAME,
                     t.getAsMakeFileTarget());
             makeFile.addLine(MAKEFILE_FILE_TARGET_SECTION_NAME,
@@ -208,7 +205,19 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
     @Override
     public boolean hasTargetFor(String source)
     {
-        return targets.containsKey(source);
+        if(null == source)
+        {
+            return false;
+        }
+        for(int i = 0; i < targets.size(); i++)
+        {
+            Target t = targets.get(i);
+            if(source.equals(t.getSource()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addTarget(Target aTarget)
@@ -218,7 +227,7 @@ public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
             listVariables.put(".DEFAULT_GOAL", aTarget.getOutput());
             numDefaultTargets++;
         }
-        targets.put(aTarget.getSource(), aTarget);
+        targets.add(aTarget);
     }
 
     public void extendListVariable(String list, String newElement)

@@ -256,12 +256,16 @@ public class Function extends CElement
                 if(null == comment)
                 {
                     return  getDeclaration() + lineSperator
-                            + implementation + lineSperator;
+                            + "{"            + lineSperator
+                            + implementation + lineSperator
+                            + "}"            + lineSperator;
                 }
                 else
                 {
                     return  getDeclaration() + " // from " + comment + lineSperator
-                            + implementation + lineSperator;
+                            + "{"            + lineSperator
+                            + implementation + lineSperator
+                            + "}"            + lineSperator;
                 }
             }
         }
