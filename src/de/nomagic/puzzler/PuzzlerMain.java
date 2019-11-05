@@ -18,7 +18,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +37,7 @@ import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.Generator.CCodeGenerator;
 import de.nomagic.puzzler.Generator.CodeGeneratorFactory;
 import de.nomagic.puzzler.Generator.Generator;
+import de.nomagic.puzzler.Generator.IDEProjectFileGenerator;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
 import de.nomagic.puzzler.solution.Solution;
@@ -151,17 +152,8 @@ public class PuzzlerMain
               "</root>" +
             "</configuration>";
             ByteArrayInputStream bin;
-            try
-            {
-                bin = new ByteArrayInputStream(logCfg.getBytes("UTF-8"));
-                configurator.doConfigure(bin);
-            }
-            catch(UnsupportedEncodingException e)
-            {
-                // A system without UTF-8 ? - No chance to do anything !
-                e.printStackTrace();
-                System.exit(1);
-            }
+            bin = new ByteArrayInputStream(logCfg.getBytes(StandardCharsets.UTF_8));
+            configurator.doConfigure(bin);
         }
         catch (JoranException je)
         {
@@ -233,7 +225,7 @@ public class PuzzlerMain
                 }
                 else if( (true == "-z".equals(args[i])) || (true == "--zip_out".equals(args[i])))
                 {
-                    // zip output 
+                    // zip output
                     i++;
                     String outputDirectory = Tool.validatePath(args[i]);
                     if(1 > outputDirectory.length())
@@ -246,7 +238,7 @@ public class PuzzlerMain
                     foundOutputDirectory = true;
                     log.trace("command Line config: zip output");
                     log.trace("command Line config: output zip file name {}", outputDirectory);
-                }                
+                }
                 else if( (true == "-e".equals(args[i])) || (true == "--environment_dirctory".equals(args[i])))
                 {
                     // environment directory
@@ -314,15 +306,8 @@ public class PuzzlerMain
         return true;
     }
 
-    public void execute()
+    private Project openProject(Context ctx)
     {
-        if(null == cfg)
-        {
-            return;
-        }
-        Context ctx = new ContextImpl(cfg);
-        // open Project file
-
         Element proElement = ctx.getElementfrom(
                 ctx.cfg().getString(Configuration.PROJECT_FILE_CFG) + ".xml",
                 ctx.cfg().getString(Configuration.PROJECT_PATH_CFG),
@@ -330,31 +315,36 @@ public class PuzzlerMain
         Project pro = new ProjectImpl(ctx);
         if(false == pro.loadFromElement(proElement))
         {
-            log.error("Failed to open project!");
-            ctx.close();
-            return;
+            return null;
         }
+        else
+        {
+            return pro;
+        }
+    }
 
-        // Find environment
+    private Environment openEnvironment(Context ctx, Element envElement)
+    {
         Environment e = new Environment(ctx);
-        Element envEleemnt = ctx.loadElementFrom(pro.getEnvironmentElement(), 
+        Element envEleemnt = ctx.loadElementFrom(envElement,
                 ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG),
                 Environment.ROOT_ELEMENT_NAME);
         if(false == e.loadFromElement(envEleemnt))
         {
-            log.error("Failed to open environment!");
-            ctx.close();
-            return;
+            return null;
         }
-        ctx.addEnvironment(e);
+        else
+        {
+            return e;
+        }
+    }
 
-        // find solution
+    private Solution openSolution(Context ctx, Project pro)
+    {
         Solution s = new SolutionImpl(ctx);
         if(false == s.getFromProject(pro))
         {
-            log.error("Failed to open solution!");
-            ctx.close();
-            return;
+            return null;
         }
 
         // check if solution refers to undefined entities
@@ -362,11 +352,13 @@ public class PuzzlerMain
         if(false == s.checkAndTestAgainstEnvironment())
         {
             log.error("Solution does not match the environment!");
-            ctx.close();
-            return;
+            return null;
         }
-        ctx.addSolution(s);
+        return s;
+    }
 
+    private FileGroup createRessourcesFromSolution(Context ctx)
+    {
         // create "code creator" back end (creates the Source Code in C or other languages)
         ConfiguredAlgorithm algoTree = ConfiguredAlgorithm.getTreeFrom(ctx, null);
         Generator[] gen = CodeGeneratorFactory.getGeneratorFor(algoTree, ctx);
@@ -374,13 +366,13 @@ public class PuzzlerMain
         {
             log.error("Could not create code generators !");
             ctx.close();
-            return;
+            return null;
         }
         if(1 > gen.length)
         {
             log.error("Could not get the needed code generator !");
             ctx.close();
-            return;
+            return null;
         }
         FileGroup allFiles = new FileGroup();
         for(int i = 0; i < gen.length; i++)
@@ -393,9 +385,77 @@ public class PuzzlerMain
             {
                 log.error("Failed to generate {} source code!", curGen.getLanguageName());
                 ctx.close();
-                return;
+                return null;
             }
             allFiles.addAll(files);
+        }
+        return allFiles;
+    }
+
+    private boolean createOutput(Context ctx, FileGroup allFiles)
+    {
+        if(true == ctx.cfg().getBool(Configuration.ZIP_OUTPUT))
+        {
+            if(false ==allFiles.saveToZip(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
+            {
+                log.error("Failed to create the zip file!");
+                return false;
+            }
+        }
+        else
+        {
+            if(false ==allFiles.saveToFolder(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
+            {
+                log.error("Failed to save the generated files!");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void execute()
+    {
+        if(null == cfg)
+        {
+            return;
+        }
+        Context ctx = new ContextImpl(cfg);
+
+        // open Project file
+        Project pro = openProject(ctx);
+        if(null == pro)
+        {
+            log.error("Failed to open project!");
+            ctx.close();
+            return;
+        }
+
+        // Find environment
+        Environment e = openEnvironment(ctx, pro.getEnvironmentElement());
+        if(null == e)
+        {
+            log.error("Failed to open environment!");
+            ctx.close();
+            return;
+        }
+        ctx.addEnvironment(e);
+
+        // find solution
+        Solution s = openSolution(ctx, pro);
+        if(null == s)
+        {
+            log.error("Failed to open solution!");
+            ctx.close();
+            return;
+        }
+        ctx.addSolution(s);
+
+        FileGroup allFiles = createRessourcesFromSolution(ctx);
+        if(null == allFiles)
+        {
+            log.error("Could not create ressources !");
+            ctx.close();
+            return;
         }
 
         // check tool chain to create makefile
@@ -408,24 +468,22 @@ public class PuzzlerMain
             return;
         }
 
-        if(true == ctx.cfg().getBool(Configuration.ZIP_OUTPUT))
+        // IDE Project Files
+        allFiles = IDEProjectFileGenerator.generateFileInto(ctx, allFiles);
+        if(null == allFiles)
         {
-            if(false ==allFiles.saveToZip(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
-            {
-                log.error("Failed to create the zip file!");
-                ctx.close();
-                return;
-            }            
+            log.error("Failed to generate IDE project files!");
+            ctx.close();
+            return;
         }
-        else
+
+        if(false == createOutput(ctx, allFiles))
         {
-            if(false ==allFiles.saveToFolder(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
-            {
-                log.error("Failed to save the generated files!");
-                ctx.close();
-                return;
-            }
+            log.error("Failed to create the output!");
+            ctx.close();
+            return;
         }
+
         // success ?
         successful = ctx.wasSucessful();
         log.trace("successful = {}", successful);
