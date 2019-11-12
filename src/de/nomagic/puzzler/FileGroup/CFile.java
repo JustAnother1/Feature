@@ -4,19 +4,18 @@ import java.util.Vector;
 
 import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
 import de.nomagic.puzzler.BuildSystem.Target;
-import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 import de.nomagic.puzzler.solution.Function;
 
 public class CFile extends TextFile
 {
-    public final static String C_FILE_FILE_COMMENT_SECTION_NAME              = "FileHeader";
-    public final static String C_FILE_INCLUDE_SECTION_NAME                   = "include";
-    public final static String C_FILE_TYPE_SECTION_NAME                      = "typedef";
-    public final static String C_FILE_GLOBAL_VAR_SECTION_NAME                = "globalVar";
-    public final static String C_FILE_LOCAL_VAR_SECTION_NAME                 = "staticVar";
-    public final static String C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME = "staticFunc";
-    public final static String C_FILE_FUNCTIONS_SECTION_NAME                 = "publicFunctions";
-    public final static String C_FILE_STATIC_FUNCTIONS_SECTION_NAME          = "privateFunctions";
+    public static final String C_FILE_FILE_COMMENT_SECTION_NAME              = "FileHeader";
+    public static final String C_FILE_INCLUDE_SECTION_NAME                   = "include";
+    public static final String C_FILE_TYPE_SECTION_NAME                      = "typedef";
+    public static final String C_FILE_GLOBAL_VAR_SECTION_NAME                = "globalVar";
+    public static final String C_FILE_LOCAL_VAR_SECTION_NAME                 = "staticVar";
+    public static final String C_FILE_LOCAL_FUNCTION_DEFINITION_SECTION_NAME = "staticFunc";
+    public static final String C_FILE_FUNCTIONS_SECTION_NAME                 = "publicFunctions";
+    public static final String C_FILE_STATIC_FUNCTIONS_SECTION_NAME          = "privateFunctions";
 
     private ElementHandler includes = new IncludeHandler();
     private ElementHandler functions = new FunctionHandler();
@@ -76,6 +75,7 @@ public class CFile extends TextFile
         }
     }
 
+    @Override
     public void addLine(String sectionName, String line)
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
@@ -89,6 +89,7 @@ public class CFile extends TextFile
         }
     }
 
+    @Override
     protected Vector<String> prepareSectionData(String sectionName, Vector<String> sectionData)
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
@@ -111,9 +112,9 @@ public class CFile extends TextFile
 
     }
 
-    public void addFunction(Function func, AlgorithmInstanceInterface logic)
+    public void addFunction(Function func, String description)
     {
-        func.addComment(logic.toString());
+        func.addComment(description);
         functions.add(func);
     }
 

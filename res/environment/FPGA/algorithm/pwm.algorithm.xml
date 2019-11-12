@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <algorithm name="pwm" api="run">
-    <configurationAttribute name="frequency_Hz"/>
-    <configurationAttribute name="dutyCycle_percent"/>
     <required>
-        <parameter ref="dutyCycle_percent" />
-        <parameter ref="frequency_Hz" />
-        <childElement type="binaryOut"/>
+        <parameter name="dutyCycle_percent" />
+        <parameter name="frequency_Hz" />
+        <childElement type="bitOut"/>
     </required>
     <verilog_code>
         <module><![CDATA[

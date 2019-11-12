@@ -4,17 +4,30 @@
     <childElement type="run" />
   </required>
   <provides>
-    <singleTask value="numOfChilds equals 1"/>
+    <singleTask type="bool" value="numOfChilds equals 1"/>
   </provides>
   <c_code>
     <function name="main">
-      <![CDATA[
-    initialize();
-    for(;;)
-    {
-        €execute()€
-    }
-]]>
+     <if cond="true equals singleTask">
+      <![CDATA[{
+  for(;;)
+  {
+    €run:execute()€
+  }
+}]]>
+      </if>
+      <if cond="false equals singleTask">
+        <![CDATA[{
+  for(;;)
+  {
+  ]]>
+  <forChilds api="run">
+     <![CDATA[{€run:execute()€]]>
+  </forChilds>
+    <![CDATA[
+  }
+}]]>
+      </if>
     </function>
   </c_code>
 </algorithm>

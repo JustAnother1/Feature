@@ -5135,8 +5135,8 @@ const ioport_pin_cfg_t g_bsp_pin_cfg_data[] = {
         .pin_cfg = (IOPORT_CFG_PERIPHERAL_PIN | IOPORT_PERIPHERAL_RSPI),
     },
     {
-            .port = 4,
-            .pin = 7,
+            .port = 5,
+            .pin = 0,
         .pin_cfg = (IOPORT_CFG_PERIPHERAL_PIN | IOPORT_PERIPHERAL_SCI0_2_4_6_8
               //  | IOPORT_CFG_PORT_DIRECTION_OUTPUT
               //  | IOPORT_CFG_PORT_OUTPUT_HIGH
@@ -5150,8 +5150,8 @@ const ioport_pin_cfg_t g_bsp_pin_cfg_data[] = {
         .pin_cfg = (IOPORT_CFG_PERIPHERAL_PIN | IOPORT_PERIPHERAL_CTSU),
     },
     {
-            .port = 4,
-            .pin = 11,
+            .port = 5,
+            .pin = 1,
         .pin_cfg = (IOPORT_CFG_PERIPHERAL_PIN | IOPORT_PERIPHERAL_SCI0_2_4_6_8
                  // | IOPORT_CFG_PORT_DIRECTION_OUTPUT
                  // | IOPORT_CFG_PORT_OUTPUT_HIGH
@@ -5482,8 +5482,8 @@ uint32_t r_cgc_clock_hzget(cgc_system_clocks_t clock);
 #define R_SYSTEM_SCKDIVCR_FCK_SHIFT      28
 #define R_SYSTEM_SCKSCR_CKSEL_MASK       ((uint8_t)0x07)
 #define R_SYSTEM_SCKSCR_CKSEL_SHIFT      0
-#define R_SYSTEM_MEMWAITCR_MEMWAIT_MASK  0x01  // not in S1JA data sheet
-#define R_SYSTEM_MEMWAITCR_MEMWAIT_SHIFT 0
+#define R_SYSTEM_MEMWAIT_MEMWAIT_MASK  0x01  
+#define R_SYSTEM_MEMWAIT_MEMWAIT_SHIFT 0
 #define R_SYSTEM_MOSCCR_MOSTP_MASK       ((uint8_t)0x01)
 #define R_SYSTEM_MOSCCR_MOSTP_SHIFT      0
 #define R_SYSTEM_HOCOCR_HCSTP_MASK       ((uint8_t)0x01)
@@ -5545,7 +5545,7 @@ typedef struct {                                    /*!< R_SYSTEM Structure     
     __IO uint8_t          PLLCCR2;                         /*!< PLL Clock Control Register                                            */
     __I  uint8_t          RESERVED4[4];
     __IO uint8_t          BCKCR;                           /*!< External Bus Clock Control Register                                   */
-    __IO uint8_t          MEMWAITCR;                       /*!< Memory Wait Cycle COntrol register                                   */
+    __IO uint8_t          MEMWAIT;                         /*!< Memory Wait Cycle COntrol register                                   */
     __IO uint8_t          MOSCCR;                          /*!< Main Clock Oscillator Control Register                                */
     __I  uint8_t          RESERVED6[3];
     __IO uint8_t          HOCOCR;                          /*!< High-Speed On-Chip Oscillator Control Register                        */
@@ -5677,6 +5677,66 @@ typedef enum e_cgc_sys_clock_div
 #define BSP_CFG_PCKD_DIV          (CGC_SYS_CLOCK_DIV_2)
 #define BSP_CFG_FCK_DIV           (CGC_SYS_CLOCK_DIV_2)
 
+#define OFS_SEQ1 0xA001A001 | (1 << 1) | (3 << 2)
+#define OFS_SEQ2 (15 << 4) | (3 << 8) | (3 << 10)
+#define OFS_SEQ3 (1 << 12) | (1 << 14) | (1 << 17)
+#define OFS_SEQ4 (3 << 18) |(15 << 20) | (3 << 24) | (3 << 26)
+#define OFS_SEQ5 (1 << 28) | (1 << 30)
+#define BSP_CFG_ROM_REG_OFS0 (OFS_SEQ1 | OFS_SEQ2 | OFS_SEQ3 | OFS_SEQ4 | OFS_SEQ5)
+#define BSP_CFG_ROM_REG_OFS1 (0xFFFFFEC3 | (1 << 2) | (3 << 3) | (1 << 8))
+#define BSP_CFG_ROM_REG_MPU_PC0_ENABLE (1)
+#define BSP_CFG_ROM_REG_MPU_PC0_START (0x000FFFFC)
+#define BSP_CFG_ROM_REG_MPU_PC0_END (0x000FFFFF)
+#define BSP_CFG_ROM_REG_MPU_PC1_ENABLE (1)
+#define BSP_CFG_ROM_REG_MPU_PC1_START (0x000FFFFC)
+#define BSP_CFG_ROM_REG_MPU_PC1_END (0x000FFFFF)
+#define BSP_CFG_ROM_REG_MPU_REGION0_ENABLE (1)
+#define BSP_CFG_ROM_REG_MPU_REGION0_START (0x000FFFFC)
+#define BSP_CFG_ROM_REG_MPU_REGION0_END (0x000FFFFF)
+#define BSP_CFG_ROM_REG_MPU_REGION1_ENABLE (1)
+#define BSP_CFG_ROM_REG_MPU_REGION1_START (0x200FFFFC)
+#define BSP_CFG_ROM_REG_MPU_REGION1_END (0x200FFFFF)
+#define BSP_CFG_ROM_REG_MPU_REGION2_ENABLE (1)
+#define BSP_CFG_ROM_REG_MPU_REGION2_START (0x407FFFFC)
+#define BSP_CFG_ROM_REG_MPU_REGION2_END (0x400DFFFF)
+#define BSP_CFG_ROM_REG_MPU_REGION3_ENABLE (1)
+#define BSP_CFG_ROM_REG_MPU_REGION3_START (0x400DFFFC)
+#define BSP_CFG_ROM_REG_MPU_REGION3_END (0x400DFFFF)
+
+/** OR in the HOCO frequency setting from bsp_clock_cfg.h with the OFS1 setting from bsp_cfg.h. */
+#define BSP_ROM_REG_OFS1_SETTING        (((uint32_t)BSP_CFG_ROM_REG_OFS1 & 0xFFFF8FFFU) | ((uint32_t)BSP_CFG_HOCO_FREQUENCY << 12))
+
+/** Build up SECMPUAC register based on MPU settings. */
+#define BSP_ROM_REG_MPU_CONTROL_SETTING     ((0xFFFFFCF0U) | \
+                                             ((uint32_t)BSP_CFG_ROM_REG_MPU_PC0_ENABLE << 8) | \
+                                             ((uint32_t)BSP_CFG_ROM_REG_MPU_PC1_ENABLE << 9) | \
+                                             ((uint32_t)BSP_CFG_ROM_REG_MPU_REGION0_ENABLE) | \
+                                             ((uint32_t)BSP_CFG_ROM_REG_MPU_REGION1_ENABLE << 1) | \
+                                             ((uint32_t)BSP_CFG_ROM_REG_MPU_REGION2_ENABLE << 2) | \
+                                             ((uint32_t)BSP_CFG_ROM_REG_MPU_REGION3_ENABLE << 3))
+
+#define BSP_SECTION_ROM_REGISTERS ".rom_registers"
+
+static const uint32_t g_bsp_rom_registers[] __attribute__ ((section(BSP_SECTION_ROM_REGISTERS))) __attribute__ ((__used__)) =
+{
+    (uint32_t) 0xFF8FFF0F, // BSP_CFG_ROM_REG_OFS0,
+    (uint32_t) 0xFFFFCEC7, // BSP_ROM_REG_OFS1_SETTING,
+    ((uint32_t)BSP_CFG_ROM_REG_MPU_PC0_START      & 0xFFFFFFFCU),
+    ((uint32_t)BSP_CFG_ROM_REG_MPU_PC0_END        | 0x00000003U),
+    ((uint32_t)BSP_CFG_ROM_REG_MPU_PC1_START      & 0xFFFFFFFCU),
+    ((uint32_t)BSP_CFG_ROM_REG_MPU_PC1_END        | 0x00000003U),
+    ((uint32_t)BSP_CFG_ROM_REG_MPU_REGION0_START  & 0x000FFFFCU),
+    (((uint32_t)BSP_CFG_ROM_REG_MPU_REGION0_END   & 0x000FFFFFU) | 0x00000003U),
+    ((uint32_t)BSP_CFG_ROM_REG_MPU_REGION1_START  & 0xFFFFFFFCU),
+    ((uint32_t)BSP_CFG_ROM_REG_MPU_REGION1_END    | 0x00000003U),
+    (((uint32_t)BSP_CFG_ROM_REG_MPU_REGION2_START & 0x407FFFFCU) | 0x40000000U),
+    (((uint32_t)BSP_CFG_ROM_REG_MPU_REGION2_END   & 0x407FFFFCU) | 0x40000003U),
+    (((uint32_t)BSP_CFG_ROM_REG_MPU_REGION3_START & 0x407FFFFCU) | 0x40000000U),
+    (((uint32_t)BSP_CFG_ROM_REG_MPU_REGION3_END   & 0x407FFFFCU) | 0x40000003U),
+    (uint32_t)BSP_ROM_REG_MPU_CONTROL_SETTING
+};
+
+
 
 uint32_t g_clock_freq[CGC_CLOCK_NUM_CLOCKS]  __attribute__ ((section(".noinit"))) __attribute__ ((__used__));
 
@@ -5709,6 +5769,7 @@ void bsp_clock_init (void)
 
     R_SYSTEM->HOCOWTCR = (R_SYSTEM->HOCOWTCR &~R_SYSTEM_HOCOWTCR_HSTS_MASK) | (R_SYSTEM_HOCOWTCR_HSTS_MASK & MAXIMUM_HOCOWTR_HSTS);
 
+    R_SYSTEM->MEMWAIT = 0x01;
     R_SYSTEM->SCKSCR = BSP_CFG_CLOCK_SOURCE;
 
     R_SYSTEM->SCKDIVCR = (BSP_CFG_PCKD_DIV << R_SYSTEM_SCKDIVCR_PCKD_SHIFT)

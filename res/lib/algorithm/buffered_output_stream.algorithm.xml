@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="buffered_output_stream" api="buffered_output_stream">
+    <childElement type="output_stream"/>
+    <c_code>
+    <function name="sendLine" param_type="string" param0_name="line" >
+        <![CDATA[{ int i;
+        for(i = 0; i < strlen(€line€); i++)
+        {
+            output_stream:sendByte(€line€[i]);
+        }
+        }]]>
+        </function>
+    </c_code>
+</algorithm>

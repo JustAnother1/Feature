@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="event_reporter" api="event">
+    <required>
+        <parameter name="eventName" type="String" default="something happened!" />
+        <childElement type="buffered_output_stream"/>
+    </required>
+    <c_code>
+    <additional>
+    </additional>
+        <function name="trigger">
+        <![CDATA[€buffered_output_stream:sendLine(eventName)€]]>
+        </function>
+    </c_code>
+</algorithm>

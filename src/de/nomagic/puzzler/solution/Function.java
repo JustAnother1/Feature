@@ -1,6 +1,6 @@
 package de.nomagic.puzzler.solution;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.jdom2.Element;
 import org.jdom2.output.XMLOutputter;
@@ -12,28 +12,22 @@ import de.nomagic.puzzler.FileGroup.FunctionHandler;
 
 public class Function extends CElement
 {
-    public final static String FUNCTION_NAME_ATTRIBUTE_NAME = "name";
-    public final static String FUNCTION_TYPE_ATTRIBUTE_NAME = "type";
-    public final static String FUNCTION_REQUIRED_TYPE = "required";
-    public final static String FUNCTION_RESULT_ATTRIBUTE_NAME = "result";
-    public final static String FUNCTION_PARAMETER_ATTRIBUTE_NAME = "param";
+    public static final String FUNCTION_NAME_ATTRIBUTE_NAME = "name";
+    public static final String FUNCTION_TYPE_ATTRIBUTE_NAME = "type";
+    public static final String FUNCTION_REQUIRED_TYPE = "required";
+    public static final String FUNCTION_RESULT_ATTRIBUTE_NAME = "result";
+    public static final String FUNCTION_PARAMETER_ATTRIBUTE_NAME = "param";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private String result;
-    private Vector<String> parameterDefinitions = new Vector<String>();
+    private ArrayList<String> parameterDefinitions = new ArrayList<String>();
     private String name = "";
     private String comment = null;
     private boolean required = false;
     private final Element tag;
     private String implementation = null;
 
-
-    /**
-     *
-     * @param tag
-     *
-     */
     public Function(Element tag)
     {
         this.tag = tag;
@@ -145,10 +139,9 @@ public class Function extends CElement
                 String other = xout.outputString(next.tag);
                 if(false == my.equals(other))
                 {
-                    log.trace("tag differs {} - {}", xout.outputString(this.tag), xout.outputString(next.tag));
+                    log.trace("tag differs {} - {}", my, other);
                     return false;
                 }
-                // else TODO optimize.
             }
         }
         // comment is allowed to be different
@@ -157,7 +150,7 @@ public class Function extends CElement
 
     /**
      *
-     * @return true = this function must be present to fullfill the API; false= this function may be missing
+     * @return true = this function must be present to fulfill the API; false= this function may be missing
      */
     public boolean isRequired()
     {
@@ -171,7 +164,7 @@ public class Function extends CElement
 
     private String getDeclaration()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if(null == result)
         {
             sb.append("void");
@@ -183,7 +176,7 @@ public class Function extends CElement
         sb.append(" ");
         sb.append(name);
         sb.append("(");
-        if(0 == parameterDefinitions.size())
+        if(true == parameterDefinitions.isEmpty())
         {
             sb.append("void");
         }
@@ -271,7 +264,6 @@ public class Function extends CElement
         }
         else
         {
-            // TODO context Error
             log.error("Invalid Type requested!");
             return null;
         }

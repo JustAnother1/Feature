@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="command" >
+  <function name="execute"  type="required" param0_name="args" param0_type="String" result="String" />
+  <function name="descibe"  type="required" result="String" />
+  <function name="getName"  type="required" result="String" />
+</api>

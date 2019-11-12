@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<algorithm name="gpio" api="binaryOut">
-    <configurationAttribute name="port" type="unsigned integer"/>
-    <configurationAttribute name="pin" type="unsigned integer"/>
+<algorithm name="gpio" api="bitOut">
     <required>
-        <parameter ref="port" />
-        <parameter ref="pin" />
+        <parameter name="port" type="unsigned integer" />
+        <parameter name="pin" type="unsigned integer" />
     </required>
 
     <c_code>
@@ -357,7 +355,7 @@ void HW_IOPORT_PFSWrite(uint32_t port, uint32_t pin, uint32_t value)
     /* New value can be safely written to PFS. */
     *p_dest = value;
 }
-]]></file>    
+]]></file>
         </additional>
     <function  name="initialize">
       <![CDATA[HW_IOPORT_PFSWrite(€port€, €pin€, (IOPORT_CFG_PORT_DIRECTION_OUTPUT | IOPORT_CFG_PORT_OUTPUT_LOW) );]]>

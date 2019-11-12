@@ -16,7 +16,7 @@ import de.nomagic.puzzler.Project;
 public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface
 {
     public static final String REQUIRED_CFG_NAME = "parameter";
-    public static final String REQUIRED_CFG_ATTRIBUTE_NAME = "ref";
+    public static final String REQUIRED_CFG_ATTRIBUTE_NAME = "name";
     public static final String REQUIRED_ALGORITHM_NAME = "childElement";
     public static final String REQUIRED_ALGORITHM_ATTRIBUTE_NAME = "type";
 
@@ -408,20 +408,27 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     public String dumpProperty()
     {
-        StringBuffer sb = new StringBuffer();
-        sb.append("Properties:\n");
-        Iterator<String> keys = properties.keySet().iterator();
-        while(keys.hasNext())
+        if(true == properties.isEmpty())
         {
-            String key = keys.next();
-            sb.append(key + " : " + properties.get(key) + "\n");
+            return "Properties: <empty>";
         }
-        if(null != parent)
+        else
         {
-            sb.append("Parent: " + parent.toString());
-            sb.append(parent.dumpProperty());
+            StringBuilder sb = new StringBuilder();
+            sb.append("Properties:\n");
+            Iterator<String> keys = properties.keySet().iterator();
+            while(keys.hasNext())
+            {
+                String key = keys.next();
+                sb.append(key + " : " + properties.get(key) + "\n");
+            }
+            if(null != parent)
+            {
+                sb.append("Parent: " + parent.toString());
+                sb.append(parent.dumpProperty());
+            }
+            return sb.toString();
         }
-        return sb.toString();
     }
 
     public String getParameter(String name)
@@ -439,15 +446,22 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     public String dumpParameter()
     {
-        StringBuffer sb = new StringBuffer();
-        sb.append("Parameter:\n");
-        Iterator<String> keys = parameters.keySet().iterator();
-        while(keys.hasNext())
+        if(true == parameters.isEmpty())
         {
-            String key = keys.next();
-            sb.append(key + " : " + parameters.get(key) + "\n");
+            return "Parameter: <empty>";
         }
-        return sb.toString();
+        else
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Parameter:\n");
+            Iterator<String> keys = parameters.keySet().iterator();
+            while(keys.hasNext())
+            {
+                String key = keys.next();
+                sb.append(key + " : " + parameters.get(key) + "\n");
+            }
+            return sb.toString();
+        }
     }
 
     public String getBuildIn(String word)

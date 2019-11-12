@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <algorithm name="pwm_task" api="run">
-    <configurationAttribute name="frequency_Hz" type="unsigned integer" />
-    <configurationAttribute name="dutyCycle_percent" type="unsigned integer" />
     <required>
-        <parameter ref="dutyCycle_percent" />
-        <parameter ref="frequency_Hz" />
-        <childElement type="binaryOut"/>
+        <parameter name="dutyCycle_percent" type="unsigned integer" />
+        <parameter name="frequency_Hz" type="unsigned integer" />
+        <childElement type="bitOut"/>
     </required>
     <c_code>
         <function name="execute">

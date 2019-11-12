@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<api name="binaryIn" >
+<api name="bitIn" >
   <function name="getValue"  type="required" result="bool" />
 </api>

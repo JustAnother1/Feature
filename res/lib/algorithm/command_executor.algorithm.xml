@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="command_executor" api="run">
+    <required>
+        <childElement type="line_input_stream"/>
+        <childElement type="buffered_output_stream"/>
+        <childElement type="command"/>
+    </required>
+    <c_code>
+    <additional>
+    char help_cmd[] = "help";
+    </additional>
+        <function name="execute">
+        <![CDATA[
+        if(true == €line_input_stream:hasNewLine()€)
+        {
+            char* line = €line_input_stream:getNextLine()€
+            if(0 == strcmp(help_cmd, line))
+            {
+                // print help         ]]>
+    <forChilds api="command">
+    <![CDATA[ €buffered_output_stream:sendLine(€command:describe()€)€
+    ]]>
+    </forChilds>
+            <![CDATA[
+            }
+            // all other commands
+            ]]>
+    <forChilds api="command">
+    <![CDATA[
+    if(0 == strcmp(€command:getName()€, line))
+    {
+        €buffered_output_stream:sendLine(€command:execute(line)€)€
+    }
+    ]]>
+    </forChilds>
+            <![CDATA[
+        }
+        ]]>
+        </function>
+    </c_code>
+</algorithm>

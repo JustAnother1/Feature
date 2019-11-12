@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="uart" api="input_stream,output_stream">
+  <required>
+    <parameter name="ressource" type="string" />
+    <parameter name="speed_bitps" type="int />
+  </required>
+
+  <c_code>
+    <additional>
+      <include>uart.h</include>
+      <file name ="uart.h"><![CDATA[
+#ifndef SRC_UART_H_
+#define SRC_UART_H_
+
+#include <stdint.h>
+
+#define UART1 0
+#define UART2 1
+#define UART3 2
+
+/*
+ * UART P601
+
+Baudrate
+PCLKB (max 32MHz) (24 MHz) (12MHz)(6MHz)(3MHz)
+
+BRR default = 0xff (8bit Register)
+
+BRR = N
+Bitrate = B
+
+SMR (CKS (00) -> n = 0
+
+CKS (00) -> n = 0
+CKS (01) -> n = 1
+CKS (10) -> n = 2
+CKS (11) -> n = 3
+
+
+MDDR
+SEMR
+BGDM
+ABCS
+ABCSE
+
+
+Example:
+9600 bit/s, n = 0; N = 38, Error = 0,16% bei 12MHz
+300 bit/s n = 2; N= 77, Error = 0,16% bei 12MHz
+ABCS = 0
+ABCSE = 0
+BGDM = 0
+ *
+ *
+ */
+
+
+void uart_enable(uint_fast8_t uart);
+void uart_disable(uint_fast8_t uart);
+
+void uart_send_byte(uint_fast8_t uart, uint_fast8_t b);
+
+#endif /* SRC_UART_H_ */
+]]></file>
+      <file name ="uart.c"><![CDATA[
+#include "uart.h"
+#include "power.h"
+#include "delay.h"
+
+// Pins
+// R7FS1JA
+// LQFP 64
+//                Function
+// Pin, Name,   0      1          9
+//  1   P400          RXD1_C
+//  9   P213          RXD1_D
+// 10   P212          TXD1_D
+// 12   P411  TXD0_F  RXD1_B
+// 13   P410          TXD1_B
+// 15   P408  RXD0_A  TXD1_C
+// 16   P407  TXD0_A           TXD9_A
+// 22   P206          TXD1_A
+// 23   P205  TXD0_C
+// 24   P204  RXD0_C
+// 28   P304                   TXD9_C
+// 30   P302  TXD0_B  RXD1_A
+// 31   P301  RXD0_B
+// 34   P110  TXD0_D           RXD9_B
+// 47   P101                   RXD9_C
+// 48   P100                   TXD9_D
+// 49   P500  RXD0_D
+// 50   P501  TXD0_E
+// 63   P000                   RXD9_A
+// 64   P109                   TXD9_B
+
+#include "irqn.h"
+#include "core_armv8mbl.h"                          // Cortex-M23 (ARMv8MBL) processor and core peripherals
+
+typedef struct {                                    // R_SCI0 Structure
+      __IO uint8_t   SMR;                           // Serial Mode Register
+      __IO uint8_t   BRR;                           // Bit Rate Register
+      __IO uint8_t   SCR;                           // Serial Control Register
+      __IO uint8_t   TDR;                           // Transmit Data Register
+      __IO uint8_t   SSR;                           // Serial Status Register(SCMR.SMIF = 0 and FCR.FM=0)
+      __IO uint8_t   RDR;                           // Receive Data Register
+      __IO uint8_t   SCMR;                          // Smart Card Mode Register
+      __IO uint8_t   SEMR;                          // Serial Extended Mode Register
+      __IO uint8_t   SNFR;                          // Noise Filter Setting Register
+      __IO uint8_t   SIMR1;                         // I2C Mode Register 1
+      __IO uint8_t   SIMR2;                         // I2C Mode Register 2
+      __IO uint8_t   SIMR3;                         // I2C Mode Register 3
+      __IO uint8_t   SISR;                          // I2C Status Register
+      __IO uint8_t   SPMR;                          // SPI Mode Register
+      __O  uint16_t  TDRHL;                         // Transmit Data Register
+      __I  uint8_t   RDRH;                          // Receive Data Register High byte.
+      __I  uint8_t   RDRL;                          // Receive Data Register low byte.
+      __IO uint8_t   MDDR;                          // Modulation Duty Register
+      __IO uint8_t   DCCR;                          // Data Compare Match Control Register
+      __IO uint16_t  FCR;                           // FIFO Control Register
+      __I  uint16_t  FDR;                           // FIFO Data Count Register
+      __I  uint16_t  LSR;                           // Line Status Register
+      __IO uint16_t  CDR;                           // Compare Match Data Register
+      __IO uint8_t   SPTR;                          // Serial Port Register
+} R_SCI0_Type;
+
+
+#define R_SCI0_BASE                     0x40070000UL
+#define R_SCI1_BASE                     0x40070020UL
+#define R_SCI9_BASE                     0x40070120UL
+
+#define R_SCI0                          ((R_SCI0_Type             *) R_SCI0_BASE)
+#define R_SCI1                          ((R_SCI0_Type             *) R_SCI1_BASE)
+#define R_SCI9                          ((R_SCI0_Type             *) R_SCI9_BASE)
+
+#define REG_SSR_TDRE_MASK                0x80
+
+
+static R_SCI0_Type* registers[3] = {R_SCI0, R_SCI1, R_SCI9};
+
+void uart_enable(uint_fast8_t uart)
+{
+    switch(uart)
+    {
+    case UART1:
+        powerOn(SCI_0);
+        break;
+
+    case UART2:
+        powerOn(SCI_1);
+        break;
+
+    case UART3:
+        powerOn(SCI_9);
+        break;
+    }
+    R_BSP_SoftwareDelay(10, BSP_DELAY_UNITS_MILLISECONDS);
+
+    registers[uart]->FCR = 0x0;
+    registers[uart]->SCMR = 0x10;
+    registers[uart]->SMR = 0x00;
+    registers[uart]->BRR = 38;
+    registers[uart]->SEMR = 0;
+    registers[uart]->SPTR = 0x03;
+
+    registers[uart]->SCR = 0x30;  // receive enabled + transmit enabled
+}
+
+void uart_disable(uint_fast8_t uart)
+{
+    registers[uart]->SCR = 0x00;
+    switch(uart)
+    {
+    case UART1:
+        powerOff(SCI_0);
+        break;
+
+    case UART2:
+        powerOff(SCI_1);
+        break;
+
+    case UART3:
+        powerOff(SCI_9);
+        break;
+    }
+}
+
+void uart_send_byte(uint_fast8_t uart, uint_fast8_t b)
+{
+    while (0U == (registers[uart]->SSR & REG_SSR_TDRE_MASK))
+    {
+        // wait until there is no more data in the send buffer,
+    }
+
+    // write the byte into the transmit register
+    registers[uart]->TDR = (uint8_t)b;
+}
+]]></file>
+      <file name ="delay.h"><![CDATA[
+#ifndef SRC_DELAY_H_
+#define SRC_DELAY_H_
+
+#include <stdint.h>
+#include "clock.h"
+
+/** Available delay units for R_BSP_SoftwareDelay(). These are ultimately used to calculate a total # of microseconds */
+typedef enum
+{
+    BSP_DELAY_UNITS_SECONDS =      1000000,  ///< Requested delay amount is in seconds
+    BSP_DELAY_UNITS_MILLISECONDS = 1000,     ///< Requested delay amount is in milliseconds
+    BSP_DELAY_UNITS_MICROSECONDS = 1         ///< Requested delay amount is in microseconds
+} bsp_delay_units_t;
+
+void R_BSP_SoftwareDelay(uint32_t delay, bsp_delay_units_t units);
+void r_cgc_delay_cycles(cgc_clock_t clock, uint16_t cycles);
+
+#endif /* SRC_DELAY_H_ */
+]]></file>
+      <file name ="delay.c"><![CDATA[
+#include "delay.h"
+#include "clock.h"
+
+
+#define DELAY_LOOP_CYCLES 4     ///< 4 cycles per loop.
+
+__attribute__((naked)) static void software_delay_loop (uint32_t loop_cnt);
+
+
+/*******************************************************************************************************************//**
+* @brief       Delay the specified duration in units and return.
+* @param[in]   delay  The number of 'units' to delay.
+* @param[in]   units  The 'base' (bsp_delay_units_t) for the units specified. Valid values are:
+*              BSP_DELAY_UNITS_SECONDS, BSP_DELAY_UNITS_MILLISECONDS, BSP_DELAY_UNITS_MICROSECONDS.@n
+*              For example:@n
+*              At 1 MHz one cycle takes 1 microsecond (.000001 seconds).@n
+*              At 12 MHz one cycle takes 1/12 microsecond or 83 nanoseconds.@n
+*              Therefore one run through software_delay_loop() takes:
+*              ~ (83 * DELAY_LOOP_CYCLES) or 332 ns.
+*              A delay of 2 us therefore requires 2000ns/332ns or 6 loops.
+*
+*              The 'theoretical' maximum delay that may be obtained is determined by a full 32 bit loop count and the system clock rate.
+*              @240MHz:  ((0xFFFFFFFF loops * 4 cycles /loop) / 240000000) = 71 seconds.
+*              @32MHz:  ((0xFFFFFFFF loops * 4 cycles /loop) / 32000000) = 536 seconds
+*
+*              Note that requests for very large delays will be affected by rounding in the calculations and the actual delay
+*              achieved may be slightly less. @32 MHz, for example, a request for 532 seconds will be closer to 536 seconds.
+*
+*              Note also that if the calculations result in a loop_cnt of zero, the software_delay_loop() function is not called
+*              at all. In this case the requested delay is too small (nanoseconds) to be carried out by the loop itself, and the
+*              overhead associated with executing the code to just get to this point has certainly satisfied the requested delay.
+*
+* @retval        None.
+***********************************************************************************************************************/
+void R_BSP_SoftwareDelay(uint32_t delay, bsp_delay_units_t units)
+{
+    uint32_t iclk_hz = 0;
+    uint32_t cycles_requested;
+    uint32_t ns_per_cycle;
+    uint32_t loops_required = 0;
+    uint32_t total_us = (delay * units);  /** Convert the requested time to microseconds. */
+    uint64_t ns_64bits;
+
+    iclk_hz = r_cgc_clock_hzget(CGC_SYSTEM_CLOCKS_ICLK);
+
+    /* Running on the Sub-clock (32768 Hz) there are 30517 ns/cycle. This means one cycle takes 31 us. One execution
+     * loop of the delay_loop takes 6 cycles which at 32768 Hz is 180 us. That does not include the overhead below prior to even getting
+     * to the delay loop. Given this, at this frequency anything less then a delay request of 122 us will not even generate a single
+     * pass through the delay loop.  For this reason small delays (<=~200 us) at this slow clock rate will not be possible and such a request
+     * will generate a minimum delay of ~200 us.*/
+
+     ns_per_cycle = (1000000000)/iclk_hz;            /** Get the # of nanoseconds/cycle. */
+
+     /* We want to get the time in total nanoseconds but need to be conscious of overflowing 32 bits. We also do not want to do 64 bit */
+     /* division as that pulls in a division library. */
+     ns_64bits = (uint64_t)total_us * (uint64_t)1000;      // Convert to ns.
+
+     /* Have we overflowed 32 bits? */
+     if (ns_64bits <= 0xFFFFFFFFUL)
+     {
+         /* No, we will not overflow. */
+         cycles_requested =  ((uint32_t)ns_64bits / ns_per_cycle);
+         loops_required = cycles_requested / DELAY_LOOP_CYCLES;
+     }
+     else
+     {
+         /* We did overflow. Try dividing down first. */
+         total_us = (total_us / (ns_per_cycle * DELAY_LOOP_CYCLES));
+         ns_64bits = (uint64_t)total_us * (uint64_t)1000;      // Convert to ns.
+
+         /* Have we overflowed 32 bits? */
+          if (ns_64bits <= 0xFFFFFFFFUL)
+          {
+              /* No, we will not overflow. */
+              loops_required =  (uint32_t)ns_64bits;
+          }
+          else
+          {
+              /* We still overflowed, use the max count for cycles */
+              loops_required =  0xFFFFFFFFUL;
+          }
+     }
+
+     /** Only delay if the supplied parameters constitute a delay. */
+     if (loops_required > (uint32_t)0)
+     {
+         software_delay_loop(loops_required);
+     }
+}
+
+/*******************************************************************************************************************//**
+* @brief This assembly language routine takes roughly 4 cycles per loop. 2 additional cycles
+*        occur when the loop exits. The 'naked' attribute  indicates that the specified function does not need
+*        prologue/epilogue sequences generated by the compiler.
+* @param[in]     loop_cnt  The number of loops to iterate.
+* @retval        None.
+***********************************************************************************************************************/
+__attribute__((naked)) static void software_delay_loop (uint32_t loop_cnt)
+{
+        __asm volatile ("sw_delay_loop:         \n"
+                        "   sub r0, r0, #1      \n"     ///< 1 cycle
+                        "   cmp r0, #0          \n"     ///< 1 cycle
+                        "   bne sw_delay_loop   \n"     ///< 2 cycles
+                        "   bx lr               \n");   ///< 2 cycles
+
+    /** loop_cnt is used but since it is used in assembly an unused parameter warning can be generated. */
+        (void) (loop_cnt);
+}
+
+#define CGC_CLOCK_NUM_CLOCKS    ((uint8_t) CGC_CLOCK_SUBCLOCK + 1U)
+extern uint32_t           g_clock_freq[CGC_CLOCK_NUM_CLOCKS] __attribute__ ((section(".noinit")));
+
+/*******************************************************************************************************************//**
+ * @brief      This function delays for a specified number of clock cycles, of the selected clock
+ * @param[in]  p_system_reg  pointer to system register structure
+ * @param[in]  clock the clock to time
+ * @param[in]  cycles the number of cycles to delay
+ * @retval     none
+ **********************************************************************************************************************/
+void r_cgc_delay_cycles(cgc_clock_t clock, uint16_t cycles)
+{
+    /* delay for number of clock cycles specified */
+
+    uint32_t               delay_count;
+    uint32_t               clock_freq_in;
+    uint32_t               system_clock_freq;
+
+    system_clock_freq = r_cgc_clock_hzget(CGC_SYSTEM_CLOCKS_ICLK);
+    clock_freq_in     = g_clock_freq[clock];
+    if (clock_freq_in != 0U)             // ensure divide by zero doesn't happen
+    {
+        delay_count = ((system_clock_freq / clock_freq_in) * cycles);
+
+        while (delay_count > 0U)
+        {
+            delay_count--;
+        }
+    }
+}
+]]></file>
+    </additional>
+
+  <function  name="initialize" >
+        <![CDATA[uart_disable(UART€ressource€);
+    {
+        volatile uint8_t read_port = 0U;
+        read_port = 255;
+        while(0 != read_port)
+        {
+            read_port --;
+        }
+    };
+    uart_enable(UART€ressource€);]]>
+    </function>
+
+  <function name="hasNewByte" result="bool">
+        <![CDATA[/* TODO hasNewByte */]]>
+    </function>
+  <function name="getReceivedByte" result="byte">
+        <![CDATA[/* TODO getReceivedByte */]]>
+    </function>
+
+  <function name="sendByte" param0_type="byte" param0_name="data">
+        <![CDATA[uart_send_byte(UART€ressource€, €data€);]]>
+    </function>
+
+  </c_code>
+</algorithm>

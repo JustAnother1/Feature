@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="output_stream" >
+  <function name="sendLine"  type="required" param0_name="line" param0_type="string" />
+</api>

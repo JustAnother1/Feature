@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <api name="st_gpio" >
-  <function name="enablePort"  type="required" param="character" />
+  <function name="enablePort"  type="required" param0_name="which" param0_type="character" />
 </api>

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<algorithm name="gpio" api="binaryOut,binaryIn">
-  <configurationAttribute name="pin" type="string"/>
+<algorithm name="gpio" api="bitOut,bitIn">
   <required>
-    <parameter ref="pin" />
+    <parameter name="pin" type="string" />
   </required>
 
 </algorithm>

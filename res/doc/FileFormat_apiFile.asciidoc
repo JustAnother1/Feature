@@ -13,15 +13,33 @@ API files are xml files. The root element is a "api" element.
 
 === api element
 ==== Attributes
-The "name" attribute defines the name of the Interface. The name is also used in the filename.
-The optional "implements" attribute defines other api that are also covered by this definition. 
+
+The "name" attribute defines the name of the interface. The name is also used in the filename.
+
+The optional "implements" attribute defines other api that are also covered by this definition. If more then one other api is also implemented these api names are separated with "," from each other.
+
 ==== child elements
 The API element can have many child elements of type function element.
 
 === function element
 ==== Attributes
- The "name" attribute defines the function name.
- The "type" attribute defines if this function must be present ("required") to fulfil the interface.
+
+The "name" attribute defines the function name.
+
+The "type" attribute defines if this function must be present ("required") to fulfill the interface.
+
+The "result" attribute defines the data type of the value that is returned if the function gets called.
+If the function does not return a value then the "result" attribute is missing.
+
+The "param0_name" attribute specifies the name of the first parameter. The name is used to refer to the parameters value from the functions implementation.
+
+The "param0_type" attribute specifies the variable type of the first parameter.
+
+If the function has no parameters then the "param*" attributes are missing.
+If the function accepts more than one parameter then the attributes for the second parameter are
+"param1_name" and "param1_type" for the third they are
+"param2_name" and "param2_type" and so on for further parameters.
+
 ==== child elements
 none.
 

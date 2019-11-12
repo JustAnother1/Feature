@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <api name="delay" >
-  <function name="delay_ms"  type="required" param="int" />
+  <function name="delay_ms"  type="required" param0_name="time" param0_type="int" />
 </api>

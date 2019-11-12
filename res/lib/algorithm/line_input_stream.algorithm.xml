@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="line_input_stream">
+    <required>
+        <parameter name="maxLineLength" type="unsigned integer" default="50" />
+        <childElement type="input_stream"/>
+    </required>
+    <c_code>
+      <additional>
+        <include>stdbool.h</include>
+        <include>stdint.h</include>
+        <variable><![CDATA[bool hasLine = false;]]></variable>
+        <variable><![CDATA[uint_fast8_t curPage = 0;]]></variable>
+        <variable><![CDATA[uint_fast8_t curIdx = 0;]]></variable>
+        <variable><![CDATA[uint_fast8_t lastPage = 0;]]></variable>
+        <variable><![CDATA[char recv_buf[2][€maxLineLength€];]]></variable>
+        <function name="check" return="void" >
+            <![CDATA[€if(true == input_stream:hasNewByte())
+            {
+                recv_buf[curPage][curIdx] = input_stream:getReceivedByte();
+                curIdx++;
+                if(('\r' == recv_buf[curPage][curIdx]) || ('\n' = recv_buf[curPage][curIdx] || (€maxLineLength€ >= curIdx))
+                {
+                    recv_buf[curPage][curIdx] = 0;
+                    curIdx = 0;
+                    lastPage = curPage;
+                    if(1 == curPage)
+                    {
+                        curPage = 0;
+                    }
+                    else
+                    {
+                        curPage = 1;
+                    }
+                    hasLine = true;
+                }
+            } €]]>
+        </function>
+      </additional>
+      <function name="hasNewLine" return="bool" >
+        <![CDATA[€check();
+        return hasLine€]]>
+      </function>
+      <function name="getNextLine" return="string" >
+        <![CDATA[€hasLine = false;
+        return recv_buf[lastPage][0]€]]>
+      </function>
+    </c_code>
+</algorithm>

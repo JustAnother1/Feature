@@ -13,13 +13,37 @@ Algorithm files are xml files. The root element is a "algorithm" element.
 
 === algorithm element
 ==== Attributes
-The attribute "name" defines the name of the attribute. The name is also part of the filename.
-The attribute "api" defines the Interfaces that the algorithm fulfills. Each Interface is defined in a API File. For details see the API File Format definition.
+The attribute "name" defines the name of the algorithm. The name is also part of the filename.
+
+The attribute "api" defines the interfaces that the algorithm fulfills. Each Interface is defined in a API File. For details see the API File Format definition. If more then one other api is also implemented these api names are separated with "," from each other.
 
 ==== child elements
 The algorithm element may have a "required" element.
 The algorithm element may have a "provides" element.
 The algorithm element may have a "c_code" element.
+
+=== required element
+==== Attributes
+None.
+
+==== child elements
+The required element may have many child elements. All children have to be either "childElement" or "parameter" elements.
+
+=== childElement element
+==== Attributes
+The "type" attribute defines the Interface (api) that child elements need to implement.
+
+=== parameter element
+==== Attributes
+The attribute "name" defines the name of a parameter that need to be given to this algorithm.
+
+The attribute "type" specifies the data type of the parameter.
+
+The optional attribute "default" may specify a default value. If a default value is provided then this parameter does not need to be provided when this algorithm gets used in a solution.
+
+==== child elements
+None.
+
 
 === provides element
 ==== Attributes
@@ -30,31 +54,11 @@ The algorithm element may have many child elements. All child elements have to c
 
 === algorithm_information element style
 The name defines the name of the algorithm information object.
+
 ==== Attributes
-The attribute "type" defines the type of information object. Valid types are: bool, int, float, string.
-AThe attribute value defines the value of the information object. To assign a value to a "bool" information object a boolean expression may be used. To assign the value of an "int" or "float" information object a mathematic expression may be used.
+The attribute "type" defines the type of information object. Valid types are: bool, int, float, String.
 
-==== child elements
-None.
-
-
-=== required element
-==== Attributes
-None.
-
-==== child elements
-The provides element may have many child elements. All children have to be either "childElement" or "parameter" elements.
-
-=== childElement element
-==== Attributes
-The "type" attribute defines the Interface (api) that child elements need to implement.
-
-==== child elements
-The provides element may have many child elements. All children have to be either "childElement" or "parameter" elements.
-
-=== parameter element
-==== Attributes
-The attribute "ref" defines the name of a parameter that need to be given to this algorithm.
+The attribute "value" defines the value of the information object. To assign a value to a "bool" information object a boolean expression may be used. To assign the value of an "int" or "float" information object a mathematical expression may be used.
 
 ==== child elements
 None.
@@ -63,26 +67,76 @@ None.
 === c_code element
 The c_code element must have function elements for all functions defined in the apis listed in the "api" attribute.
 
+This section can also have an "additional" element.
+
 ==== Attributes
 None
 
 ==== child elements
-Function elements for all functions defined in the apis.
+Function elements for all functions defined in the apis. And an optional "Additional" element.
+
+=== additional element
+Sometimes the C Code for the implementation of the algorithm has some additional dependencies. This element allows them to be specified.
+
+==== Attributes
+None
+
+==== child elements
+Child elements can be the "include" element, the "variable" element, the "file" element or the "function" element.
+
+=== include element
+The include element defines an addition file that needs to be included. The file name is provided as text content of the element.
+
+==== Attributes
+None.
+
+==== child elements
+None.
+
+=== variable element
+This element defines a variable that needs to be valid when the implementation of this algorithm is used.
+
+==== Attributes
+None.
+
+==== child elements
+A CDATA section containing the C declaration of the variable needed.
 
 
 === function element
 ==== Attributes
 The attribute "name" defines the name of the function.The function must be a part of an Interface that this algorithm implements. Each Interface is defined in a API File. For details see the API File Format definition.
-The attribute param0_type defines the data type of the first parameter.
-The attribute param0_name defines the name of the first parameter.
-The attribute param1_type defines the data type of the second parameter.
-The attribute param1_name defines the name of the second parameter.
-The attribute param2_type defines the data type of the third parameter.
-The attribute param2_name defines the name of the third parameter.
+
+The attribute "param0_type" defines the data type of the first parameter.
+
+The attribute "param0_name" defines the name of the first parameter.
+
+The attribute "param1_type" defines the data type of the second parameter.
+
+The attribute "param1_name" defines the name of the second parameter.
+
+The attribute "param2_type" defines the data type of the third parameter.
+
+The attribute "param2_name" defines the name of the third parameter.
+
 ...
 
+The attibute "result" defines the data type of the returned value. If no value is returned then this attribute is missing.
+
 ==== child elements
-child elements  are either if elements or a CDATA section that contains the code.
+child elements are either if elements or a CDATA section that contains the code.
+
+
+=== CDATA section
+This section contains the C code that implements the algorithm. The text is normal C source code. The C Code can contain placeholders. Placeholders start and end with the euro sign '€'.
+Placeholders can be:
+
+== function calls
+Syntax: €api:function(parameter)€
+
+Example: €run.execute()€
+
+These will be replaced by the implementation delivered by the function from the api referred. This must be either a child or a library function.
 
 
 === if element
@@ -90,9 +144,17 @@ child elements  are either if elements or a CDATA section that contains the code
 The attribute "cond" defines the condition of the if element. If the condition is true then the child is used as if it was in the location of the if element. If the condition is false then the child element is not used.
 
 ==== child elements
-The content is a CDATA section that contains C-Code that implement the function. This C-Code also contains markers. These markers define locations in the code where c_code of child elements will be added.
+All elements that can be children of the function element can also be child elements here.
 
+=== forChilds element
+==== Attributes
+The elements in this section will be instantiated once for every child of this algorithm that implements the api defined in the attribute "api".
 
+==== child elements
+All elements that can be children of the function element can also be child elements here.
+
+== The initialize function
+The "initialize" function is a specialty. All algorithms may have such a function although this function is not part of any api. If a algorithm has a "initialize" function and is used in a solution then the "initialize" function will be executed in the beginning of the main function before anything else specified in the solution is executed. This allows the algorithms to do some generic initialization before being used for the first time.
 
 == Example
 
@@ -110,19 +172,21 @@ The content is a CDATA section that contains C-Code that implement the function.
     <function name="main">
      <if cond="true equals singleTask">
       <![CDATA[{
-  €initialize€
   for(;;)
   {
-    €execute€
+    €run:execute()€
   }
 }]]>
       </if>
       <if cond="false equals singleTask">
         <![CDATA[{
-  €initialize€
   for(;;)
   {
-    €execute€
+  ]]>
+  <forChilds api="run">
+     <![CDATA[{€run:execute()€]]>
+  </forChilds>
+    <![CDATA[
   }
 }]]>
       </if>

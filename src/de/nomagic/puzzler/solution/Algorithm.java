@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.jdom2.Attribute;
 import org.jdom2.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
@@ -15,6 +17,8 @@ public class Algorithm extends Base
     public static final String ALGORITHM_REFFERENCE_ATTRIBUTE_NAME = "algorithm";
     public static final String ALGORITHM_NAME_ATTRIBUTE_NAME = "name";
     public static final String ALGORITHM_API_ATTRIBUTE_NAME = "api";
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     private Element root = null;
 
@@ -103,11 +107,18 @@ public class Algorithm extends Base
             for(int i = 0; i < apiArr.length; i++)
             {
                 Api curApi = Api.getFromFile(apiArr[i], ctx);
-                if(true == curApi.alsoImplements(api))
+                if(null == curApi)
                 {
-                    return true;
+                    log.error("Reference to the invalid API {} in {} !", apiArr[i], this.toString());
                 }
-                // else continue search
+                else
+                {
+                    if(true == curApi.alsoImplements(api))
+                    {
+                        return true;
+                    }
+                    // else continue search
+                }
             }
             return false;
         }

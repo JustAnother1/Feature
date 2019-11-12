@@ -41,17 +41,12 @@ public class CCodeGenerator extends Generator
     public static final String ALGORITHM_ADDITIONAL_FILE_CHILD_NAME = "file";
     public static final String ALGORITHM_ADDITIONAL_VARIABLE_CHILD_NAME = "variable";
 
-    public static final String CFG_DOC_CODE_SRC = "document_code_source";
-
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     private ConditionEvaluator condiEval;
     private FileGroup codeGroup;
     private CFile sourceFile;
     private HashMap<String, CInitCodeBlock> initcode = new HashMap<String, CInitCodeBlock>();
-
-    // if this is true then all code snippets will be wrapped into comment lines explaining where they came from.
-    private boolean documentCodeSource = false;
 
     public CCodeGenerator(Context ctx)
     {
@@ -60,17 +55,9 @@ public class CCodeGenerator extends Generator
     }
 
     @Override
-    public void configure(Configuration cfg)
+    public String getLanguageName()
     {
-        if(null == cfg)
-        {
-            return;
-        }
-        if("true".equals(cfg.getString(CFG_DOC_CODE_SRC)))
-        {
-            log.trace("Switching on documentation of source code");
-            documentCodeSource = true;
-        }
+        return "C";
     }
 
     public FileGroup generateFor(AlgorithmInstanceInterface logic)
@@ -93,9 +80,17 @@ public class CCodeGenerator extends Generator
         log.trace("starting to generate the c implementation for {}", logic);
 
         Api api = Api.getFromFile(REQUIRED_ROOT_API, ctx);
+        if(null == api)
+        {
+            ctx.addError(this, "" + logic + " : Failed to load the api " + REQUIRED_ROOT_API + " !");
+            return null;
+        }
 
         addImplementationForTo(api, logic, "main.c");
-
+        if(false == ctx.wasSucessful())
+        {
+            return null;
+        }
         addInitCode();
 
         return codeGroup;
@@ -103,7 +98,7 @@ public class CCodeGenerator extends Generator
 
     private void addInitCode()
     {
-        Element funcElement = new Element("function");
+        Element funcElement = new Element(ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME);
         funcElement.setAttribute(Function.FUNCTION_NAME_ATTRIBUTE_NAME, ALGORITHM_INITIALISATION_FUNCTION_NAME);
         funcElement.setAttribute(Function.FUNCTION_TYPE_ATTRIBUTE_NAME, Function.FUNCTION_REQUIRED_TYPE);
         Function initFunc = new Function(funcElement);
@@ -165,7 +160,7 @@ public class CCodeGenerator extends Generator
 
             if(true == documentCodeSource)
             {
-                sourceFile.addFunction(funcs[i], logic);
+                sourceFile.addFunction(funcs[i], logic.toString());
             }
             else
             {
@@ -200,7 +195,7 @@ public class CCodeGenerator extends Generator
                     if(true == ALGORITHM_INITIALISATION_FUNCTION_NAME.equals(name))
                     {
                         // found another init function
-                        log.trace("Founf initFunctuntion in {}", logic);
+                        log.trace("Found initFunctuntion in {}", logic);
                         String id = logic.toString();
                         String impl = getImplementationFromFunctionElement(curElement, "", logic);
                         if(true == documentCodeSource)
@@ -242,6 +237,10 @@ public class CCodeGenerator extends Generator
         }
 
         handleInitFunctionOfAlgorithm(logic);
+        if(false == ctx.wasSucessful())
+        {
+            return null;
+        }
 
         functionToCall.setFunctionArguments(
                 condiEval.evaluateConditionParenthesis(functionToCall.getArguments(), logic, null, null));
@@ -266,7 +265,14 @@ public class CCodeGenerator extends Generator
         getAdditionalsFrom(logic);
         implementation = implementation.trim();
         implementation = replacePlaceholders(implementation, functionToCall.getArguments(), logic, functionElement);
-        return implementation;
+        if(false == ctx.wasSucessful())
+        {
+            return null;
+        }
+        else
+        {
+            return implementation;
+        }
     }
 
     private String getImplementationFromFunctionElement(Element function, String FunctionArguments, AlgorithmInstanceInterface logic)
@@ -445,7 +451,7 @@ public class CCodeGenerator extends Generator
         return res.toString();
     }
 
-    private String replacePlaceholders(String implementation,
+    private String replacePlaceholdersInPart(String implementation,
             String FunctionParameters,
             AlgorithmInstanceInterface logic,
             Element functionElement)
@@ -500,6 +506,7 @@ public class CCodeGenerator extends Generator
                         ctx.addError(this,
                             "Invalid parameter requested : " + parts[i] );
                         ctx.addError(this,"available parameters: " + logic.dumpParameter());
+                        ctx.addError(this,"available properties: " + logic.dumpProperty());
                         return null;
                     }
                     else
@@ -510,6 +517,116 @@ public class CCodeGenerator extends Generator
             }
         }
         return res.toString();
+    }
+
+    private String handleBracesInImplementation(String implementation,
+            String FunctionParameters,
+            AlgorithmInstanceInterface logic,
+            Element functionElement)
+    {
+        HashMap<Integer,StringBuilder> partsMap = new HashMap<Integer,StringBuilder>();
+        Integer level = 0;
+        StringBuilder curPart =  new StringBuilder();
+        partsMap.put(level, curPart);
+        for(int i = 0; i < implementation.length(); i++)
+        {
+            char c = implementation.charAt(i);
+            switch(c)
+            {
+            case'(':
+                partsMap.put(level, curPart);
+                level++;
+                curPart =  new StringBuilder();
+                break;
+
+            case')':
+                String part = curPart.toString();
+                if(true == part.contains(IMPLEMENTATION_PLACEHOLDER_REGEX))
+                {
+                    part = replacePlaceholdersInPart(part, FunctionParameters, logic, functionElement);
+                    if(null == part)
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    // nothing to replace
+                }
+                level--;
+                curPart = partsMap.get(level);
+                curPart.append('(' + part + ')');
+                break;
+
+            default:
+                curPart.append(c);
+                break;
+            }
+        }
+        String part = curPart.toString();
+        if(true == part.contains(IMPLEMENTATION_PLACEHOLDER_REGEX))
+        {
+            part = replacePlaceholdersInPart(part, FunctionParameters, logic, functionElement);
+        }
+        else
+        {
+            // nothing to replace
+        }
+        return part;
+    }
+
+    private String replacePlaceholders(String implementation,
+            String FunctionParameters,
+            AlgorithmInstanceInterface logic,
+            Element functionElement)
+    {
+        int numEuros = 0;
+        int numOpenBraces = 0;
+        int numClosingBaces = 0;
+        for(int i = 0; i < implementation.length(); i++)
+        {
+            switch(implementation.charAt(i))
+            {
+            case '€': numEuros++; break;
+            case '(': numOpenBraces++; break;
+            case ')': numClosingBaces++; break;
+            default: break;
+            }
+        }
+
+        if(0 == numEuros)
+        {
+            return implementation;
+        }
+
+        if(0 != numEuros%2)
+        {
+            ctx.addError(this,"Invalid Syntax: odd number of € ! ");
+            return null;
+        }
+        if(numOpenBraces != numClosingBaces)
+        {
+            ctx.addError(this,"Invalid Syntax: braces don't match"
+                    + " (open: " + numOpenBraces + "; close: " +  numClosingBaces + ") !");
+            return null;
+        }
+
+        if(0 != numOpenBraces)
+        {
+            return handleBracesInImplementation(implementation, FunctionParameters, logic, functionElement);
+        }
+        else
+        {
+            if(true == implementation.contains(IMPLEMENTATION_PLACEHOLDER_REGEX))
+            {
+                return replacePlaceholdersInPart(implementation, FunctionParameters, logic, functionElement);
+            }
+            else
+            {
+                // nothing to replace
+                return implementation;
+            }
+        }
     }
 
     private String getFunctionParameterValue(String ParameterName,
@@ -597,7 +714,7 @@ public class CCodeGenerator extends Generator
 
                 if(true == documentCodeSource)
                 {
-                    sourceFile.addFunction(func, logic);
+                    sourceFile.addFunction(func, logic.toString());
                 }
                 else
                 {
@@ -634,12 +751,6 @@ public class CCodeGenerator extends Generator
                                      "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
                                      "*/"});
         return aFile;
-    }
-
-    @Override
-    public String getLanguageName()
-    {
-        return "C";
     }
 
 }
