@@ -14,9 +14,9 @@
  -->
 <project default="all" basedir="." xmlns:cs="antlib:com.puppycrawl.tools.checkstyle.ant">
     <property name="mainJar" value="Puzzler.jar" />
-	<property name="mainJarFat" value="PuzzlerFat.jar" />
+    <property name="mainJarFat" value="PuzzlerFat.jar" />
     <property name="destDir" value="bin" />
-	<property name="fatDir" value="fat" />
+    <property name="fatDir" value="fat" />
     <property name="javadoc" value="res/doc/javadoc" />
     <property name="srcDir" value="src" />
     <property name="testsDir" value="tests" />
@@ -60,9 +60,9 @@
 
     <target name="clean" description="delete everything that might have previously been created" >
         <delete dir="${destDir}"/>
-    	<delete dir="${fatDir}"/>
+        <delete dir="${fatDir}"/>
         <delete file="${mainJar}"></delete>
-    	<delete file="${mainJarFat}"></delete>
+        <delete file="${mainJarFat}"></delete>
         <delete dir="${javadoc}"/>
     </target>
 
@@ -103,17 +103,17 @@
             </manifest>
         </jar>
     </target>
-	
+
     <target name="fatjar" depends="compile" description="create the fat Jar File">
-    	<unzip src="lib/slf4j-1.7.5/slf4j-api-1.7.5.jar" dest="${fatDir}"/>
-    	<unzip src="lib/logback-1.0.13/logback-core-1.0.13.jar" dest="${fatDir}"/>
-    	<unzip src="lib/logback-1.0.13/logback-classic-1.0.13.jar" dest="${fatDir}"/>
-    	<unzip src="lib/jdom-2.0.6/jdom-2.0.6.jar" dest="${fatDir}"/>
-    	<delete file="${fatDir}/META-INF/MANIFEST.MF"></delete>
+        <unzip src="lib/slf4j-1.7.5/slf4j-api-1.7.5.jar" dest="${fatDir}"/>
+        <unzip src="lib/logback-1.0.13/logback-core-1.0.13.jar" dest="${fatDir}"/>
+        <unzip src="lib/logback-1.0.13/logback-classic-1.0.13.jar" dest="${fatDir}"/>
+        <unzip src="lib/jdom-2.0.6/jdom-2.0.6.jar" dest="${fatDir}"/>
+        <delete file="${fatDir}/META-INF/MANIFEST.MF"></delete>
         <jar destfile="${mainJarFat}" update="false">
             <fileset dir="${fatDir}">
                 <include name="**/*" />
-            </fileset>        	
+            </fileset>
             <fileset dir="${destDir}">
                 <include name="**/*.class" />
                 <include name="commit-id" />
@@ -125,8 +125,8 @@
                 <attribute name="Built-Date" value="${TODAY}"/>
             </manifest>
         </jar>
-    	<delete dir="${fatDir}"/>
-    </target>	
+        <delete dir="${fatDir}"/>
+    </target>
 
     <target name="javadoc" description="create Documentation" >
         <javadoc packagenames="de.nomagic.*"
@@ -200,6 +200,12 @@
     </target>
 
     <target name="test" depends="unittest">
+    </target>
+
+    <target name="runTests">
+        <exec executable="/bin/bash">
+            <arg value="runTests.sh"/>
+        </exec>
     </target>
 
     <target name="all" depends="jar">
