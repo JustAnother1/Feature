@@ -128,13 +128,6 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             //as long as we find the Algorithm for this then it is OK.
             evnElement = new Element(name);
             evnElement.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, name);
-            /*
-            ctx.addError("ConfiguredAlgorithm.getTreeFromEnvironment",
-                            "Failed to get Configuration for " + name
-                            + " required by " + parent.getDescription()
-                            + " from the environment !");
-            return null;
-            */
         }
         // else OK
         String algoName = evnElement.getAttributeValue(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME);
@@ -260,9 +253,10 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             String attrName = curE.getAttributeValue(REQUIRED_CFG_ATTRIBUTE_NAME);
             if(null == attrName)
             {
+                LOG.error("Missing attribute in " + curE.toString());
                 ctx.addError("ConfiguredAlgorithm.allRequiredDataAvailable",
-                                "Attribute " + REQUIRED_CFG_ATTRIBUTE_NAME
-                                + " missing for required configuration !");
+                                "Attribute \"" + REQUIRED_CFG_ATTRIBUTE_NAME
+                                + "\" missing for required configuration !");
                 return false;
             }
             Attribute at = cfgAttributes.get(attrName);
@@ -270,7 +264,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             {
                 ctx.addError("ConfiguredAlgorithm.allRequiredDataAvailable",
                                 "required attribute " + attrName + " has not been given !");
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 Iterator<String> it = cfgAttributes.keySet().iterator();
                 sb.append("Given Attributes: ");
                 while(it.hasNext())
@@ -340,6 +334,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                 LOG.trace("Property {} : {}", propertyName, propertyValue);
                 // evaluate PropertyValue
                 propertyValue = condiEval.evaluateConditionParenthesis(propertyValue, this, null, null);
+                LOG.trace("Property {} evaluated to {}", propertyName, propertyValue);
                 properties.put(propertyName, propertyValue);
             }
         }
@@ -390,18 +385,9 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     public String getProperty(String name)
     {
         String res = properties.get(name);
-        if(null == res)
+        if((null == res) && (null != parent))
         {
-            if(null != parent)
-            {
-                res = parent.getProperty(name);
-            }
-        }
-        if(null == res)
-        {
-            // TODO fix propertioes
-            // LOG.warn("Did not find the property{}", name);
-            // LOG.warn(dumpProperty());
+            res = parent.getProperty(name);
         }
         return res;
     }
@@ -434,12 +420,9 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     public String getParameter(String name)
     {
         String res = parameters.get(name);
-        if(null == res)
+        if((null == res) && (null != parent))
         {
-            if(null != parent)
-            {
-                res = parent.getParameter(name);
-            }
+            res = parent.getParameter(name);
         }
         return res;
     }

@@ -96,7 +96,7 @@ public class PuzzlerMain
         System.out.println("Parameters:");
         System.out.println("-D<SettingName>=<Value>    : Set a value to a configuration variable.");
         System.out.println("                           : currently supported:");
-        System.out.println("                           : " + CCodeGenerator.CFG_DOC_CODE_SRC + "=true  : code source in code");
+        System.out.println("                           : " + CCodeGenerator.CFG_DOC_CODE_SRC + "=true  : define in comments which algorithm cretaed the source code lines");
         System.out.println("-e /--environment_dirctory : directory with environment configuration.");
         System.out.println("-h / --help                : print this message.");
         System.out.println("-l /--library_dirctory     : directory for library of Algorithms and APIs.");

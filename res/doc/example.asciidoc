@@ -100,10 +100,10 @@ The things we want to do in the software happens in tasks. This run-API specifie
 To keep this simple the PWM algorithm uses delays to create the PWM signal. We therefore need a delay functionality and a delay API.
 
 
-.binaryOutput.api.xml
+.bitOout.api.xml
 ----
 <?xml version="1.0" encoding="utf-8" ?>
-<api name="binaryOut" >
+<api name="bitOut" >
   <function  name="initialize" type="optional" />
   <function name="setValue"  type="required" param="bool" />
 </api>
@@ -154,24 +154,24 @@ As this algorithm is a program_entry_point it needs to provide a main function. 
     <required>
         <parameter ref="dutyCycle_percent" />
         <parameter ref="frequency_Hz" />
-        <childElement type="binaryOut"/>
+        <childElement type="bitOut"/>
     </required>
     <c_code>
         <function  name="initialize">
-            <![CDATA[$$$binaryOut:initialize()$$$]]>
+            <![CDATA[$$$bitOut:initialize()$$$]]>
         </function>
         <function name="execute">
             <![CDATA[
-    $$$binaryOut:setValue(true)$$$
+    $$$bitOut:setValue(true)$$$
     $$$delay:delay_ms(10 / frequency_Hz * dutyCycle_percent)$$$ // Delay
-    $$$binaryOut:setValue(false)$$$
+    $$$bitOut:setValue(false)$$$
     $$$delay:delay_ms(10 / frequency_Hz * (100 - dutyCycle_percent))$$$ // Delay]]>
         </function>
     </c_code>
 </algorithm>
 ----
 
-The pwm_task algorithm implements the switching pattern. It does this by switching the LED on (binaryOut:setValue(true)) waiting for some time (delay:delay_ms(10 / frequency_Hz * dutyCycle_percent) ) then switching it off again and waiting some more time.
+The pwm_task algorithm implements the switching pattern. It does this by switching the LED on (bitOut:setValue(true)) waiting for some time (delay:delay_ms(10 / frequency_Hz * dutyCycle_percent) ) then switching it off again and waiting some more time.
 
 We have seen in the super_loop algorithm that this will then be "called" again and again.
 
@@ -223,7 +223,7 @@ As the delay functionality is provided by the avr-libc it is very easy to create
 .gpio.algorithm.xml
 ----
 <?xml version="1.0" encoding="utf-8" ?>
-<algorithm name="gpio" api="binaryOut,binaryIn">
+<algorithm name="gpio" api="bitOut,bitIn">
   <configurationAttribute name="port" type="character"/>
   <configurationAttribute name="pin" type="unsigned integer"/>
   <required>

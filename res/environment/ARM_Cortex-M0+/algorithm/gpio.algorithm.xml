@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<algorithm name="gpio" api="binaryOut,binaryIn">
+<algorithm name="gpio" api="bitOut,bitIn">
     <configurationAttribute name="port" type="character"/>
     <configurationAttribute name="pin" type="unsigned integer"/>
     <required>
@@ -11,23 +11,23 @@
         <additional>
             <include>gpio.h</include>
         </additional>
-        
-	    <function  name="initialize">
-	      <![CDATA[
-	    GPIO€port€->DIRSET   |=  1<<€pin€;]]>
-	    </function>
-	
-	    <function  name="setValue"  param0_type="bool" param0_name="on">
-	      <if cond="true equals param(on)">
-	        <![CDATA[GPIO€port€->OUTSET |= 1<<€pin€;]]>
-	      </if>
-	      <if cond="false equals param(on)">
-	        <![CDATA[GPIO€port€->OUTCLR |= 1<<€pin€;]]>
-	      </if>
-	    </function>
-	
-	    <function  name="getValue" result="bool">
-	      <![CDATA[if(0 !=(GPIO€port€->IN & 1<<€pin€)) {return DIN_HIGH;} else {return DIN_LOW;}]]>
-	    </function>
+
+        <function  name="initialize">
+          <![CDATA[
+        GPIO€port€->DIRSET   |=  1<<€pin€;]]>
+        </function>
+
+        <function  name="setValue"  param0_type="bool" param0_name="on">
+          <if cond="true equals param(on)">
+            <![CDATA[GPIO€port€->OUTSET |= 1<<€pin€;]]>
+          </if>
+          <if cond="false equals param(on)">
+            <![CDATA[GPIO€port€->OUTCLR |= 1<<€pin€;]]>
+          </if>
+        </function>
+
+        <function  name="getValue" result="bool">
+          <![CDATA[if(0 !=(GPIO€port€->IN & 1<<€pin€)) {return DIN_HIGH;} else {return DIN_LOW;}]]>
+        </function>
     </c_code>
 </algorithm>

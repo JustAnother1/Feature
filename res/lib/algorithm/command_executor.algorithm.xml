@@ -13,6 +13,7 @@
         <![CDATA[
         if(true == €line_input_stream:hasNewLine()€)
         {
+            while(true) {
             char* line = €line_input_stream:getNextLine()€
             if(0 == strcmp(help_cmd, line))
             {
@@ -22,6 +23,7 @@
     ]]>
     </forChilds>
             <![CDATA[
+                break;
             }
             // all other commands
             ]]>
@@ -30,11 +32,16 @@
     if(0 == strcmp(€command:getName()€, line))
     {
         €buffered_output_stream:sendLine(€command:execute(line)€)€
+        break;
     }
     ]]>
     </forChilds>
             <![CDATA[
-        }
+                // if we reach this point then this is an invalid command
+                €buffered_output_stream:sendLine("Invalid command! : ")€
+                €buffered_output_stream:sendLine(line)€
+            } // while(true)
+        } // if( has new line)
         ]]>
         </function>
     </c_code>

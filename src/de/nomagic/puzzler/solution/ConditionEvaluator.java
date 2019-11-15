@@ -243,6 +243,10 @@ public class ConditionEvaluator extends Base
             String test = algo.getProperty(parameter);
             if(null == test)
             {
+                test = algo.getBuildIn(parameter);
+            }
+            if(null == test)
+            {
                 return KEY_FALSE;
             }
             else
@@ -262,6 +266,10 @@ public class ConditionEvaluator extends Base
             }
             // If not then evaluate now
             String res = algo.getProperty(parameter);
+            if(null == res)
+            {
+                res = algo.getBuildIn(parameter);
+            }
             if(null == res)
             {
                 // there is something wrong here
@@ -415,6 +423,11 @@ public class ConditionEvaluator extends Base
 
         //configuration Attributes
         String val = algo.getProperty(Word);
+        if(null == val)
+        {
+            // might be build-in
+            val = algo.getBuildIn(Word);
+        }
         if(null != val)
         {
             return val;
@@ -580,6 +593,7 @@ public class ConditionEvaluator extends Base
             }
             else
             {
+                log.trace("equals failed: {} != {}", valOne, valTwo);
                 return KEY_FALSE;
             }
 

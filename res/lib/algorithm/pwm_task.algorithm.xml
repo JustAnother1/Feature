@@ -8,9 +8,9 @@
     <c_code>
         <function name="execute">
           <![CDATA[
-    €binaryOut:setValue(true)€
+    €bitOut:setValue(true)€
     €delay:delay_ms(10 / frequency_Hz * dutyCycle_percent)€ // Delay
-    €binaryOut:setValue(false)€
+    €bitOut:setValue(false)€
     €delay:delay_ms(10 / frequency_Hz * (100 - dutyCycle_percent))€ // Delay]]>
         </function>
     </c_code>
