@@ -24,7 +24,8 @@ public class ConditionEvaluationTest {
         Configuration cfg = new Configuration();
         ContextImpl ctx = new ContextImpl(cfg);
         ConditionEvaluator dut = new ConditionEvaluator(ctx);
-        Element result = dut.getBest(null, null, null, null);
+        Element condition = new Element("bla");
+        Element result = dut.getBest(condition, null, null, null);
         assertEquals(null, result);
     }
 
