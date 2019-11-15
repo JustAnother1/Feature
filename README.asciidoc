@@ -1,6 +1,12 @@
 Feature
 -------
 
+image::https://github.com/JustAnother1/Feature/workflows/Java build/badge.svg[build state]
+
+image::https://github.com/JustAnother1/Feature/workflows/Java unit test/badge.svg[unit test state]
+
+image::https://github.com/JustAnother1/Feature/workflows/run%20%22runTests.sh%22/badge.svg[run tests state]
+
 Feature allows you to define your software in a new way. It covers the only a part of the process of software creation. Feature is starting with high level algorithms down to the smallest implementation details.
 
 Feature does not hide any magic silver bullet behind the curtain. The principles are all out in the open. The complexity of the project has to be handled to come to a working solution. Feature just gives you a different approach to handling the complexity of your problem.
