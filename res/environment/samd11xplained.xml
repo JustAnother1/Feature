@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <environment>
-    <tool name="ARM_Cortex-M0+" device="ATSAMD11D14A"/>>
+    <tool name="ARM_Cortex-M0plus" device="ATSAMD11D14A"/>>
     <resources>
         <greenLed algorithm="gpio" port="A" pin="16" />
     </resources>
