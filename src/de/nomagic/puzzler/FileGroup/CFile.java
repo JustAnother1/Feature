@@ -1,6 +1,6 @@
 package de.nomagic.puzzler.FileGroup;
 
-import java.util.Vector;
+import java.util.List;
 
 import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
 import de.nomagic.puzzler.BuildSystem.Target;
@@ -90,7 +90,7 @@ public class CFile extends TextFile
     }
 
     @Override
-    protected Vector<String> prepareSectionData(String sectionName, Vector<String> sectionData)
+    protected List<String> prepareSectionData(String sectionName, List<String> sectionData)
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
         {

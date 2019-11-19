@@ -1,7 +1,7 @@
 package de.nomagic.puzzler.FileGroup;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 public abstract class ElementHandler
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-    protected List<CElement> elements = new Vector<CElement>();
+    protected List<CElement> elements = new LinkedList<CElement>();
 
     public ElementHandler()
     {
@@ -32,19 +32,19 @@ public abstract class ElementHandler
         }
     }
 
-    protected abstract Vector<CElement> makeUnique();
+    protected abstract List<CElement> makeUnique();
 
-    public Vector<String> getCode(int type, String lineSperator)
+    public List<String> getCode(int type, String lineSperator)
     {
         if(true == isEmpty())
         {
-            return new Vector<String>();
+            return new LinkedList<String>();
         }
-        Vector<CElement> unique = makeUnique();
+        List<CElement> unique = makeUnique();
 
         log.trace("{} unique entries!", unique.size());
         // expand to valid statements
-        Vector<String> res = new Vector<String>();
+        LinkedList<String> res = new LinkedList<String>();
         for(int i = 0; i < unique.size(); i++)
         {
             CElement ele = unique.get(i);

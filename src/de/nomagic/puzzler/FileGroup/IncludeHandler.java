@@ -2,7 +2,8 @@ package de.nomagic.puzzler.FileGroup;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
 
 public class IncludeHandler extends ElementHandler
 {
@@ -13,9 +14,9 @@ public class IncludeHandler extends ElementHandler
     }
 
     @Override
-    protected Vector<CElement> makeUnique()
+    protected List<CElement> makeUnique()
     {
-        Vector<CElement> unique = new Vector<CElement>();
+        LinkedList<CElement> unique = new LinkedList<CElement>();
         // remove duplicates
         Collections.sort(elements);
         Iterator<CElement> it = elements.iterator();

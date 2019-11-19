@@ -17,8 +17,9 @@ if [ $? -ne 1 ] ; then
     echo ""
     echo "ERROR: Showing the Help information failed !"
     exit
+else
+    echo "OK:  show help test finished !"
 fi
-echo " --- Test Finished ---"
 
 echo ""
 echo "Test 2:"
@@ -35,6 +36,8 @@ if [ $? -ne 0 ] ; then
     echo ""
     echo "ERROR: Creating blinky project for AVR failed !"
     exit
+else
+    echo "OK:  AVR test finished !"
 fi
 
 
@@ -46,6 +49,8 @@ if [ $? -ne 0 ] ; then
     echo ""
     echo "ERROR: Creating blinky project for AVR with comments failed !"
     exit
+else
+    echo "OK:  AVR with comments test finished !"
 fi
 
 # ST STM32
@@ -57,6 +62,8 @@ if [ $? -ne 0 ] ; then
     echo ""
     echo "ERROR: Creating blinky project for STM32 failed !"
     exit
+else
+    echo "OK:  STM32 test finished !"
 fi
 
 
@@ -68,6 +75,8 @@ if [ $? -ne 0 ] ; then
     echo ""
     echo "ERROR: Creating blinky project for STM32 with comments failed !"
     exit
+else
+    echo "OK:  STM32 with comments test finished !"
 fi
 
 echo ""
@@ -78,6 +87,8 @@ if [ $? -ne 0 ] ; then
     echo ""
     echo "ERROR: Creating blinky project for STM32 with comments failed !"
     exit
+else
+    echo "OK:  STM32 with comment into zip test finished !"
 fi
 
 # FPGA: ICE40
@@ -89,6 +100,8 @@ if [ $? -ne 0 ] ; then
     echo ""
     echo "ERROR: Creating blinky project for FPGA failed !"
     exit
+else
+    echo "OK:  FPGA test finished !"
 fi
 
 
@@ -100,6 +113,8 @@ if [ $? -ne 0 ] ; then
     echo ""
     echo "ERROR: Creating blinky project for FPGA with comments failed !"
     exit
+else
+    echo "OK:  FPGA with comments test finished !"
 fi
 
 # Renesas S1
@@ -111,6 +126,8 @@ if [ $? -ne 0 ] ; then
     echo ""
     echo "ERROR: Creating blinky project for Renesas S1JA failed !"
     exit
+else
+    echo "OK:  S1JA test finished !"
 fi
 
 
@@ -122,11 +139,12 @@ if [ $? -ne 0 ] ; then
     echo ""
     echo "ERROR: Creating blinky project for Renesas S1JA with comments failed !"
     exit
+else
+    echo "OK:  S1JA with comments test finished !"
 fi
 
 
-
-echo " --- Test Finished ---"
+echo ""
 echo ""
 echo "==========================="
 echo " --- All tests finished ---"

@@ -2,14 +2,20 @@ package de.nomagic.puzzler.FileGroup;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.solution.Function;
 
 public class FunctionHandler extends ElementHandler
 {
-    public final static int TYPE_DECLARATION = 0;
-    public final static int TYPE_IMPLEMENTATION = 1;
+    public static final int TYPE_DECLARATION = 0;
+    public static final int TYPE_IMPLEMENTATION = 1;
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     public FunctionHandler()
     {
@@ -17,9 +23,9 @@ public class FunctionHandler extends ElementHandler
     }
 
     @Override
-    protected Vector<CElement> makeUnique()
+    protected List<CElement> makeUnique()
     {
-        Vector<CElement> unique = new Vector<CElement>();
+        LinkedList<CElement> unique = new LinkedList<CElement>();
         // remove duplicates
         Collections.sort(elements);
         Iterator<CElement> it = elements.iterator();
@@ -31,8 +37,7 @@ public class FunctionHandler extends ElementHandler
             {
                 if(false == first.sameAs(next))
                 {
-                    // TODO
-                    System.out.println("! ! ! ERROR ! ! !");
+                    log.error("! ! ! ERROR ! ! !");
                 }
                 first.addComment(next.getComment());
             }

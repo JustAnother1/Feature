@@ -124,7 +124,7 @@ The attribute "param2_name" defines the name of the third parameter.
 The attibute "result" defines the data type of the returned value. If no value is returned then this attribute is missing.
 
 ==== child elements
-child elements are either if elements or a CDATA section that contains the code.
+child elements are either if elements, forChild elements or a CDATA section that contains the code.
 
 
 === CDATA section

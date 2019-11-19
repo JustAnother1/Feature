@@ -32,11 +32,13 @@ public class CCodeGenerator extends Generator
     public static final String ALGORITHM_C_CODE_CHILD_NAME = "c_code";
 
     public static final String ALGORITHM_IF_CHILD_NAME = "if";
+    public static final String ALGORITHM_FOR_CHILDS_CHILD_NAME = "forChilds";
+    public static final String ALGORITHM_FOR_CHILDS_CHILD_API_ATTRIBUTE = "api";
+    public static final String ALGORITHM_FOR_CHILDS_CHILD_CALL_ATTRIBUTE = "call";
     public static final String ALGORITHM_FUNCTION_CHILD_NAME = "function";
     public static final String ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME = "name";
     public static final String ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME = "additional";
     public static final String ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME = "include";
-    public static final String ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME = "function";
     public static final String ALGORITHM_INITIALISATION_FUNCTION_NAME = "initialize";
     public static final String ALGORITHM_ADDITIONAL_FILE_CHILD_NAME = "file";
     public static final String ALGORITHM_ADDITIONAL_VARIABLE_CHILD_NAME = "variable";
@@ -98,7 +100,7 @@ public class CCodeGenerator extends Generator
 
     private void addInitCode()
     {
-        Element funcElement = new Element(ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME);
+        Element funcElement = new Element(ALGORITHM_FUNCTION_CHILD_NAME);
         funcElement.setAttribute(Function.FUNCTION_NAME_ATTRIBUTE_NAME, ALGORITHM_INITIALISATION_FUNCTION_NAME);
         funcElement.setAttribute(Function.FUNCTION_TYPE_ATTRIBUTE_NAME, Function.FUNCTION_REQUIRED_TYPE);
         Function initFunc = new Function(funcElement);
@@ -156,6 +158,7 @@ public class CCodeGenerator extends Generator
             else
             {
                 funcs[i].setImplementation(implementation);
+                getAdditionalsFrom(logic);
             }
 
             if(true == documentCodeSource)
@@ -180,7 +183,7 @@ public class CCodeGenerator extends Generator
 
     private void handleInitFunctionOfAlgorithm(AlgorithmInstanceInterface logic)
     {
-        // check if logic hat initialize function, if so then add that to the initcode
+        // check if logic has a initialize function, if so then add that to the initcode
         Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
         if(null != cCode)
         {
@@ -207,9 +210,12 @@ public class CCodeGenerator extends Generator
                         CInitCodeBlock initB = new CInitCodeBlock(id, impl);
                         initcode.put(id, initB);
                     }
+                    // else not the initialze function -> ignore it.
                 }
             }
+            // else no functions -> nothing to do
         }
+        // else no c-Code -> nothing to do
     }
 
     private String getCImplementationOf(CFunctionCall functionToCall, AlgorithmInstanceInterface logic)
@@ -262,7 +268,6 @@ public class CCodeGenerator extends Generator
             implementation = addCommentsToImplementation(implementation, logic);
         }
 
-        getAdditionalsFrom(logic);
         implementation = implementation.trim();
         implementation = replacePlaceholders(implementation, functionToCall.getArguments(), logic, functionElement);
         if(false == ctx.wasSucessful())
@@ -277,61 +282,108 @@ public class CCodeGenerator extends Generator
 
     private String getImplementationFromFunctionElement(Element function, String FunctionArguments, AlgorithmInstanceInterface logic)
     {
-        // the algorithm might have the functions wrapped into if condition tags.
-        List<Element> cond = function.getChildren(ALGORITHM_IF_CHILD_NAME);
-        if((null == cond) || (true == cond.isEmpty()))
+        // some part of the Implementation might be conditional, So only select the valid parts
+        StringBuilder sb = new StringBuilder();
+        List<Content> parts = function.getContent();
+        for (int i = 0; i < parts.size() ; i++)
         {
-            // No conditions -> only implementation
-            String impl = function.getText();
-            log.trace("found unconditional implementation : {}", impl);
-            return impl;
-        }
-        else
-        {
-            // TODO: multiple variants with conditions -> find the best one
-            // some part of the Implementation is conditional, So only select the valid parts
-            StringBuilder sb = new StringBuilder();
-            List<Content> parts = function.getContent();
-            for (int i = 0; i < parts.size() ; i++)
+            Content curC = parts.get(i);
+            if(CType.Element == curC.getCType())
             {
-                Content curC = parts.get(i);
-                if(CType.Element == curC.getCType())
+                Element curE = (Element)curC;
+                if(ALGORITHM_IF_CHILD_NAME.equals(curE.getName()))
                 {
-                    Element curE = (Element)curC;
-                    if(ALGORITHM_IF_CHILD_NAME.equals(curE.getName()))
+                    // this part is conditional -> check if we need it.
+                    Element active = condiEval.getBest(curE, logic, FunctionArguments, function);
+                    if(null != active)
                     {
-                        // this part is conditional -> check if we need it.
-                        Element active = condiEval.getBest(curE, logic, FunctionArguments, function);
-                        if(null != active)
-                        {
-                            String impl = active.getText();
-                            log.trace("adding the conditioned parts to the implementation : {}", impl);
-                            sb.append(impl);
-                        }
-                        else
-                        {
-                            log.trace("The condition {} is not true", curE.getAttribute(ConditionEvaluator.CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME));
-                        }
-                        // else this part is not used this time.
+                        String impl = active.getText();
+                        log.trace("adding the conditioned parts to the implementation : {}", impl);
+                        sb.append(impl);
                     }
                     else
                     {
-                        String impl = curE.getText();
-                        sb.append(impl);
-                        log.trace("Adding non conditional Element data to implementation : {}", impl);
+                        log.trace("The condition {} is not true", curE.getAttribute(ConditionEvaluator.CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME));
+                    }
+                    // else this part is not used this time.
+                }
+                else  if(ALGORITHM_FOR_CHILDS_CHILD_NAME.equals(curE.getName()))
+                {
+                    String api = curE.getAttributeValue(ALGORITHM_FOR_CHILDS_CHILD_API_ATTRIBUTE);
+                    if(null == api)
+                    {
+                        ctx.addError(this, "" + logic + " : for childs element with missing api attribute !)");
+                        return null;
+                    }
+                    Api theApi = Api.getFromFile(api, ctx);
+                    if(null == theApi)
+                    {
+                        ctx.addError(this, "" + logic + " : for childs element with invalid api attribute ! (" + api + "))");
+                        return null;
+                    }
+                    String FuncToCall = curE.getAttributeValue(ALGORITHM_FOR_CHILDS_CHILD_CALL_ATTRIBUTE);
+                    if(null == FuncToCall)
+                    {
+                        // if the API has only one function then we can call that
+                        if(1 == theApi.getNumberOfFunctions())
+                        {
+                            Function first = theApi.getFunctionIndex(0);
+                            FuncToCall = first.getName();
+                            log.trace("{} : No function to call specified, but API({}) has only one function, so taking that.", logic, api);
+                        }
+                        else
+                        {
+                            ctx.addError(this, "" + logic + " : the API (" + api + ") has more than one Function. You must specify the function to call!)");
+                            return null;
+                        }
+                    }
+                    Iterator<String> it = logic.getAllChildren();
+                    while(it.hasNext())
+                    {
+                        String childName = it.next();
+                        ConfiguredAlgorithm curChild = logic.getChild(childName);
+                        if(true == curChild.hasApi(api))
+                        {
+                            CFunctionCall fc = new CFunctionCall(FuncToCall);
+                            String implementation = getCImplementationOf(fc, curChild);
+                            if(null == implementation)
+                            {
+                                String error = "Could not get an Implementation for " + FuncToCall;
+                                log.error(error);
+                                ctx.addError(this, error);
+                                return null;
+                            }
+                            else
+                            {
+                                getAdditionalsFrom(curChild);
+                                sb.append(implementation);
+                            }
+                        }
+                        // else don't care for that child
                     }
                 }
                 else
                 {
-                    // Not an element, therefore can not have if conditions,
-                    // therefore we can just extract all the text.
-                    String impl = curC.getValue();
+                    String impl = curE.getText();
                     sb.append(impl);
-                    log.trace("adding non element code to implmentation: {}", impl);
+                    log.warn("Adding non conditional Element data to implementation ! text:  {} element: {}", impl, curE);
                 }
             }
-            return sb.toString();
+            else
+            {
+                // Not an element, therefore can not have if conditions,
+                // therefore we can just extract all the text.
+                String impl = curC.getValue();
+                impl = impl.trim();
+                if(0 < impl.length())
+                {
+                    sb.append(impl);
+                    log.trace("adding non element code to implmentation: {} from {}", impl, curC);
+                }
+                // else whitespace in between tags
+            }
         }
+        return (sb.toString()).trim();
     }
 
     private Element getFunctionElement(String searchedFunctionName, String FunctionArguments, AlgorithmInstanceInterface logic)
@@ -365,6 +417,38 @@ public class CCodeGenerator extends Generator
                 return curElement;
             }
         }
+
+        // search also additional Functions
+        Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME);
+        if(null != additional)
+        {
+            List<Element> addlist = additional.getChildren();
+            if(null != addlist)
+            {
+                for(int i = 0; i < addlist.size(); i++)
+                {
+                    Element curElement = addlist.get(i);
+                    String type = curElement.getName();
+                    switch(type)
+                    {
+
+                    case ALGORITHM_FUNCTION_CHILD_NAME:
+                        String name = curElement.getAttributeValue(ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME);
+                        log.trace("func.name : {}", name);
+                        if(true == searchedFunctionName.equals(name))
+                        {
+                            // found the correct function
+                            return curElement;
+                        }
+                        break;
+
+                    default: // ignore
+                        break;
+                    }
+                }
+            }
+        }
+
         // function not found
         ctx.addError(this, "Function call to missing function! (" + logic
                         + ", function name : " + searchedFunctionName + " )");
@@ -400,6 +484,7 @@ public class CCodeGenerator extends Generator
                 {
                     found = true;
                 }
+                getAdditionalsFrom(childAlgo);
                 if(true == documentCodeSource)
                 {
                     res.append(addCommentsToImplementation(impl, logic));
@@ -433,6 +518,7 @@ public class CCodeGenerator extends Generator
                     ctx.addError(this, "" + logic + " : Function call to missing (lib) function (" + functionName + ") !");
                     return null;
                 }
+                getAdditionalsFrom(libAlgo);
                 if(true == documentCodeSource)
                 {
                     res.append(addCommentsToImplementation(impl, logic));
@@ -709,8 +795,22 @@ public class CCodeGenerator extends Generator
                 }
                 break;
 
-            case ALGORITHM_ADDITIONAL_FUNCTION_CHILD_NAME:
+            case ALGORITHM_FUNCTION_CHILD_NAME:
                 Function func = new Function(curElement);
+
+                CFunctionCall fc = new CFunctionCall(func.getName());
+                String implementation = getCImplementationOf(fc, logic);
+                if(null == implementation)
+                {
+                    String error = "Could not get an Implementation for " + func.getName();
+                    log.error(error);
+                    ctx.addError(this, error);
+                    return;
+                }
+                else
+                {
+                    func.setImplementation(implementation);
+                }
 
                 if(true == documentCodeSource)
                 {

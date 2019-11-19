@@ -3,8 +3,10 @@ package de.nomagic.puzzler.FileGroup;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +15,8 @@ public class TextFile extends AbstractFile
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
-    private HashMap<String, Vector<String>> sectionData = new HashMap<String,Vector<String>>();
-    protected Vector<String> sections = new Vector<String>();
+    private HashMap<String, List<String>> sectionData = new HashMap<String,List<String>>();
+    protected List<String> sections = new LinkedList<String>();
     private boolean addSeperation = false;
 
     public TextFile(String filename)
@@ -25,7 +27,7 @@ public class TextFile extends AbstractFile
     public void createSection(String newSection)
     {
         sections.add(newSection);
-        sectionData.put(newSection, new Vector<String>());
+        sectionData.put(newSection, new LinkedList<String>());
     }
 
     public void createSections(String[] newSections)
@@ -44,17 +46,14 @@ public class TextFile extends AbstractFile
 
     public void addLines(String sectionName, String[] lines)
     {
-        Vector<String> curSection = sectionData.get(sectionName);
+        List<String> curSection = sectionData.get(sectionName);
         if(null == curSection)
         {
-            log.error("Tried to add lines to the invalid section (" + sectionName + ")!");
+            log.error("Tried to add lines to the invalid section ({})!", sectionName);
         }
         else
         {
-            for(int i = 0; i < lines.length; i++)
-            {
-                curSection.add(lines[i]);
-            }
+            Collections.addAll(curSection, lines);
         }
     }
 
@@ -63,20 +62,20 @@ public class TextFile extends AbstractFile
         for(int sec = 0; sec < sections.size(); sec++)
         {
             String curSection = sections.get(sec);
-            Vector<String> curData = sectionData.get(curSection);
+            List<String> curData = sectionData.get(curSection);
             curData = prepareSectionData(curSection, curData);
             for(int i = 0; i < curData.size(); i++)
             {
                 out.write((curData.get(i) + getLineSperator()).getBytes());
             }
-            if((true == addSeperation) && (0 < curData.size()))
+            if((true == addSeperation) && (true == curData.isEmpty()))
             {
                 out.write(getLineSperator().getBytes());
             }
         }
     }
 
-    protected Vector<String>  prepareSectionData(String sectionName, Vector<String> sectionData)
+    protected List<String>  prepareSectionData(String sectionName, List<String> sectionData)
     {
         // Nothing to do here
         return sectionData;
@@ -89,7 +88,7 @@ public class TextFile extends AbstractFile
 
     public String[] getSectionLines(String sectionName)
     {
-        Vector<String> sect = sectionData.get(sectionName);
+        List<String> sect = sectionData.get(sectionName);
         if(null == sect)
         {
             return new String[0];

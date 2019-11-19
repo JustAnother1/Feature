@@ -20,11 +20,16 @@ public class Api extends Base
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     private Element root = null;
+    private List<Element> funcList = null;
 
     public Api(Element root, Context ctx)
     {
         super(ctx);
         this.root = root;
+        if(null != root)
+        {
+            funcList = root.getChildren(API_FUNCTION_ELEMENT_NAME);
+        }
     }
 
     @Override
@@ -55,19 +60,80 @@ public class Api extends Base
 
     public Function[] getRequiredFunctions()
     {
-        List<Element> funcList = root.getChildren(API_FUNCTION_ELEMENT_NAME);
-        ArrayList<Function> resVec = new ArrayList<Function>();
-        for(int i = 0; i < funcList.size(); i++)
+        if(null == funcList)
         {
-            Element curE = funcList.get(i);
-            Function curFunc = new Function(curE);
-            if(true == curFunc.isRequired())
-            {
-                resVec.add(curFunc);
-            }
-            // else ignore optional functions
+            return null;
         }
-        return resVec.toArray(new Function[0]);
+        else
+        {
+            ArrayList<Function> resVec = new ArrayList<Function>();
+            for(int i = 0; i < funcList.size(); i++)
+            {
+                Element curE = funcList.get(i);
+                Function curFunc = new Function(curE);
+                if(true == curFunc.isRequired())
+                {
+                    resVec.add(curFunc);
+                }
+                // else ignore optional functions
+            }
+            return resVec.toArray(new Function[0]);
+        }
+    }
+
+    public int getNumberOfFunctions()
+    {
+        if(null == funcList)
+        {
+            return 0;
+        }
+        else
+        {
+            return funcList.size();
+        }
+    }
+
+    public Function getFunctionIndex(int idx)
+    {
+        if(null == funcList)
+        {
+            return null;
+        }
+        else
+        {
+            Element curE = funcList.get(idx);
+            if(null == curE)
+            {
+                return null;
+            }
+            else
+            {
+                return new Function(curE);
+            }
+        }
+    }
+
+    public boolean containsFunction(String name)
+    {
+        if((null == funcList) || (null == name))
+        {
+            return false;
+        }
+        else
+        {
+            for(int i = 0; i < funcList.size(); i++)
+            {
+                Element curE = funcList.get(i);
+                Function curFunc = new Function(curE);
+                if(true == name.equals(curFunc.getName()))
+                {
+                    // found the function
+                    return true;
+                }
+            }
+            // searched everything -> nothing found
+            return false;
+        }
     }
 
     public boolean alsoImplements(String api)
@@ -94,7 +160,7 @@ public class Api extends Base
             Api curApi = Api.getFromFile(apiArr[i], ctx);
             if(null == curApi)
             {
-                log.error("Reference to the invalid API {} in {} !", apiArr[i], this.toString());
+                log.error("Reference to the invalid API {} in {} !", apiArr[i], this);
             }
             else
             {
