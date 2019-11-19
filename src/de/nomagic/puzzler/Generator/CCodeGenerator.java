@@ -248,8 +248,8 @@ public class CCodeGenerator extends Generator
             return null;
         }
 
-        functionToCall.setFunctionArguments(
-                condiEval.evaluateConditionParenthesis(functionToCall.getArguments(), logic, null, null));
+        // functionToCall.setFunctionArguments(condiEval.evaluateConditionParenthesis(functionToCall.getArguments(), logic, null, null));
+        functionToCall.setFunctionArguments(functionToCall.getArguments());
 
         Element functionElement = getFunctionElement(searchedFunctionName, functionToCall.getArguments(), logic);
         if(null == functionElement)
@@ -465,7 +465,8 @@ public class CCodeGenerator extends Generator
 
         CFunctionCall fc = new CFunctionCall(functionName);
         String params = fc.getArguments();
-        params = condiEval.evaluateConditionParenthesis(params, logic, null, null);
+        // log.trace("evaluating the funtion argument {}.", params);
+        // params = condiEval.evaluateConditionParenthesis(params, logic, null, null);
         fc.setFunctionArguments(params);
 
         boolean found = false;

@@ -8,7 +8,7 @@
     <additional>
     </additional>
         <function name="trigger">
-        <![CDATA[€buffered_output_stream:sendLine(eventName)€]]>
+        <![CDATA[€buffered_output_stream:sendLine("€eventName€")€]]>
         </function>
     </c_code>
 </algorithm>

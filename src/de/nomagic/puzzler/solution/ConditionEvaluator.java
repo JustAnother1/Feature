@@ -535,7 +535,7 @@ public class ConditionEvaluator extends Base
                     // there is something wrong here
                     valid = false;
                     ctx.addError(this,
-                            "two non function words in : " + conditionText);
+                            "two non function words(" + first + ", " + curPart + ") in : " + conditionText);
                     ctx.addError(this, "Algorithm: " + algo.toString());
                     ctx.addError(this, algo.dumpParameter());
                     ctx.addError(this, algo.dumpProperty());

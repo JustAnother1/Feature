@@ -2,11 +2,15 @@
 <algorithm name="buffered_output_stream" api="buffered_output_stream">
     <childElement type="output_stream"/>
     <c_code>
+    <additional>
+        <include>string.h</include>>
+    </additional>
     <function name="sendLine" param_type="string" param0_name="line" >
         <![CDATA[{ int i;
-        for(i = 0; i < strlen(€line€); i++)
+        char* s = €line€;
+        for(i = 0; i < strlen(s); i++)
         {
-            output_stream:sendByte(€line€[i]);
+            €output_stream:sendByte(s[i])€;
         }
         }]]>
         </function>

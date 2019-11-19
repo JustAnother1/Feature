@@ -2,7 +2,8 @@ package de.nomagic.puzzler.FileGroup;
 
 import static org.junit.Assert.*;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -29,8 +30,8 @@ public class CFileTest
     {
         CFile dut = new CFile("dut");
         dut.addLine("bla", "some line");
-        Vector<String> res = new Vector<String>();
-        Vector<String> newRes = dut.prepareSectionData("bla", res);
+        List<String> res = new ArrayList<String>();
+        List<String> newRes = dut.prepareSectionData("bla", res);
         assertNotNull(newRes);
         assertEquals(0, newRes.size());
     }
@@ -40,8 +41,8 @@ public class CFileTest
     {
         CFile dut = new CFile("dut");
         dut.addLine("FileHeader", "some line");
-        Vector<String> res = new Vector<String>();
-        Vector<String> newRes = dut.prepareSectionData("FileHeader", res);
+        List<String> res = new ArrayList<String>();
+        List<String> newRes = dut.prepareSectionData("FileHeader", res);
         assertNotNull(newRes);
         assertEquals(0, newRes.size());
     }
