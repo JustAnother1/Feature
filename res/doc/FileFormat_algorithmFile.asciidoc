@@ -22,6 +22,8 @@ The algorithm element may have a "required" element.
 The algorithm element may have a "provides" element.
 The algorithm element may have a "c_code" element.
 
+
+
 === required element
 ==== Attributes
 None.
@@ -29,9 +31,16 @@ None.
 ==== child elements
 The required element may have many child elements. All children have to be either "childElement" or "parameter" elements.
 
+
+
 === childElement element
 ==== Attributes
 The "type" attribute defines the Interface (api) that child elements need to implement.
+
+==== child elements
+None.
+
+
 
 === parameter element
 ==== Attributes
@@ -45,12 +54,15 @@ The optional attribute "default" may specify a default value. If a default value
 None.
 
 
+
 === provides element
 ==== Attributes
 None.
 
 ==== child elements
 The algorithm element may have many child elements. All child elements have to comply with the "algorithm_information" style.
+
+
 
 === algorithm_information element style
 The name defines the name of the algorithm information object.
@@ -64,8 +76,9 @@ The attribute "value" defines the value of the information object. To assign a v
 None.
 
 
+
 === c_code element
-The c_code element must have function elements for all functions defined in the apis listed in the "api" attribute.
+The c_code element must have function elements for all functions defined in the apis listed in the "api" attribute. The function element is documented in the "File Format Specification - commonly used elements" document.
 
 This section can also have an "additional" element.
 
@@ -74,6 +87,8 @@ None
 
 ==== child elements
 Function elements for all functions defined in the apis. And an optional "Additional" element.
+
+
 
 === additional element
 Sometimes the C Code for the implementation of the algorithm has some additional dependencies. This element allows them to be specified.
@@ -84,6 +99,8 @@ None
 ==== child elements
 Child elements can be the "include" element, the "variable" element, the "file" element or the "function" element.
 
+
+
 === include element
 The include element defines an addition file that needs to be included. The file name is provided as text content of the element.
 
@@ -93,8 +110,10 @@ None.
 ==== child elements
 None.
 
+
+
 === variable element
-This element defines a variable that needs to be valid when the implementation of this algorithm is used.
+This element defines a variable that needs to be available when the implementation of this algorithm is used.
 
 ==== Attributes
 None.
@@ -102,34 +121,9 @@ None.
 ==== child elements
 A CDATA section containing the C declaration of the variable needed.
 
-
-=== function element
-==== Attributes
-The attribute "name" defines the name of the function.The function must be a part of an Interface that this algorithm implements. Each Interface is defined in a API File. For details see the API File Format definition.
-
-The attribute "param0_type" defines the data type of the first parameter.
-
-The attribute "param0_name" defines the name of the first parameter.
-
-The attribute "param1_type" defines the data type of the second parameter.
-
-The attribute "param1_name" defines the name of the second parameter.
-
-The attribute "param2_type" defines the data type of the third parameter.
-
-The attribute "param2_name" defines the name of the third parameter.
-
-...
-
-The attibute "result" defines the data type of the returned value. If no value is returned then this attribute is missing.
-
-==== child elements
-child elements are either if elements, forChild elements or a CDATA section that contains the code.
-
-
 === CDATA section
-This section contains the C code that implements the algorithm. The text is normal C source code. The C Code can contain placeholders. Placeholders start and end with the euro sign '€'.
-Placeholders can be:
+This section contains the C code that implements the algorithm. The text is normal C source code. The C Code can contain place holders. Place holders start and end with the euro sign '€'.
+Place holders can be:
 
 == function calls
 Syntax: €api:function(parameter)€
@@ -139,12 +133,15 @@ Example: €run.execute()€
 These will be replaced by the implementation delivered by the function from the api referred. This must be either a child or a library function.
 
 
+
 === if element
 ==== Attributes
 The attribute "cond" defines the condition of the if element. If the condition is true then the child is used as if it was in the location of the if element. If the condition is false then the child element is not used.
 
 ==== child elements
-All elements that can be children of the function element can also be child elements here.
+All elements that can be children of the parent element can also be child elements here.
+
+
 
 === forChilds element
 ==== Attributes
@@ -153,8 +150,11 @@ The elements in this section will be instantiated once for every child of this a
 ==== child elements
 All elements that can be children of the function element can also be child elements here.
 
+
+
 == The initialize function
 The "initialize" function is a specialty. All algorithms may have such a function although this function is not part of any api. If a algorithm has a "initialize" function and is used in a solution then the "initialize" function will be executed in the beginning of the main function before anything else specified in the solution is executed. This allows the algorithms to do some generic initialization before being used for the first time.
+
 
 == Example
 

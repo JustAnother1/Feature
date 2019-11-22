@@ -1,18 +1,59 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <algorithm name="buffered_output_stream" api="buffered_output_stream">
-    <childElement type="output_stream"/>
+    <required>
+        <parameter name="buffer_size_in_bytes" type="int" default="0"/>
+        <childElement type="output_stream"/>
+    </required>
     <c_code>
     <additional>
         <include>string.h</include>>
+        <if cond="buffer_size_in_bytes > 0">
+             <variable><![CDATA[uint_fast8_t buf[€buffer_size_in_bytes€];]]></variable>
+             <variable><![CDATA[unsigned int idx_read = 0;]]></variable>
+             <variable><![CDATA[unsigned int idx_write = 0;]]></variable>
+        </if>
     </additional>
+
     <function name="sendLine" param_type="string" param0_name="line" >
-        <![CDATA[{ int i;
-        char* s = €line€;
-        for(i = 0; i < strlen(s); i++)
-        {
-            €output_stream:sendByte(s[i])€;
-        }
-        }]]>
+        <if cond="buffer_size_in_bytes = 0">
+            <![CDATA[{ unsigned int i;
+            char* s = €line€;
+            for(i = 0; i < strlen(s); i++)
+            {
+                €output_stream:sendByte(s[i])€;
+            }
+            }]]>
+        </if>
+        <if cond="buffer_size_in_bytes > 0">
+            <![CDATA[{ int i;
+            char* s = €line€;
+
+            while( (0 != €output_stream:canSendByte()€) && (idx_read != idx_write) )
+            {
+                // there is something in the buffer, try to send that first
+                €output_stream:sendByte(buf[idx_read]);
+                idx_read++;
+                if(buffer_size_in_bytes == idx_read)
+                {
+                    idx_read = 0;
+                }
+            }
+
+            for(i = 0; i < strlen(s); i++)
+            {
+                buf[idx_write] = s[i];
+                idx_write++;
+                if(buffer_size_in_bytes == idx_write)
+                {
+                    idx_write = 0;
+                }
+            }
+            €output_stream:enableSendIrq()€
+
+           // Interrupt service routine ?
+
+            }]]>
+        </if>
         </function>
     </c_code>
 </algorithm>

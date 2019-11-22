@@ -8,6 +8,7 @@
   </provides>
   <c_code>
     <function name="main">
+    <![CDATA[initialize();]]>
      <if cond="true equals singleTask">
       <![CDATA[{
   for(;;)

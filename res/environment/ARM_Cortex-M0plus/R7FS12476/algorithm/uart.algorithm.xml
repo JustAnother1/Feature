@@ -1,8 +1,200 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<algorithm name="delay" api="delay">
+<algorithm name="uart" api="input_stream,output_stream">
+  <required>
+    <parameter name="ressource" type="string" />
+    <parameter name="speed_bitps" type="int" />
+  </required>
+
   <c_code>
     <additional>
-      <include>delay.h</include>
+      <include>uart.h</include>
+      <file name ="uart.h"><![CDATA[
+#ifndef SRC_UART_H_
+#define SRC_UART_H_
+
+#include <stdint.h>
+
+#define UART1 0
+#define UART2 1
+#define UART3 2
+
+/*
+ * UART P601
+
+Baudrate
+PCLKB (max 32MHz) (24 MHz) (12MHz)(6MHz)(3MHz)
+
+BRR default = 0xff (8bit Register)
+
+BRR = N
+Bitrate = B
+
+SMR (CKS (00) -> n = 0
+
+CKS (00) -> n = 0
+CKS (01) -> n = 1
+CKS (10) -> n = 2
+CKS (11) -> n = 3
+
+
+MDDR
+SEMR
+BGDM
+ABCS
+ABCSE
+
+
+Example:
+9600 bit/s, n = 0; N = 38, Error = 0,16% bei 12MHz
+300 bit/s n = 2; N= 77, Error = 0,16% bei 12MHz
+ABCS = 0
+ABCSE = 0
+BGDM = 0
+ *
+ *
+ */
+
+
+void uart_enable(uint_fast8_t uart);
+void uart_disable(uint_fast8_t uart);
+
+void uart_send_byte(uint_fast8_t uart, uint_fast8_t b);
+
+#endif /* SRC_UART_H_ */
+]]></file>
+      <file name ="uart.c"><![CDATA[
+#include "uart.h"
+#include "power.h"
+#include "delay.h"
+
+// Pins
+// R7FS1JA
+// LQFP 64
+//                Function
+// Pin, Name,   0      1          9
+//  1   P400          RXD1_C
+//  9   P213          RXD1_D
+// 10   P212          TXD1_D
+// 12   P411  TXD0_F  RXD1_B
+// 13   P410          TXD1_B
+// 15   P408  RXD0_A  TXD1_C
+// 16   P407  TXD0_A           TXD9_A
+// 22   P206          TXD1_A
+// 23   P205  TXD0_C
+// 24   P204  RXD0_C
+// 28   P304                   TXD9_C
+// 30   P302  TXD0_B  RXD1_A
+// 31   P301  RXD0_B
+// 34   P110  TXD0_D           RXD9_B
+// 47   P101                   RXD9_C
+// 48   P100                   TXD9_D
+// 49   P500  RXD0_D
+// 50   P501  TXD0_E
+// 63   P000                   RXD9_A
+// 64   P109                   TXD9_B
+
+#include "irqn.h"
+#include "core_armv8mbl.h"                          // Cortex-M23 (ARMv8MBL) processor and core peripherals
+
+typedef struct {                                    // R_SCI0 Structure
+      __IO uint8_t   SMR;                           // Serial Mode Register
+      __IO uint8_t   BRR;                           // Bit Rate Register
+      __IO uint8_t   SCR;                           // Serial Control Register
+      __IO uint8_t   TDR;                           // Transmit Data Register
+      __IO uint8_t   SSR;                           // Serial Status Register(SCMR.SMIF = 0 and FCR.FM=0)
+      __IO uint8_t   RDR;                           // Receive Data Register
+      __IO uint8_t   SCMR;                          // Smart Card Mode Register
+      __IO uint8_t   SEMR;                          // Serial Extended Mode Register
+      __IO uint8_t   SNFR;                          // Noise Filter Setting Register
+      __IO uint8_t   SIMR1;                         // I2C Mode Register 1
+      __IO uint8_t   SIMR2;                         // I2C Mode Register 2
+      __IO uint8_t   SIMR3;                         // I2C Mode Register 3
+      __IO uint8_t   SISR;                          // I2C Status Register
+      __IO uint8_t   SPMR;                          // SPI Mode Register
+      __O  uint16_t  TDRHL;                         // Transmit Data Register
+      __I  uint8_t   RDRH;                          // Receive Data Register High byte.
+      __I  uint8_t   RDRL;                          // Receive Data Register low byte.
+      __IO uint8_t   MDDR;                          // Modulation Duty Register
+      __IO uint8_t   DCCR;                          // Data Compare Match Control Register
+      __IO uint16_t  FCR;                           // FIFO Control Register
+      __I  uint16_t  FDR;                           // FIFO Data Count Register
+      __I  uint16_t  LSR;                           // Line Status Register
+      __IO uint16_t  CDR;                           // Compare Match Data Register
+      __IO uint8_t   SPTR;                          // Serial Port Register
+} R_SCI0_Type;
+
+
+#define R_SCI0_BASE                     0x40070000UL
+#define R_SCI1_BASE                     0x40070020UL
+#define R_SCI9_BASE                     0x40070120UL
+
+#define R_SCI0                          ((R_SCI0_Type             *) R_SCI0_BASE)
+#define R_SCI1                          ((R_SCI0_Type             *) R_SCI1_BASE)
+#define R_SCI9                          ((R_SCI0_Type             *) R_SCI9_BASE)
+
+#define REG_SSR_TDRE_MASK                0x80
+
+
+static R_SCI0_Type* registers[3] = {R_SCI0, R_SCI1, R_SCI9};
+
+void uart_enable(uint_fast8_t uart)
+{
+    switch(uart)
+    {
+    case UART1:
+        powerOn(SCI_0);
+        break;
+
+    case UART2:
+        powerOn(SCI_1);
+        break;
+
+    case UART3:
+        powerOn(SCI_9);
+        break;
+    }
+    R_BSP_SoftwareDelay(10, BSP_DELAY_UNITS_MILLISECONDS);
+
+    registers[uart]->FCR = 0x0;
+    registers[uart]->SCMR = 0x10;
+    registers[uart]->SMR = 0x00;
+    registers[uart]->BRR = 38;
+    registers[uart]->SEMR = 0;
+    registers[uart]->SPTR = 0x03;
+
+    registers[uart]->SCR = 0x30;  // receive enabled + transmit enabled
+}
+
+void uart_disable(uint_fast8_t uart)
+{
+    registers[uart]->SCR = 0x00;
+    switch(uart)
+    {
+    case UART1:
+        powerOff(SCI_0);
+        break;
+
+    case UART2:
+        powerOff(SCI_1);
+        break;
+
+    case UART3:
+        powerOff(SCI_9);
+        break;
+    }
+}
+
+void uart_send_byte(uint_fast8_t uart, uint_fast8_t b)
+{
+    while (0U == (registers[uart]->SSR & REG_SSR_TDRE_MASK))
+    {
+        // wait until there is no more data in the send buffer,
+    }
+
+    // write the byte into the transmit register
+    registers[uart]->TDR = (uint8_t)b;
+}
+]]></file>
       <file name ="delay.h"><![CDATA[
 #ifndef SRC_DELAY_H_
 #define SRC_DELAY_H_
@@ -28,7 +220,7 @@ void r_cgc_delay_cycles(cgc_clock_t clock, uint16_t cycles);
 #include "clock.h"
 
 
-#define DELAY_LOOP_CYCLES 8     ///< 4 cycles per loop.
+#define DELAY_LOOP_CYCLES 4     ///< 4 cycles per loop.
 
 __attribute__((naked)) static void software_delay_loop (uint32_t loop_cnt);
 
@@ -166,8 +358,28 @@ void r_cgc_delay_cycles(cgc_clock_t clock, uint16_t cycles)
 ]]></file>
     </additional>
 
-    <function  name="delay_ms" param0_type="int" param0_name="time">
-      <![CDATA[R_BSP_SoftwareDelay(€time€, BSP_DELAY_UNITS_MILLISECONDS);]]>
+  <function  name="initialize" >
+        <![CDATA[uart_disable(UART€ressource€);
+    {
+        volatile uint8_t read_port = 0U;
+        read_port = 255;
+        while(0 != read_port)
+        {
+            read_port --;
+        }
+    };
+    uart_enable(UART€ressource€);]]>
+    </function>
+
+  <function name="hasNewByte" result="bool">
+        <![CDATA[/* TODO hasNewByte */]]>
+    </function>
+  <function name="getReceivedByte" result="byte">
+        <![CDATA[/* TODO getReceivedByte */]]>
+    </function>
+
+  <function name="sendByte" param0_type="byte" param0_name="data">
+        <![CDATA[uart_send_byte(UART€ressource€, €data€);]]>
     </function>
 
   </c_code>

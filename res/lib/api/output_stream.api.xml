@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <api name="output_stream" >
   <function name="sendByte"  type="required" param0_name="data" param0_type="byte" />
+  <function name="sendByteBlocking"  type="required" param0_name="data" param0_type="byte" />
+  <function name="canSendByte"  type="required" result="int" resultIs="the number of bytes that can be send without a delay. 0 if sending is currently not possible." />
+  <function name="init_sendIrq"  type="required" />
+  <function name="init_receiveIrq"  type="required" />
+  <function name="enableSendIrq"  type="required" />
+  <function name="disableSendIrq"  type="required" />
+  <function name="enableReceiveIrq"  type="required" />
+  <function name="disableReceiveIrq"  type="required" />
 </api>

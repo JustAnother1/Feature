@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<environment>
+    <tool name="ARM_Cortex-M0plus/R7FS12476"/>>
+    <resources>
+        <greenLed algorithm="gpio" port="2" pin="5" />
+    </resources>
+</environment>

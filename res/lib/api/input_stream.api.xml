@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <api name="input_stream" >
-  <function name="hasNewByte"  type="required" result="int" />
-  <function name="getReceivedByte"  type="required" result="byte" />
+  <function name="hasNewByte"  type="required" result="int" resultIs="the number of bytes available" />
+  <function name="getReceivedByte"  type="required" result="byte" resultIs="the next byte received" />
 </api>

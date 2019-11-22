@@ -5,9 +5,8 @@
       <CC>arm-none-eabi-gcc</CC>
       <LD>arm-none-eabi-gcc</LD>
       <AS>arm-none-eabi-as</AS>
-      <LKR_SCRIPT>$(device).ld</LKR_SCRIPT>
-      <CFLAGS>-c -fno-common -ffreestanding -nostdlib -nostdinc -O0 -g -mcpu=cortex-m0plus -mthumb -I.</CFLAGS>
-      <LFLAGS>-nostartfiles -nostdlib -nostdinc -g -T$(LKR_SCRIPT)</LFLAGS>
+      <CFLAGS>-ffreestanding -Og -g3 -std=gnu99 -mthumb -I. -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -flto -fno-move-loop-invariants -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal -Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast -Wno-padded -mfloat-abi=soft -march=armv6-m -mcpu=cortex-m0plus</CFLAGS>
+      <LFLAGS>-nostartfiles -T$(LKR_SCRIPT) -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -flto -fno-move-loop-invariants -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wpadded -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal -g3 -Xlinker --gc-sections --specs=nano.specs -mcpu=cortex-m0plus</LFLAGS>
       <CPFLAGS>-Obinary</CPFLAGS>
       <ASFLAGS> -g -Wall -gdwarf-2 -mthumb -mcpu=cortex-m0plus </ASFLAGS>
     </variables>
@@ -17,11 +16,30 @@
         <output>$(project).elf</output>
         <rule>$(LD) $(LFLAGS) -o $(project).elf $(OBJS)</rule>
       </target>
-      <target phony="true">
+      <target>
         <source>$(project).elf</source>
+        <output>$(project).bin</output>
+        <rule>arm-none-eabi-objcopy -O binary -S $(project).elf $(project).bin</rule>
+      </target>
+      <target>
+        <source>$(project).elf</source>
+        <output>$(project).hex</output>
+        <rule>arm-none-eabi-objcopy -O ihex -S $(project).elf $(project).hex</rule>
+      </target>
+      <target default="true" phony="true" >
+        <source>$(project).hex $(project).bin</source>
+        <output>size</output>
+        <rule>arm-none-eabi-size $(project).elf</rule>
+      </target>
+      <target phony="true">
+        <source>$(project).bin</source>
         <output>flash</output>
-        <rule>arm-none-eabi-objcopy -O binary -S $(project).elf $(project).bin
-        openocd -f $(device).cfg -c "program $(project).elf verify reset exit"</rule>
+        <rule>openocd -f $(device).cfg -c "program $(project).elf verify reset exit"</rule>
+      </target>
+      <target phony="true" >
+        <source>size</source>
+        <output>all</output>
+        <rule></rule>
       </target>
     </targets>
   </required>

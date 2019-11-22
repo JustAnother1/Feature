@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="gpio" api="bitOut">
+    <required>
+        <parameter name="port" type="unsigned integer" />
+        <parameter name="pin" type="unsigned integer" />
+    </required>
+
+    <c_code>
+        <additional>
+          <include>gpio.h</include>
+          <file name ="gpio.h"><![CDATA[
+#ifndef SRC_GPIO_H_
+#define SRC_GPIO_H_
+
+#include <stddef.h>
+#include <stdint.h>
+
+#include "ssp_err.h"
+
+/** Options to configure pin functions  */
+typedef enum e_ioport_cfg_options
+{
+    IOPORT_CFG_PORT_DIRECTION_INPUT  = 0x00000000,      ///< Sets the pin direction to input (default)
+    IOPORT_CFG_PORT_DIRECTION_OUTPUT = 0x00000004,      ///< Sets the pin direction to output
+    IOPORT_CFG_PORT_OUTPUT_LOW       = 0x00000000,      ///< Sets the pin level to low
+    IOPORT_CFG_PORT_OUTPUT_HIGH      = 0x00000001,      ///< Sets the pin level to high
+    IOPORT_CFG_PULLUP_ENABLE         = 0x00000010,      ///< Enables the pin's internal pull-up
+    IOPORT_CFG_PIM_TTL               = 0x00000020,      ///< Enables the pin's input mode
+    IOPORT_CFG_NMOS_ENABLE           = 0x00000040,      ///< Enables the pin's NMOS open-drain output
+    IOPORT_CFG_PMOS_ENABLE           = 0x00000080,      ///< Enables the pin's PMOS open-drain ouput
+    IOPORT_CFG_DRIVE_MID             = 0x00000400,      ///< Sets pin drive output to medium
+    IOPORT_CFG_DRIVE_MID_IIC         = 0x00000C00,      ///< Sets pin to drive output needed for IIC on a 20mA port
+    IOPORT_CFG_DRIVE_HIGH            = 0x00000C00,      ///< Sets pin drive output to high
+    IOPORT_CFG_EVENT_RISING_EDGE     = 0x00001000,      ///< Sets pin event trigger to rising edge
+    IOPORT_CFG_EVENT_FALLING_EDGE    = 0x00002000,      ///< Sets pin event trigger to falling edge
+    IOPORT_CFG_EVENT_BOTH_EDGES      = 0x00003000,      ///< Sets pin event trigger to both edges
+    IOPORT_CFG_IRQ_ENABLE            = 0x00004000,      ///< Sets pin as an IRQ pin
+    IOPORT_CFG_ANALOG_ENABLE         = 0x00008000,      ///< Enables pin to operate as an analog pin
+    IOPORT_CFG_PERIPHERAL_PIN        = 0x00010000       ///< Enables pin to operate as a peripheral pin
+} ioport_cfg_options_t;
+
+/** Levels that can be set and read for individual pins */
+typedef enum e_ioport_level
+{
+    IOPORT_LEVEL_LOW = 0,               ///< Low
+    IOPORT_LEVEL_HIGH                   ///< High
+} ioport_level_t;
+
+/** Pin identifier and pin PFS pin configuration value */
+typedef struct st_ioport_pin_cfg
+{
+    uint32_t pin_cfg;         ///< Pin PFS configuration - Use ioport_cfg_options_t parameters to configure
+    uint32_t pin;
+    uint32_t port;
+} ioport_pin_cfg_t;
+
+/** Multiple pin configuration data for loading into PFS registers by R_IOPORT_Init()  */
+typedef struct st_ioport_cfg
+{
+    uint16_t                 number_of_pins; ///< Number of pins for which there is configuration data
+    ioport_pin_cfg_t const * p_pin_cfg_data; ///< Pin configuration data
+} ioport_cfg_t;
+
+ssp_err_t R_IOPORT_PinWrite (uint32_t port, uint32_t pin, ioport_level_t level);
+void HW_IOPORT_PFSWrite(uint32_t port, uint32_t pin, uint32_t value);
+
+
+#endif /* SRC_GPIO_H_ */
+]]></file>
+          <file name ="gpio.c"><![CDATA[
+#include "gpio.h"
+#include "irqn.h"
+#include "core_armv8mbl.h"                          /*!< Cortex-M23 (ARMv8MBL) processor and core peripherals                  */
+
+/**
+  * @brief Pmn Pin Function Control Register (PmnPFS) (m = 0 to B, n=0 to 15) (R_PFS)
+  */
+
+typedef struct {                                    /*!< R_PFS Structure                                                       */
+    __IO uint32_t  P000PFS;                         /*!< P00%s Pin Function Control Register                                   */
+    __IO uint32_t  P001PFS;                         /*!< P00%s Pin Function Control Register                                   */
+    __IO uint32_t  P002PFS;                         /*!< P00%s Pin Function Control Register                                   */
+    __IO uint32_t  P003PFS;                         /*!< P00%s Pin Function Control Register                                   */
+    __IO uint32_t  P004PFS;                         /*!< P00%s Pin Function Control Register                                   */
+    __IO uint32_t  P005PFS;                         /*!< P00%s Pin Function Control Register                                   */
+    __IO uint32_t  P006PFS;                         /*!< P00%s Pin Function Control Register                                   */
+    __IO uint32_t  P007PFS;                         /*!< P00%s Pin Function Control Register                                   */
+    __IO uint32_t  P008PFS;                         /*!< P00%s Pin Function Control Register                                   */
+    __IO uint32_t  P009PFS;                         /*!< P00%s Pin Function Control Register                                   */
+    __IO uint32_t  P010PFS;                         /*!< P0%s Pin Function Control Register                                    */
+    __IO uint32_t  P011PFS;                         /*!< P0%s Pin Function Control Register                                    */
+  __I  uint8_t RESERVED24[2 * 4];                   // Added MEF 08/25/2015 P012 and P013 are not present
+    __IO uint32_t  P014PFS;                         /*!< P0%s Pin Function Control Register                                    */
+    __IO uint32_t  P015PFS;                         /*!< P0%s Pin Function Control Register                                    */
+    __IO uint32_t  P100PFS;                         /*!< P10%s Pin Function Control Register                                   */
+    __IO uint32_t  P101PFS;                         /*!< P10%s Pin Function Control Register                                   */
+    __IO uint32_t  P102PFS;                         /*!< P10%s Pin Function Control Register                                   */
+    __IO uint32_t  P103PFS;                         /*!< P10%s Pin Function Control Register                                   */
+    __IO uint32_t  P104PFS;                         /*!< P10%s Pin Function Control Register                                   */
+    __IO uint32_t  P105PFS;                         /*!< P10%s Pin Function Control Register                                   */
+    __IO uint32_t  P106PFS;                         /*!< P10%s Pin Function Control Register                                   */
+    __IO uint32_t  P107PFS;                         /*!< P10%s Pin Function Control Register                                   */
+    __IO uint32_t  P108PFS;                         /*!< P10%s Pin Function Control Register                                   */
+    __IO uint32_t  P109PFS;                         /*!< P10%s Pin Function Control Register                                   */
+    __IO uint32_t  P110PFS;                         /*!< P1%s Pin Function Control Register                                    */
+    __IO uint32_t  P111PFS;                         /*!< P1%s Pin Function Control Register                                    */
+    __IO uint32_t  P112PFS;                         /*!< P1%s Pin Function Control Register                                    */
+    __IO uint32_t  P113PFS;                         /*!< P1%s Pin Function Control Register                                    */
+    __IO uint32_t  P114PFS;                         /*!< P1%s Pin Function Control Register                                    */
+    __IO uint32_t  P115PFS;                         /*!< P1%s Pin Function Control Register                                    */
+    __IO uint32_t  P200PFS;                         /*!< P20%s Pin Function Control Register                                   */
+    __IO uint32_t  P201PFS;                         /*!< P20%s Pin Function Control Register                                   */
+    __IO uint32_t  P202PFS;                         /*!< P20%s Pin Function Control Register                                   */
+    __IO uint32_t  P203PFS;                         /*!< P20%s Pin Function Control Register                                   */
+    __IO uint32_t  P204PFS;                         /*!< P20%s Pin Function Control Register                                   */
+    __IO uint32_t  P205PFS;                         /*!< P20%s Pin Function Control Register                                   */
+    __IO uint32_t  P206PFS;                         /*!< P20%s Pin Function Control Register                                   */
+    __IO uint32_t  P207PFS;                         /*!< P20%s Pin Function Control Register                                   */
+  __I  uint8_t RESERVED1[4 * 4];                    // Added MEF 08/25/2015 P208, 209, 210, 211 are not present
+    __IO uint32_t  P212PFS;                         /*!< P2%s Pin Function Control Register                                    */
+    __IO uint32_t  P213PFS;                         /*!< P2%s Pin Function Control Register                                    */
+  __I  uint8_t RESERVED2[2 * 4];                    // Added MEF 09/02/2015 P214, 215 are not present
+    __IO uint32_t  P300PFS;                         /*!< P30%s Pin Function Control Register                                   */
+    __IO uint32_t  P301PFS;                         /*!< P30%s Pin Function Control Register                                   */
+    __IO uint32_t  P302PFS;                         /*!< P30%s Pin Function Control Register                                   */
+    __IO uint32_t  P303PFS;                         /*!< P30%s Pin Function Control Register                                   */
+    __IO uint32_t  P304PFS;                         /*!< P30%s Pin Function Control Register                                   */
+    __IO uint32_t  P305PFS;                         /*!< P30%s Pin Function Control Register                                   */
+    __IO uint32_t  P306PFS;                         /*!< P30%s Pin Function Control Register                                   */
+    __IO uint32_t  P307PFS;                         /*!< P30%s Pin Function Control Register                                   */
+    __IO uint32_t  P308PFS;                         /*!< P30%s Pin Function Control Register                                   */
+    __IO uint32_t  P309PFS;                         /*!< P30%s Pin Function Control Register                                   */
+    __IO uint32_t  P310PFS;                         /*!< P3%s Pin Function Control Register                                    */
+    __IO uint32_t  P311PFS;                         /*!< P3%s Pin Function Control Register                                    */
+    __IO uint32_t  P312PFS;                         /*!< P3%s Pin Function Control Register                                    */
+    __IO uint32_t  P313PFS;                         /*!< P3%s Pin Function Control Register                                    */
+    __IO uint32_t  P314PFS;                         /*!< P3%s Pin Function Control Register                                    */
+    __IO uint32_t  P315PFS;                         /*!< P3%s Pin Function Control Register                                    */
+    __IO uint32_t  P400PFS;                         /*!< P40%s Pin Function Control Register                                   */
+    __IO uint32_t  P401PFS;                         /*!< P40%s Pin Function Control Register                                   */
+    __IO uint32_t  P402PFS;                         /*!< P40%s Pin Function Control Register                                   */
+    __IO uint32_t  P403PFS;                         /*!< P40%s Pin Function Control Register                                   */
+    __IO uint32_t  P404PFS;                         /*!< P40%s Pin Function Control Register                                   */
+    __IO uint32_t  P405PFS;                         /*!< P40%s Pin Function Control Register                                   */
+    __IO uint32_t  P406PFS;                         /*!< P40%s Pin Function Control Register                                   */
+    __IO uint32_t  P407PFS;                         /*!< P40%s Pin Function Control Register                                   */
+    __IO uint32_t  P408PFS;                         /*!< P40%s Pin Function Control Register                                   */
+    __IO uint32_t  P409PFS;                         /*!< P40%s Pin Function Control Register                                   */
+    __IO uint32_t  P410PFS;                         /*!< P4%s Pin Function Control Register                                    */
+    __IO uint32_t  P411PFS;                         /*!< P4%s Pin Function Control Register                                    */
+    __IO uint32_t  P412PFS;                         /*!< P4%s Pin Function Control Register                                    */
+    __IO uint32_t  P413PFS;                         /*!< P4%s Pin Function Control Register                                    */
+    __IO uint32_t  P414PFS;                         /*!< P4%s Pin Function Control Register                                    */
+    __IO uint32_t  P415PFS;                         /*!< P4%s Pin Function Control Register                                    */
+    __IO uint32_t  P500PFS;                         /*!< P50%s Pin Function Control Register                                   */
+    __IO uint32_t  P501PFS;                         /*!< P50%s Pin Function Control Register                                   */
+    __IO uint32_t  P502PFS;                         /*!< P50%s Pin Function Control Register                                   */
+    __IO uint32_t  P503PFS;                         /*!< P50%s Pin Function Control Register                                   */
+    __IO uint32_t  P504PFS;                         /*!< P50%s Pin Function Control Register                                   */
+    __IO uint32_t  P505PFS;                         /*!< P50%s Pin Function Control Register                                   */
+    __IO uint32_t  P506PFS;                         /*!< P50%s Pin Function Control Register                                   */
+    __IO uint32_t  P507PFS;                         /*!< P50%s Pin Function Control Register                                   */
+    __IO uint32_t  P508PFS;                         /*!< P50%s Pin Function Control Register                                   */
+    __IO uint32_t  P509PFS;                         /*!< P50%s Pin Function Control Register                                   */
+    __IO uint32_t  P510PFS;                         /*!< P5%s Pin Function Control Register                                    */
+    __IO uint32_t  P511PFS;                         /*!< P5%s Pin Function Control Register                                    */
+    __IO uint32_t  P512PFS;                         /*!< P5%s Pin Function Control Register                                    */
+    __IO uint32_t  P513PFS;                         /*!< P5%s Pin Function Control Register                                    */
+    __IO uint32_t  P514PFS;                         /*!< P5%s Pin Function Control Register                                    */
+    __IO uint32_t  P515PFS;                         /*!< P5%s Pin Function Control Register                                    */
+    __IO uint32_t  P600PFS;                         /*!< P60%s Pin Function Control Register                                   */
+    __IO uint32_t  P601PFS;                         /*!< P60%s Pin Function Control Register                                   */
+    __IO uint32_t  P602PFS;                         /*!< P60%s Pin Function Control Register                                   */
+    __IO uint32_t  P603PFS;                         /*!< P60%s Pin Function Control Register                                   */
+    __IO uint32_t  P604PFS;                         /*!< P60%s Pin Function Control Register                                   */
+    __IO uint32_t  P605PFS;                         /*!< P60%s Pin Function Control Register                                   */
+    __IO uint32_t  P606PFS;                         /*!< P60%s Pin Function Control Register                                   */
+    __IO uint32_t  P607PFS;                         /*!< P60%s Pin Function Control Register                                   */
+    __IO uint32_t  P608PFS;                         /*!< P60%s Pin Function Control Register                                   */
+    __IO uint32_t  P609PFS;                         /*!< P60%s Pin Function Control Register                                   */
+    __IO uint32_t  P610PFS;                         /*!< P6%s Pin Function Control Register                                    */
+    __IO uint32_t  P611PFS;                         /*!< P6%s Pin Function Control Register                                    */
+    __IO uint32_t  P612PFS;                         /*!< P6%s Pin Function Control Register                                    */
+    __IO uint32_t  P613PFS;                         /*!< P6%s Pin Function Control Register                                    */
+    __IO uint32_t  P614PFS;                         /*!< P6%s Pin Function Control Register                                    */
+    __IO uint32_t  P615PFS;                         /*!< P6%s Pin Function Control Register                                    */
+    __IO uint32_t  P700PFS;                         /*!< P70%s Pin Function Control Register                                   */
+    __IO uint32_t  P701PFS;                         /*!< P70%s Pin Function Control Register                                   */
+    __IO uint32_t  P702PFS;                         /*!< P70%s Pin Function Control Register                                   */
+    __IO uint32_t  P703PFS;                         /*!< P70%s Pin Function Control Register                                   */
+    __IO uint32_t  P704PFS;                         /*!< P70%s Pin Function Control Register                                   */
+    __IO uint32_t  P705PFS;                         /*!< P70%s Pin Function Control Register                                   */
+    __IO uint32_t  P706PFS;                         /*!< P70%s Pin Function Control Register                                   */
+    __IO uint32_t  P707PFS;                         /*!< P70%s Pin Function Control Register                                   */
+    __IO uint32_t  P708PFS;                         /*!< P70%s Pin Function Control Register                                   */
+    __IO uint32_t  P709PFS;                         /*!< P70%s Pin Function Control Register                                   */
+    __IO uint32_t  P710PFS;                         /*!< P7%s Pin Function Control Register                                    */
+    __IO uint32_t  P711PFS;                         /*!< P7%s Pin Function Control Register                                    */
+    __IO uint32_t  P712PFS;                         /*!< P7%s Pin Function Control Register                                    */
+    __IO uint32_t  P713PFS;                         /*!< P7%s Pin Function Control Register                                    */
+  __I  uint32_t  RESERVED3[2];
+    __IO uint32_t  P800PFS;                         /*!< P80%s Pin Function Control Register                                   */
+    __IO uint32_t  P801PFS;                         /*!< P80%s Pin Function Control Register                                   */
+    __IO uint32_t  P802PFS;                         /*!< P80%s Pin Function Control Register                                   */
+    __IO uint32_t  P803PFS;                         /*!< P80%s Pin Function Control Register                                   */
+    __IO uint32_t  P804PFS;                         /*!< P80%s Pin Function Control Register                                   */
+    __IO uint32_t  P805PFS;                         /*!< P80%s Pin Function Control Register                                   */
+    __IO uint32_t  P806PFS;                         /*!< P80%s Pin Function Control Register                                   */
+    __IO uint32_t  P807PFS;                         /*!< P80%s Pin Function Control Register                                   */
+    __IO uint32_t  P808PFS;                         /*!< P80%s Pin Function Control Register                                   */
+    __IO uint32_t  P809PFS;                         /*!< P80%s Pin Function Control Register                                   */
+    __IO uint32_t  P810PFS;                         /*!< P8%s Pin Function Control Register                                    */
+    __IO uint32_t  P811PFS;                         /*!< P8%s Pin Function Control Register                                    */
+    __IO uint32_t  P812PFS;                         /*!< P8%s Pin Function Control Register                                    */
+    __IO uint32_t  P813PFS;                         /*!< P8%s Pin Function Control Register                                    */
+  __I  uint32_t  RESERVED4[2];
+    __IO uint32_t  P900PFS;                         /*!< P90%s Pin Function Control Register                                   */
+    __IO uint32_t  P901PFS;                         /*!< P90%s Pin Function Control Register                                   */
+    __IO uint32_t  P902PFS;                         /*!< P90%s Pin Function Control Register                                   */
+    __IO uint32_t  P903PFS;                         /*!< P90%s Pin Function Control Register                                   */
+    __IO uint32_t  P904PFS;                         /*!< P90%s Pin Function Control Register                                   */
+    __IO uint32_t  P905PFS;                         /*!< P90%s Pin Function Control Register                                   */
+    __IO uint32_t  P906PFS;                         /*!< P90%s Pin Function Control Register                                   */
+    __IO uint32_t  P907PFS;                         /*!< P90%s Pin Function Control Register                                   */
+    __IO uint32_t  P908PFS;                         /*!< P90%s Pin Function Control Register                                   */
+    __IO uint32_t  P909PFS;                         /*!< P90%s Pin Function Control Register                                   */
+    __IO uint32_t  P910PFS;                         /*!< P9%s Pin Function Control Register                                    */
+    __IO uint32_t  P911PFS;                         /*!< P9%s Pin Function Control Register                                    */
+    __IO uint32_t  P912PFS;                         /*!< P9%s Pin Function Control Register                                    */
+    __IO uint32_t  P913PFS;                         /*!< P9%s Pin Function Control Register                                    */
+    __IO uint32_t  P914PFS;                         /*!< P9%s Pin Function Control Register                                    */
+    __IO uint32_t  P915PFS;                         /*!< P9%s Pin Function Control Register                                    */
+    __IO uint32_t  PA00PFS;                         /*!< PA0%s Pin Function Control Register                                   */
+    __IO uint32_t  PA01PFS;                         /*!< PA0%s Pin Function Control Register                                   */
+    __IO uint32_t  PA02PFS;                         /*!< PA0%s Pin Function Control Register                                   */
+    __IO uint32_t  PA03PFS;                         /*!< PA0%s Pin Function Control Register                                   */
+    __IO uint32_t  PA04PFS;                         /*!< PA0%s Pin Function Control Register                                   */
+    __IO uint32_t  PA05PFS;                         /*!< PA0%s Pin Function Control Register                                   */
+    __IO uint32_t  PA06PFS;                         /*!< PA0%s Pin Function Control Register                                   */
+    __IO uint32_t  PA07PFS;                         /*!< PA0%s Pin Function Control Register                                   */
+    __IO uint32_t  PA08PFS;                         /*!< PA0%s Pin Function Control Register                                   */
+    __IO uint32_t  PA09PFS;                         /*!< PA0%s Pin Function Control Register                                   */
+    __IO uint32_t  PA10PFS;                         /*!< PA%s Pin Function Control Register                                    */
+    __IO uint32_t  PA11PFS;                         /*!< PA%s Pin Function Control Register                                    */
+    __IO uint32_t  PA12PFS;                         /*!< PA%s Pin Function Control Register                                    */
+    __IO uint32_t  PA13PFS;                         /*!< PA%s Pin Function Control Register                                    */
+    __IO uint32_t  PA14PFS;                         /*!< PA%s Pin Function Control Register                                    */
+    __IO uint32_t  PA15PFS;                         /*!< PA%s Pin Function Control Register                                    */
+    __IO uint32_t  PB00PFS;                         /*!< PB0%s Pin Function Control Register                                   */
+    __IO uint32_t  PB01PFS;                         /*!< PB0%s Pin Function Control Register                                   */
+    __IO uint32_t  PB02PFS;                         /*!< PB0%s Pin Function Control Register                                   */
+    __IO uint32_t  PB03PFS;                         /*!< PB0%s Pin Function Control Register                                   */
+    __IO uint32_t  PB04PFS;                         /*!< PB0%s Pin Function Control Register                                   */
+    __IO uint32_t  PB05PFS;                         /*!< PB0%s Pin Function Control Register                                   */
+    __IO uint32_t  PB06PFS;                         /*!< PB0%s Pin Function Control Register                                   */
+    __IO uint32_t  PB07PFS;                         /*!< PB0%s Pin Function Control Register                                   */
+} R_PFS_Type;
+
+
+#define IOPORT_PRV_PCNTR_OFFSET        0x00000020U
+
+typedef struct {                                    /*!< R_IOPORT1 Structure                                                   */
+  __IO uint32_t  PCNTR1;                            /*!< Port Control Register 1                                               */
+  __I  uint32_t  PCNTR2;                            /*!< Port Control Register 2                                               */
+  __O  uint32_t  PCNTR3;                            /*!< Port Control Register 3                                               */
+  __IO uint32_t  PCNTR4;                            /*!< Port Control Register 4                                               */
+} R_IOPORT1_Type;
+
+/** Superset list of all possible IO ports. */
+typedef enum e_ioport_port
+{
+    IOPORT_PORT_00 = 0x0000,                            ///< IO port 0
+    IOPORT_PORT_01 = 0x0100,                            ///< IO port 1
+    IOPORT_PORT_02 = 0x0200,                            ///< IO port 2
+    IOPORT_PORT_03 = 0x0300,                            ///< IO port 3
+    IOPORT_PORT_04 = 0x0400,                            ///< IO port 4
+    IOPORT_PORT_05 = 0x0500,                            ///< IO port 5
+    IOPORT_PORT_06 = 0x0600,                            ///< IO port 6
+    IOPORT_PORT_07 = 0x0700,                            ///< IO port 7
+    IOPORT_PORT_08 = 0x0800,                            ///< IO port 8
+    IOPORT_PORT_09 = 0x0900,                            ///< IO port 9
+    IOPORT_PORT_10 = 0x0A00,                            ///< IO port 10
+    IOPORT_PORT_11 = 0x0B00,                            ///< IO port 11
+} ioport_port_t;
+
+/** IO port type used with ports */
+typedef uint16_t ioport_size_t;                     ///< IO port size on this device
+
+/** Pointer to IOPORT base register. */
+#define gp_ioport_reg  ((R_IOPORT1_Type *) 0x40040000)
+
+/** Pointer to PFS base register. */
+#define p_pfs_reg  ((R_PFS_Type *) 0x40040800)
+
+#define IOPORT_PRV_PERIPHERAL_FUNCTION (1U << 16)
+
+
+/*******************************************************************************************************************//**
+ * @brief  Sets a pin's output either high or low. Implements ioport_api_t::pinWrite.
+ *
+ * @retval SSP_SUCCESS              Pin written to.
+ * @retval SSP_ERR_INVALID_ARGUMENT     The pin and/or level not valid.
+ *
+ * @note This function is re-entrant for different pins. This function makes use of the PCNTR3 register to atomically
+ * modify the level on the specified pin on a port.
+ **********************************************************************************************************************/
+ssp_err_t R_IOPORT_PinWrite (uint32_t port, uint32_t pin, ioport_level_t level)
+{
+    volatile uint32_t * p_dest;
+    ioport_size_t set_value = 0U;
+    ioport_size_t reset_value = 0U;
+
+    ioport_size_t pin_mask = (ioport_size_t) (1U << pin);
+
+    if (IOPORT_LEVEL_LOW == level)
+    {
+        reset_value = pin_mask;
+    }
+    else
+    {
+        set_value = pin_mask;
+    }
+
+    p_dest = (uint32_t *) (
+                            (uint32_t) (
+                                        ( port * IOPORT_PRV_PCNTR_OFFSET)
+                                        + ((uint32_t) (uint32_t volatile *) &gp_ioport_reg->PCNTR3)
+                                    )
+                    );
+
+    /** PCNTR4 register: lower word = set data, upper word = reset_data */
+    *p_dest = (uint32_t) (((uint32_t) reset_value << 16) | set_value);
+
+    return SSP_SUCCESS;
+}
+
+/*******************************************************************************************************************//**
+ * Writes to the specified pin's PFS register
+ *
+ * @param[in]    p_pfs_reg  Base address of the PFS registers
+ * @param[in]    pin        Pin to write PFS data for
+ * @param[in]    value      Value to be written to the PFS register
+ *
+ **********************************************************************************************************************/
+void HW_IOPORT_PFSWrite(uint32_t port, uint32_t pin, uint32_t value)
+{
+    volatile uint32_t * p_dest;
+
+    p_dest = (uint32_t *)
+                            (uint32_t) (
+                                    (port * 16 * 4)
+                                    + (pin *4) + ((uint32_t) p_pfs_reg)
+                                       );
+
+    /* New value can be safely written to PFS. */
+    *p_dest = value;
+}
+]]></file>
+        </additional>
+    <function  name="initialize">
+      <![CDATA[HW_IOPORT_PFSWrite(€port€, €pin€, (IOPORT_CFG_PORT_DIRECTION_OUTPUT | IOPORT_CFG_PORT_OUTPUT_LOW) );]]>
+    </function>
+
+    <function  name="setValue"  param0_type="bool" param0_name="on">
+      <if cond="true equals param(on)">
+        <![CDATA[R_IOPORT_PinWrite(€port€, €pin€, IOPORT_LEVEL_HIGH);]]>
+      </if>
+      <if cond="false equals param(on)">
+        <![CDATA[R_IOPORT_PinWrite(€port€, €pin€, IOPORT_LEVEL_LOW);]]>
+      </if>
+    </function>
+
+  </c_code>
+</algorithm>

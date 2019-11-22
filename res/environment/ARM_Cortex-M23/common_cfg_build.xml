@@ -5,9 +5,10 @@
       <CC>arm-none-eabi-gcc</CC>
       <LD>arm-none-eabi-gcc</LD>
       <AS>arm-none-eabi-as</AS>
-      <CFLAGS>-Og -g3 -mcpu=cortex-m23 -std=gnu99 -mthumb -I. -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -flto -fno-move-loop-invariants -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal -Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast -Wno-padded -mfloat-abi=soft -march=armv8-m.base</CFLAGS>
-      <LFLAGS>-nostartfiles -T$(LKR_SCRIPT) -mcpu=cortex-m23 -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -flto -fno-move-loop-invariants -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wpadded -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal  -g3 -Xlinker --gc-sections --specs=nano.specs</LFLAGS>
+      <CFLAGS>-fno-common -ffreestanding -Og -g3 -std=gnu99 -mthumb -I. -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -flto -fno-move-loop-invariants -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal -Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast -Wno-padded -mfloat-abi=soft -march=armv8-m.base -mcpu=cortex-m23 </CFLAGS>
+      <LFLAGS>-nostartfiles -T$(LKR_SCRIPT) -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -flto -fno-move-loop-invariants -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wpadded -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal -g3 -Xlinker --gc-sections --specs=nano.specs -mcpu=cortex-m23 </LFLAGS>
       <CPFLAGS>-Obinary</CPFLAGS>
+      <ASFLAGS> -g -Wall -gdwarf-2 -mthumb -mcpu=cortex-m23 </ASFLAGS>
     </variables>
     <targets>
       <target>
@@ -30,6 +31,11 @@
         <output>size</output>
         <rule>arm-none-eabi-size $(project).elf</rule>
       </target>
+      <target phony="true">
+        <source>$(project).bin</source>
+        <output>flash</output>
+        <rule>openocd -f $(device).cfg -c "program $(project).elf verify reset exit"</rule>
+      </target>
       <target phony="true" >
         <source>size</source>
         <output>all</output>
@@ -41,6 +47,3 @@
     <CP>arm-none-eabi-objcopy</CP>
   </variables>
 </build_cfg>
-
-
-

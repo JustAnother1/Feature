@@ -2,7 +2,7 @@
 <algorithm name="uart" api="input_stream,output_stream">
   <required>
     <parameter name="ressource" type="string" />
-    <parameter name="speed_bitps" type="int />
+    <parameter name="speed_bitps" type="int" default="9600" />
   </required>
 
   <c_code>
@@ -358,7 +358,7 @@ void r_cgc_delay_cycles(cgc_clock_t clock, uint16_t cycles)
 ]]></file>
     </additional>
 
-  <function  name="initialize" >
+    <function  name="initialize" >
         <![CDATA[uart_disable(UART€ressource€);
     {
         volatile uint8_t read_port = 0U;
@@ -371,15 +371,48 @@ void r_cgc_delay_cycles(cgc_clock_t clock, uint16_t cycles)
     uart_enable(UART€ressource€);]]>
     </function>
 
-  <function name="hasNewByte" result="bool">
+    <function name="hasNewByte" result="bool">
         <![CDATA[/* TODO hasNewByte */]]>
     </function>
-  <function name="getReceivedByte" result="byte">
+
+    <function name="getReceivedByte" result="byte">
         <![CDATA[/* TODO getReceivedByte */]]>
     </function>
 
-  <function name="sendByte" param0_type="byte" param0_name="data">
+    <function name="sendByteBlocking" param0_type="byte" param0_name="data">
         <![CDATA[uart_send_byte(UART€ressource€, €data€);]]>
+    </function>
+
+    <function name="sendByte" param0_type="byte" param0_name="data">
+        <![CDATA[registers[UART€ressource€]->TDR = (uint8_t)€data€;]]>
+    </function>
+
+    <function name="canSendByte"  type="required" result="int" />
+        <![CDATA[/* TODO canSendByte */]]>
+    </function>
+
+    <function name="init_sendIrq"  type="required" />
+        <![CDATA[/* TODO init_sendIrq */]]>
+    </function>
+
+    <function name="init_receiveIrq"  type="required" />
+        <![CDATA[/* TODO init_receiveIrq */]]>
+    </function>
+
+    <function name="enableSendIrq"  type="required" />
+        <![CDATA[/* TODO enableSendIrq */]]>
+    </function>
+
+    <function name="disableSendIrq"  type="required" />
+        <![CDATA[/* TODO disableSendIrq */]]>
+    </function>
+
+    <function name="enableReceiveIrq"  type="required" />
+        <![CDATA[/* TODO enableReceiveIrq */]]>
+    </function>
+
+    <function name="disableReceiveIrq"  type="required" />
+        <![CDATA[/* TODO disableReceiveIrq */]]>
     </function>
 
   </c_code>

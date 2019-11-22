@@ -1,0 +1,40 @@
+File Format Specification - commonly used elements
+=================================================
+:toc:
+:numbered:
+:showcomments:
+
+== Summary
+This document does not define the file format of a specific file. It specifies Elements that can be used in several locations in different files. In the format definition of those files the Elements defined here will be referenced.  This shall help keeping the documentation clear and consistent.
+
+
+=== function element
+==== Attributes
+The attribute "name" defines the name of the function.
+
+The "type" attribute defines if this function must be present ("required") to fulfill the interface (API).
+
+The attribute "param0_type" defines the data type of the first parameter.
+
+The attribute "param0_name" defines the name of the first parameter. The name is used to refer to the parameters value from the functions implementation.
+
+The attribute "param1_type" defines the data type of the second parameter.
+
+The attribute "param1_name" defines the name of the second parameter.
+
+The attribute "param2_type" defines the data type of the third parameter.
+
+The attribute "param2_name" defines the name of the third parameter.
+
+...
+
+If the function has no parameters then the "param*" attributes are missing.
+
+The attibute "result" defines the data type of the returned value. If no value is returned then this attribute is missing.
+
+The attribute "resultIs" explains the meaning of the returned data. This is primarily to document the function to make it easier to use it. This attribute shall be available in the api file.
+
+==== child elements
+in the api file : none
+
+in the algorithm file:  child elements are either if elements, forChild elements or a CDATA section that contains the code.
