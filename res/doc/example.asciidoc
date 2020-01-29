@@ -129,10 +129,10 @@ With the APIs in place we now need some logic.
   <c_code>
     <function name="main">
       <![CDATA[{
-  $$$initialize()$$$
+  €initialize()€
   for(;;)
   {
-    $$$execute()$$$
+    €execute()€
   }
 }]]>
     </function>
@@ -142,7 +142,7 @@ With the APIs in place we now need some logic.
 
 This super_loop algorithm takes tasks as child (<childElement type="run" />) It also provides the information if only one task is run. (singleTask)
 Informations like that and other parameter data can be used to provide alternative implementations. Feature will then use the appropriate implementation for the situation.
-As this algorithm is a program_entry_point it needs to provide a main function. To implement the main function is is necessary to "call" the functions of the child tasks. This is done by the $$$<child function name>(<optinal parameters>)$$$ block.
+As this algorithm is a program_entry_point it needs to provide a main function. To implement the main function is is necessary to "call" the functions of the child tasks. This is done by the €<child function name>(<optinal parameters>)€ block.
 
 
 .pwm_task.algorithm.xml
@@ -158,14 +158,14 @@ As this algorithm is a program_entry_point it needs to provide a main function. 
     </required>
     <c_code>
         <function  name="initialize">
-            <![CDATA[$$$bitOut:initialize()$$$]]>
+            <![CDATA[€bitOut:initialize()€]]>
         </function>
         <function name="execute">
             <![CDATA[
-    $$$bitOut:setValue(true)$$$
-    $$$delay:delay_ms(10 / frequency_Hz * dutyCycle_percent)$$$ // Delay
-    $$$bitOut:setValue(false)$$$
-    $$$delay:delay_ms(10 / frequency_Hz * (100 - dutyCycle_percent))$$$ // Delay]]>
+    €bitOut:setValue(true)€
+    €delay:delay_ms(10 / frequency_Hz * dutyCycle_percent)€ // Delay
+    €bitOut:setValue(false)€
+    €delay:delay_ms(10 / frequency_Hz * (100 - dutyCycle_percent))€ // Delay]]>
         </function>
     </c_code>
 </algorithm>
@@ -211,7 +211,7 @@ The definition of delay and greenLed is necessary as the solution refers to them
     </additional>
 
     <function  name="delay_ms" param0_type="int" param0_name="time">
-      <![CDATA[_delay_ms($$$time$$$);]]>
+      <![CDATA[_delay_ms(€time€);]]>
     </function>
 
   </c_code>
@@ -237,20 +237,20 @@ As the delay functionality is provided by the avr-libc it is very easy to create
     </additional>
 
     <function  name="initialize">
-      <![CDATA[DDR$$$port$$$ |= (1<<DD$$$port$$$$$$pin$$$); //Set the pin $$$pin$$$ on Port$$$port$$$ to output]]>
+      <![CDATA[DDR€port€ |= (1<<DD€port€€pin€); //Set the pin €pin€ on Port€port€ to output]]>
     </function>
 
     <function  name="setValue" param0_type="bool" param0_name="on">
       <if cond="true equals param(on)">
-        <![CDATA[PORT$$$port$$$ |= (1<<PORT$$$port$$$$$$pin$$$);    // Turn bit $$$pin$$$ on Port$$$port$$$ to 1 => on]]>
+        <![CDATA[PORT€port€ |= (1<<PORT€port€€pin€);    // Turn bit €pin€ on Port€port€ to 1 => on]]>
       </if>
       <if cond="false equals param(on)">
-        <![CDATA[PORT$$$port$$$ &= ~(1<<PORT$$$port$$$$$$pin$$$);    // Turn bit $$$pin$$$ on Port$$$port$$$ to 0 => off]]>
+        <![CDATA[PORT€port€ &= ~(1<<PORT€port€€pin€);    // Turn bit €pin€ on Port€port€ to 0 => off]]>
       </if>
     </function>
 
     <function  name="getValue" result="bool">
-      <![CDATA[(PORT$$$port$$$ & 1<<$$$pin$$$);]]>
+      <![CDATA[(PORT€port€ & 1<<€pin€);]]>
     </function>
 
   </c_code>
