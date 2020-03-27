@@ -70,9 +70,9 @@ if __name__ == '__main__':
         print('Python Version used is  %s !' % (sys.version))
         print('PyQt version: should be at least 5.12.3 and is %s !' % (PYQT_VERSION_STR))
         stdoutdata = subprocess.getoutput('git rev-parse HEAD')
-        print('git revision: ' + stdoutdata) # git rev-parse HEAD
+        print('git revision: ' + stdoutdata)
         stdoutdata = subprocess.getoutput('git diff --shortstat')
-        print('git changes ' + stdoutdata)  # git diff --shortstat
+        print('git changes ' + stdoutdata)
     else:
         qInstallMessageHandler(QuietMessageHandler)
 

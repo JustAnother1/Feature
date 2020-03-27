@@ -1,3 +1,5 @@
+gui/__pycache__/
+
 *.class
 
 # Mobile Tools for Java (J2ME)
