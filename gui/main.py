@@ -14,7 +14,7 @@ from PyQt5.QtCore import QtCriticalMsg
 from PyQt5.QtCore import QtFatalMsg
 from PyQt5.Qt import PYQT_VERSION_STR
 from main_window import MainWndow
-
+from configuration import Configuration
 
 def QuietMessageHandler(mode, context, message):
     if mode == QtWarningMsg:
@@ -25,7 +25,10 @@ def QuietMessageHandler(mode, context, message):
         mode = 'FATAL'
     else:
         return
-    print('%s: %s (%s:%s:%s )' % (mode, message, os.path.basename(context.file), context.function, context.line))
+    file = os.path.basename(context.file)
+    if None == file :
+        file = "unknown"
+    print('%s: %s (%s:%s:%s )' % (mode, message, file, context.function, context.line))
 
 # qDebug, qInfo, qWarning, qCritical, qFatal
 def VerboseMessageHandler(mode, context, message):
@@ -39,7 +42,10 @@ def VerboseMessageHandler(mode, context, message):
         mode = 'FATAL'
     else:
         mode = 'DEBUG'
-    print('%s: %s (%s:%s:%s )' % (mode, message, os.path.basename(context.file), context.function, context.line))
+    file = os.path.basename(context.file)
+    if None == file :
+        file = "unknown"
+    print('%s: %s (%s:%s:%s )' % (mode, message, file, context.function, context.line))
 
 
 
@@ -62,10 +68,11 @@ if __name__ == '__main__':
     parser.process(app)
 
     # default configuration
-    cfg = {'verboseLogging' : False}
+    cfg = Configuration('ini', 'cmdline.txt')
+    cfg.setBool('verboseLogging', False)
 
     if parser.isSet(verboseLoggingOption):
-        cfg['verboseLogging'] = True
+        cfg.setBool('verboseLogging', True)
         qInstallMessageHandler(VerboseMessageHandler)
         print('Python Version used is  %s !' % (sys.version))
         print('PyQt version: should be at least 5.12.3 and is %s !' % (PYQT_VERSION_STR))

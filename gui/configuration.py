@@ -24,10 +24,14 @@ class Configuration(object):
         if None != self.data:
             self.data.sync()
 
-    def getInt(self, settingName, default):
+    def setBool(self, which, value):
+        if None != self.data:
+            self.data.setValue(which, value)
+
+    def getBool(self, settingName, default):
         if None != self.data:
             if None != settingName:
-                res = self.data.value(settingName, defaultValue=default, type=int)
+                res = self.data.value(settingName, defaultValue=default, type=bool)
                 if res == default:
                     self.data.setValue(settingName, res)
                 return res
@@ -36,6 +40,15 @@ class Configuration(object):
     def setInt(self, which, value):
         if None != self.data:
             self.data.setValue(which, value)
+
+    def getInt(self, settingName, default):
+        if None != self.data:
+            if None != settingName:
+                res = self.data.value(settingName, defaultValue=default, type=int)
+                if res == default:
+                    self.data.setValue(settingName, res)
+                return res
+        return default
 
     def setString(self, which, value):
         if None != self.data:

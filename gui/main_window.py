@@ -27,13 +27,14 @@ class MainWndow(QMainWindow):
     aboutAct = None
     aboutQtAct = None
 
-
     def __init__(self, cfg, parent=None):
         super().__init__(parent)
+
         self.configurations = {}
         self.configurations['command line'] = cfg
-
+        self.configurations['bla'] = cfg
         self.configurations['personal'] = Configuration('native', None)
+
         self.resize(self.configurations['personal'].getInt('MainWindow.width', 750), self.configurations['personal'].getInt('MainWindow.height', 550) )
         self.setWindowIcon(QIcon('images/logo.png'))
 
@@ -76,7 +77,7 @@ class MainWndow(QMainWindow):
         self.helpMenu.addAction(self.aboutQtAct)
 
     def SettingsDialog(self):
-        self.configurations['personal'] = showSettingsDialog(self, self.configurations['personal'])
+        self.configurations = showSettingsDialog(self, self.configurations)
 
     def QuitLdbg(self):
         qDebug("Starting shutdown")
