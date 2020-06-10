@@ -30,7 +30,7 @@ import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.FileGroup.TextFile;
 import de.nomagic.puzzler.configuration.Configuration;
 
-public class MakeBuildSystem extends BuildSystem implements BuildSystemAddApi
+public class MakeBuildSystem extends BuildSystem
 {
     public static final String MAKEFILE_FILE_COMMENT_SECTION_NAME = "FileHeader";
     public static final String MAKEFILE_FILE_VARIABLES_SECTION_NAME = "Variables";

@@ -11,7 +11,6 @@ import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 
 public class CodeGeneratorFactory
 {
-
     private static final Logger log = LoggerFactory.getLogger("CodeGeneratorFactory");
 
 
@@ -19,7 +18,6 @@ public class CodeGeneratorFactory
     {
         // not used
     }
-
 
     public static Generator[] getGeneratorFor(AlgorithmInstanceInterface algoTree,
             Context ctx)
@@ -32,8 +30,10 @@ public class CodeGeneratorFactory
 
         ArrayList<Generator> resVec = new ArrayList<Generator>();
 
+        Element res = null;
         // check for C Code
-        if(false == algoTree.hasApi(CCodeGenerator.REQUIRED_ROOT_API))
+        res = algoTree.getAlgorithmElement(CCodeGenerator.ALGORITHM_C_CODE_CHILD_NAME);
+        if(null == res)
         {
             log.trace("Is not a valid C-Code tree");
         }
@@ -43,16 +43,28 @@ public class CodeGeneratorFactory
             resVec.add(new CCodeGenerator(ctx));
         }
 
-        // check for Verilog code
-        Element res = algoTree.getAlgorithmElement(VerilogCodeGenerator.ALGORITHM_VERILOG_CODE_CHILD_NAME);
-        if(null != res)
+        // check for C++ Code
+        res = algoTree.getAlgorithmElement(CppCodeGenerator.ALGORITHM_CPP_CODE_CHILD_NAME);
+        if(null == res)
         {
-            log.trace("tree has Verilog-Code");
-            resVec.add(new VerilogCodeGenerator(ctx));
+            log.trace("Is not a valid C++-Code tree");
         }
         else
         {
+            log.trace("tree has C++-Code");
+            resVec.add(new CppCodeGenerator(ctx));
+        }
+
+        // check for Verilog code
+        res = algoTree.getAlgorithmElement(VerilogCodeGenerator.ALGORITHM_VERILOG_CODE_CHILD_NAME);
+        if(null == res)
+        {
             log.trace("Is not a valid Verilog-Code tree");
+        }
+        else
+        {
+            log.trace("tree has Verilog-Code");
+            resVec.add(new VerilogCodeGenerator(ctx));
         }
 
         return resVec.toArray(new Generator[0]);

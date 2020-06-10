@@ -30,8 +30,8 @@ import ch.qos.logback.core.util.StatusPrinter;
 
 import org.jdom2.Element;
 
-import de.nomagic.puzzler.BuildSystem.BuildSystem;
-import de.nomagic.puzzler.BuildSystem.MakeBuildSystem;
+import de.nomagic.puzzler.BuildSystem.BuildSystemApi;
+import de.nomagic.puzzler.BuildSystem.BuildSystemFactory;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.Generator.CCodeGenerator;
@@ -68,6 +68,8 @@ public class PuzzlerMain
             final BufferedReader in = new BufferedReader(new InputStreamReader(s));
             final String commitId = in.readLine();
             final String changes = in.readLine();
+            in.close();
+            s.close();
             if(null != changes)
             {
                 if(0 < changes.length())
@@ -389,6 +391,42 @@ public class PuzzlerMain
             }
             allFiles.addAll(files);
         }
+
+        // check tool chain to create makefile
+        BuildSystemApi make = BuildSystemFactory.getBuildSystemFor(ctx);
+        if(null == make)
+        {
+            log.error("Failed to find build environment!");
+            ctx.close();
+            return null;
+        }
+        allFiles = make.createBuildFor(allFiles);
+        if(null == allFiles)
+        {
+            log.error("Build environment failed to generte files !");
+            ctx.close();
+            return null;
+        }
+
+        // IDE Project Files
+        allFiles = IDEProjectFileGenerator.generateFileInto(ctx, allFiles);
+        if(null == allFiles)
+        {
+            log.error("Failed to generate IDE project files!");
+            ctx.close();
+            return null;
+        }
+
+        // the environment may specify files that it needs - create those now
+        Environment e = ctx.getEnvironment();
+        allFiles = e.addRequiredFiles(ctx, allFiles);
+        if(null == allFiles)
+        {
+            log.error("Failed to generate required files provided by the environment !");
+            ctx.close();
+            return null;
+        }
+
         return allFiles;
     }
 
@@ -450,6 +488,7 @@ public class PuzzlerMain
         }
         ctx.addSolution(s);
 
+        // create all needed files in memory
         FileGroup allFiles = createRessourcesFromSolution(ctx);
         if(null == allFiles)
         {
@@ -458,25 +497,7 @@ public class PuzzlerMain
             return;
         }
 
-        // check tool chain to create makefile
-        BuildSystem make = new MakeBuildSystem(ctx);
-        allFiles = make.createBuildFor(allFiles);
-        if(null == allFiles)
-        {
-            log.error("Failed to generate build environment!");
-            ctx.close();
-            return;
-        }
-
-        // IDE Project Files
-        allFiles = IDEProjectFileGenerator.generateFileInto(ctx, allFiles);
-        if(null == allFiles)
-        {
-            log.error("Failed to generate IDE project files!");
-            ctx.close();
-            return;
-        }
-
+        // write created files out
         if(false == createOutput(ctx, allFiles))
         {
             log.error("Failed to create the output!");

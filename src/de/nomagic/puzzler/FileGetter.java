@@ -170,7 +170,7 @@ public final class FileGetter
                 {
                     sb.append(subpaths[k]);
                     sb.append(File.separator);
-                }            
+                }
                 res = getFromFile(sb.toString(), fileName, ctx);
                 if(null != res)
                 {
@@ -180,7 +180,7 @@ public final class FileGetter
         }
         return res;
     }
-    
+
     public static Element getFromFile(String[] paths, String fileName, Context ctx)
     {
         if(null == paths)
@@ -208,8 +208,8 @@ public final class FileGetter
                 ctx);
         if(null == algo)
         {
-            LOG.trace("Could not load the Element from the file {}",
-                    path + fileName);
+            // LOG.trace("Could not load the Element from the file {}",
+            //         path + fileName);
             return null;
         }
 
@@ -219,7 +219,8 @@ public final class FileGetter
             LOG.trace("No root tag in the File {} ", fileName);
             return null;
         }
-        LOG.trace("Loaded the Element({}) from the file {}", root.getName(), path + fileName);
+        LOG.trace("Loaded the Element({}) from the file {}",
+                root.getName(), path + fileName);
         return root;
     }
 
@@ -269,7 +270,7 @@ public final class FileGetter
             String[] subPaths = ctx.getEnvironment().getPlatformParts();
 
             root = getFromFile(paths, subPaths, fileName, ctx);
-            
+
             if(null == root)
             {
                 // if that also failed then the common one from the library

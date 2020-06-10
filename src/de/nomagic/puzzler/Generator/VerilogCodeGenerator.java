@@ -22,9 +22,6 @@ public class VerilogCodeGenerator extends Generator
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
-    // if this is true then all code sniplets will be wrapped into comment lines explaining where they came from.
-    private boolean documentCodeSource = false;
-
     public VerilogCodeGenerator(Context ctx)
     {
         super(ctx);
@@ -104,5 +101,12 @@ public class VerilogCodeGenerator extends Generator
     {
         return "Verilog";
     }
+
+    protected String fillInFunctionCall(String functionName, AlgorithmInstanceInterface logic)
+    {
+        // this is an error
+        return null;
+    }
+
 
 }

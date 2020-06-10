@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<algorithm name="app_main" api="program_entry_point">
+  <required>
+    <childElement type="run" />
+  </required>
+  <cpp_code>
+    <function name="main">
+    <![CDATA[int main()
+{]]>
+      <forChilds api="run">
+         <![CDATA[{€run:execute()€]]>
+      </forChilds>
+<![CDATA[return 0;
+}]]>
+    </function>
+  </cpp_code>
+</algorithm>

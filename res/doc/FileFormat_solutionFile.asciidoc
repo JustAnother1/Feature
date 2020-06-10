@@ -14,6 +14,7 @@ Solution files are xml files. The root element is a "solution" element.
 === solution element
 ==== Attributes
 None.
+
 ==== child elements
 The solution element has exactly one child element. The direct child element need to comply with the algorithm element style. The child must implement the "program_entry_point" API.
 

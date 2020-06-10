@@ -1,12 +1,11 @@
-
 package de.nomagic.puzzler.Generator;
 
 import java.util.Iterator;
 import java.util.List;
 
 import org.jdom2.Content;
-import org.jdom2.Content.CType;
 import org.jdom2.Element;
+import org.jdom2.Content.CType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +13,7 @@ import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.CFile;
+import de.nomagic.puzzler.FileGroup.CppFile;
 import de.nomagic.puzzler.FileGroup.FileFactory;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
@@ -23,15 +23,15 @@ import de.nomagic.puzzler.solution.ConditionEvaluator;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
 import de.nomagic.puzzler.solution.Function;
 
-public class CCodeGenerator extends Generator
-{
-    public static final String ALGORITHM_C_CODE_CHILD_NAME = "c_code";
+public class CppCodeGenerator extends Generator {
+
+    public static final String ALGORITHM_CPP_CODE_CHILD_NAME = "cpp_code";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
-    private CFile sourceFile;
+    private CppFile sourceFile;
 
-    public CCodeGenerator(Context ctx)
+    public CppCodeGenerator(Context ctx)
     {
         super(ctx);
     }
@@ -39,9 +39,10 @@ public class CCodeGenerator extends Generator
     @Override
     public String getLanguageName()
     {
-        return "C";
+        return "C++";
     }
 
+    @Override
     public FileGroup generateFor(AlgorithmInstanceInterface logic)
     {
         codeGroup = new FileGroup();
@@ -59,7 +60,7 @@ public class CCodeGenerator extends Generator
             return null;
         }
 
-        log.trace("starting to generate the C implementation for {}", logic);
+        log.trace("starting to generate the C++ implementation for {}", logic);
 
         Api api = Api.getFromFile(REQUIRED_ROOT_API, ctx);
         if(null == api)
@@ -68,7 +69,7 @@ public class CCodeGenerator extends Generator
             return null;
         }
 
-        addImplementationForTo(api, logic, "main.c");
+        addImplementationForTo(api, logic, "main.cpp");
         if(false == ctx.wasSucessful())
         {
             return null;
@@ -97,8 +98,20 @@ public class CCodeGenerator extends Generator
         }
         initFunc.setImplementation(sb.toString());
 
-        CFile main = (CFile)codeGroup.getFileWithName("main.c");
+        CppFile main = (CppFile)codeGroup.getFileWithName("main.cpp");
         main.addFunction(initFunc);
+    }
+
+    private CppFile createFile(String fileName)
+    {
+        CppFile aFile = new CppFile(fileName);
+
+        // there should be a file comment explaining what this is
+        aFile.addLines(CppFile.C_FILE_FILE_COMMENT_SECTION_NAME,
+                       new String[] {"// automatically created " + fileName,
+                                     "// created at: " + Tool.curentDateTime(),
+                                     "// created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
+        return aFile;
     }
 
     private void addImplementationForTo(Api api, AlgorithmInstanceInterface logic, String curFileName)
@@ -110,13 +123,13 @@ public class CCodeGenerator extends Generator
         }
         else if(curAbsFile instanceof CFile)
         {
-            sourceFile = (CFile)curAbsFile;
+            sourceFile = (CppFile)curAbsFile;
         }
         else
         {
             // we should add code to a file that is not a C File!
-            log.error("Can not add C source code of {} to {} !", logic, curFileName);
-            ctx.addError(this, "Can not add C source code of " + logic + " to " + curFileName + " !");
+            log.error("Can not add C++ source code of {} to {} !", logic, curFileName);
+            ctx.addError(this, "Can not add C++ source code of " + logic + " to " + curFileName + " !");
             return;
         }
 
@@ -127,7 +140,7 @@ public class CCodeGenerator extends Generator
         for(int i = 0; i < funcs.length; i++)
         {
             CFunctionCall fc = new CFunctionCall(funcs[i].getName());
-            String implementation = getCImplementationOf(fc, logic);
+            String implementation = getCppImplementationOf(fc, logic);
             if(null == implementation)
             {
                 String error = "Could not get an Implementation for " + funcs[i].getName();
@@ -154,46 +167,9 @@ public class CCodeGenerator extends Generator
         codeGroup.add(sourceFile);
     }
 
-    private void handleInitFunctionOfAlgorithm(AlgorithmInstanceInterface logic)
+    private String getCppImplementationOf(CFunctionCall functionToCall, AlgorithmInstanceInterface logic)
     {
-        // check if logic has a initialize function, if so then add that to the initcode
-        Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
-        if(null != cCode)
-        {
-            List<Element> funcs = cCode.getChildren(ALGORITHM_FUNCTION_CHILD_NAME);
-            if(null != funcs)
-            {
-                for(int i = 0; i < funcs.size(); i++)
-                {
-                    // check all functions
-                    Element curElement = funcs.get(i);
-                    String name = curElement.getAttributeValue(ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME);
-                    if(true == ALGORITHM_INITIALISATION_FUNCTION_NAME.equals(name))
-                    {
-                        // found another init function
-                        log.trace("Found initFunctuntion in {}", logic);
-                        String id = logic.toString();
-                        String impl = getImplementationFromFunctionElement(curElement, "", logic);
-                        if(true == documentCodeSource)
-                        {
-                            impl = addCommentsToImplementation(impl, logic);
-                        }
-                        impl = impl.trim();
-                        impl = replacePlaceholders(impl, "", logic, curElement);
-                        CInitCodeBlock initB = new CInitCodeBlock(id, impl);
-                        initcode.put(id, initB);
-                    }
-                    // else not the initialize function -> ignore it.
-                }
-            }
-            // else no functions -> nothing to do
-        }
-        // else no C-Code -> nothing to do
-    }
-
-    private String getCImplementationOf(CFunctionCall functionToCall, AlgorithmInstanceInterface logic)
-    {
-        log.trace("getting the C implemention of the function {} from {}",
+        log.trace("getting the C++ implemention of the function {} from {}",
                 functionToCall, logic);
 
         String searchedFunctionName = functionToCall.getName();
@@ -250,6 +226,43 @@ public class CCodeGenerator extends Generator
         {
             return implementation;
         }
+    }
+
+    private void handleInitFunctionOfAlgorithm(AlgorithmInstanceInterface logic)
+    {
+        // check if logic has a initialize function, if so then add that to the initcode
+        Element cCode = logic.getAlgorithmElement(ALGORITHM_CPP_CODE_CHILD_NAME);
+        if(null != cCode)
+        {
+            List<Element> funcs = cCode.getChildren(ALGORITHM_FUNCTION_CHILD_NAME);
+            if(null != funcs)
+            {
+                for(int i = 0; i < funcs.size(); i++)
+                {
+                    // check all functions
+                    Element curElement = funcs.get(i);
+                    String name = curElement.getAttributeValue(ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME);
+                    if(true == ALGORITHM_INITIALISATION_FUNCTION_NAME.equals(name))
+                    {
+                        // found another init function
+                        log.trace("Found initFunctuntion in {}", logic);
+                        String id = logic.toString();
+                        String impl = getImplementationFromFunctionElement(curElement, "", logic);
+                        if(true == documentCodeSource)
+                        {
+                            impl = addCommentsToImplementation(impl, logic);
+                        }
+                        impl = impl.trim();
+                        impl = replacePlaceholders(impl, "", logic, curElement);
+                        CInitCodeBlock initB = new CInitCodeBlock(id, impl);
+                        initcode.put(id, initB);
+                    }
+                    // else not the initialize function -> ignore it.
+                }
+            }
+            // else no functions -> nothing to do
+        }
+        // else no C++-Code -> nothing to do
     }
 
     private String getImplementationFromFunctionElement(Element function, String FunctionArguments, AlgorithmInstanceInterface logic)
@@ -317,7 +330,7 @@ public class CCodeGenerator extends Generator
                         if(true == curChild.hasApi(api))
                         {
                             CFunctionCall fc = new CFunctionCall(FuncToCall);
-                            String implementation = getCImplementationOf(fc, curChild);
+                            String implementation = getCppImplementationOf(fc, curChild);
                             if(null == implementation)
                             {
                                 String error = "Could not get an Implementation for " + FuncToCall;
@@ -366,7 +379,7 @@ public class CCodeGenerator extends Generator
             return null;
         }
 
-        Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
+        Element cCode = logic.getAlgorithmElement(ALGORITHM_CPP_CODE_CHILD_NAME);
         if(null == cCode)
         {
             ctx.addError(this,
@@ -446,7 +459,7 @@ public class CCodeGenerator extends Generator
             ConfiguredAlgorithm childAlgo = logic.getChild(childName);
             if(true == childAlgo.hasApi(fc.getApi()))
             {
-                String impl = getCImplementationOf(fc, childAlgo);
+                String impl = getCppImplementationOf(fc, childAlgo);
                 if(null == impl)
                 {
                     continue;
@@ -483,7 +496,7 @@ public class CCodeGenerator extends Generator
                     return null;
                 }
                 CFunctionCall libfc = new CFunctionCall(functionName);
-                String impl = getCImplementationOf(libfc, libAlgo);
+                String impl = getCppImplementationOf(libfc, libAlgo);
                 if(null == impl)
                 {
                     ctx.addError(this, "" + logic + " : Function call to missing (lib) function (" + functionName + ") !");
@@ -510,7 +523,7 @@ public class CCodeGenerator extends Generator
 
     private void getAdditionalsFrom(AlgorithmInstanceInterface logic)
     {
-        Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
+        Element cCode = logic.getAlgorithmElement(ALGORITHM_CPP_CODE_CHILD_NAME);
         if(null == cCode)
         {
             ctx.addError(this,
@@ -553,7 +566,7 @@ public class CCodeGenerator extends Generator
                 Function func = new Function(curElement);
 
                 CFunctionCall fc = new CFunctionCall(func.getName());
-                String implementation = getCImplementationOf(fc, logic);
+                String implementation = getCppImplementationOf(fc, logic);
                 if(null == implementation)
                 {
                     String error = "Could not get an Implementation for " + func.getName();
@@ -592,19 +605,4 @@ public class CCodeGenerator extends Generator
         }
     }
 
-    private CFile createFile(String fileName)
-    {
-        CFile aFile = new CFile(fileName);
-
-        // there should be a file comment explaining what this is
-        aFile.addLines(CFile.C_FILE_FILE_COMMENT_SECTION_NAME,
-                       new String[] {"/*",
-                                     "  automatically created " + fileName,
-                                     "  created at: " + Tool.curentDateTime(),
-                                     "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
-                                     "*/"});
-        return aFile;
-    }
-
 }
-;

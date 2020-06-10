@@ -15,6 +15,7 @@
 package de.nomagic.puzzler.Environment;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,33 +28,36 @@ import org.slf4j.LoggerFactory;
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGetter;
-import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
+import de.nomagic.puzzler.BuildSystem.BuildSystemApi;
 import de.nomagic.puzzler.BuildSystem.Target;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.FileFactory;
+import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
 
 public class Environment extends Base
 {
     public static final String ROOT_ELEMENT_NAME = "environment";
     public static final String TOOL_ELEMENT_NAME = "tool";
+    public static final String BUILD_SYSTEM_ELEMENT_NAME = "build";
+    public static final String BUILD_SYSTEM_TYPE_ATTRIBUTE_NAME = "type";
     public static final String TOOL_NAME_ATTRIBUTE_NAME = "name";
     public static final String PIN_MAPPING_ELEMENT_NAME = "resources";
     public static final String BUILD_CFG_ROOT_ELEMENT_NAME = "build_cfg";
+    public static final String ADDITIONAL_FILES_ROOT_ELEMENT_NAME = "additional";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-    
+
     private Element xmlTreeRoot = null;
-    private String platformName = "";
     private String[] platformParts = new String[0];
-    
+
     public Environment(Context ctx)
     {
         super(ctx);
     }
 
     public boolean loadFromElement(Element environmentRoot)
-    {    
+    {
         if(null == environmentRoot)
         {
             ctx.addError(this, "No Environment Tag in Project !");
@@ -71,24 +75,35 @@ public class Environment extends Base
             ctx.addError(this, "Environment did not specify the platform / environment type / tool chain to use.");
             return false;
         }
-        platformName = cpu.getAttributeValue(TOOL_NAME_ATTRIBUTE_NAME);
+        String platformName = cpu.getAttributeValue(TOOL_NAME_ATTRIBUTE_NAME);
         log.trace("type : {}", platformName);
         if(null == platformName)
         {
-            ctx.addError(this, "Environment did not specify the type.");
-            platformName = "";
+            ctx.addError(this, "Environment did not specify the tool name.");
             platformParts = new String[0];
             return false;
         }
         platformParts = platformName.split("/");
         return true;
     }
-    
+
     public String[] getPlatformParts()
     {
         return platformParts;
     }
 
+    public String getBuldSystemType()
+    {
+        if(null != xmlTreeRoot)
+        {
+            Element build = xmlTreeRoot.getChild(BUILD_SYSTEM_ELEMENT_NAME);
+            if(null != build)
+            {
+                return build.getAttributeValue(BUILD_SYSTEM_TYPE_ATTRIBUTE_NAME);
+            }
+        }
+        return null;
+    }
 
     public boolean provides(String name)
     {
@@ -139,7 +154,7 @@ public class Environment extends Base
         return null;
     }
 
-    private Element getConfigurationElementFrom(String Path, String FileName)
+    private Element getConfigurationElementFrom(String Path, String FileName, String RootElementName)
     {
         Document comCfgDoc = FileGetter.tryToGetXmlFile(Path, FileName, false, ctx);
         if(null != comCfgDoc)
@@ -152,7 +167,7 @@ public class Environment extends Base
                 return null;
             }
 
-            if(false == BUILD_CFG_ROOT_ELEMENT_NAME.equals(root.getName()))
+            if(false == RootElementName.equals(root.getName()))
             {
                 ctx.addError(this, "Invalid root tag(" + root.getName() + ")  "
                         + "in the configuration file " + Path + FileName);
@@ -168,14 +183,8 @@ public class Environment extends Base
         }
     }
 
-    private void addConfigurationFromTo(
-            Element cfgElement, 
-            BuildSystemAddApi BuildSystem, 
-            Map<String, String> requiredEnvironmentVariables)
+    private void addVariables(Element reqVariables, BuildSystemApi BuildSystem)
     {
-        // extract all "needed" stuff
-        Element required = cfgElement.getChild("required");
-        Element reqVariables = required.getChild("variables");
         if(null != reqVariables)
         {
             List<Element> variList = reqVariables.getChildren();
@@ -191,9 +200,10 @@ public class Environment extends Base
             // else no required Variables
         }
         // else no required Variables
+    }
 
-        // required Targets
-        Element reqTargets = required.getChild("targets");
+    private void addTargets(Element reqTargets, BuildSystemApi BuildSystem)
+    {
         if(null != reqTargets)
         {
             List<Element> targetList = reqTargets.getChildren();
@@ -210,9 +220,10 @@ public class Environment extends Base
             // else no required Targets
         }
         // else no required Targets
+    }
 
-        // required Files
-        Element reqFiles = required.getChild("files");
+    private void addFiles(Element reqFiles, BuildSystemApi BuildSystem)
+    {
         if(null != reqFiles)
         {
             List<Element> fileList = reqFiles.getChildren();
@@ -227,6 +238,26 @@ public class Environment extends Base
                 }
             }
             // else no required Targets
+        }
+        // else no required Targets
+    }
+
+    private boolean addConfigurationFromTo(
+            Element cfgElement,
+            BuildSystemApi BuildSystem,
+            Map<String, String> requiredEnvironmentVariables)
+    {
+        if(null == cfgElement)
+        {
+            return false;
+        }
+        // extract all "needed" stuff
+        Element required = cfgElement.getChild("required");
+        if(null != required)
+        {
+            addVariables(required.getChild("variables"), BuildSystem);
+            addTargets(required.getChild("targets"), BuildSystem);
+            addFiles(required.getChild("files"), BuildSystem);
         }
 
         // then extract everything mentioned in the hashmap.
@@ -244,24 +275,24 @@ public class Environment extends Base
                 }
             }
         }
+        return true;
     }
 
-    public boolean configureBuild(
-            BuildSystemAddApi buildSystem, 
-            Map<String, String> requiredEnvironmentVariables)
+    private Element[] getConfigFile(String postfix, String RootElementName)
     {
+        ArrayList<Element> res = new ArrayList<Element>();
         // Find configuration file for environment
         String commonCfgFolder;
         String envPath = ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG);
         if(1 > envPath.length())
         {
             ctx.addError(this, "Environment path not configured !");
-            return false;
+            return null;
         }
-        
+
         String deviceName = platformParts[platformParts.length -1]; // last element
         StringBuilder architectureName = new StringBuilder();
-        
+
         for(int i = 0; i < platformParts.length -1; i++)
         {
             architectureName.append(platformParts[i]);
@@ -271,8 +302,8 @@ public class Environment extends Base
                 + architectureName.toString();
 
         // search in project folder
-        Element commonElement = getConfigurationElementFrom(commonCfgFolder, "common_" + "cfg_build.xml");
-        Element deviceElement = getConfigurationElementFrom(commonCfgFolder, deviceName + "_cfg_build.xml");
+        Element commonElement = getConfigurationElementFrom(commonCfgFolder, "common" + postfix, RootElementName);
+        Element deviceElement = getConfigurationElementFrom(commonCfgFolder, deviceName + postfix, RootElementName);
 
         // if not found then search in environment folder
         if(null == commonElement)
@@ -286,39 +317,93 @@ public class Environment extends Base
                 {
                     sb.append(platformParts[k]);
                     sb.append(File.separator);
-                }   
+                }
                 commonElement = getConfigurationElementFrom(
                         sb.toString(),
-                        "common_" + "cfg_build.xml");
+                        "common" + postfix,
+                        RootElementName);
                 if(null != commonElement)
                 {
                     break;
                 }
             }
-            
+
         }
+
         if(null == deviceElement)
         {
             // only in the device sub folder
-            deviceElement = getConfigurationElementFrom(ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) + architectureName,
-                    deviceName + "_cfg_build.xml");
+            deviceElement = getConfigurationElementFrom(
+                    ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG) + architectureName,
+                    deviceName + postfix,
+                    RootElementName);
         }
+        // TODO ??? maybe have more than one common file?
+        res.add(commonElement);
+        res.add(deviceElement);
+        return res.toArray(new Element[0]);
+    }
 
-        if((null == commonElement) && (null == deviceElement))
+    public boolean configureBuild(
+            BuildSystemApi buildSystem,
+            Map<String, String> requiredEnvironmentVariables)
+    {
+        Element[] cfgFiles = getConfigFile("_cfg_build.xml", BUILD_CFG_ROOT_ELEMENT_NAME);
+
+        if(null == cfgFiles)
         {
             ctx.addError(this, "No Build system configuration file found!");
             return false;
         }
 
-        if(null != commonElement)
+        for(int i = 0; i < cfgFiles.length; i++)
         {
-            addConfigurationFromTo(commonElement, buildSystem, requiredEnvironmentVariables);
-        }
-        if(null != deviceElement)
-        {
-            addConfigurationFromTo(deviceElement, buildSystem, requiredEnvironmentVariables);
+            if( false == addConfigurationFromTo(cfgFiles[i], buildSystem, requiredEnvironmentVariables))
+            {
+                return false;
+            }
         }
         return true;
+    }
+
+    private FileGroup addFiles(Element reqFiles, FileGroup allFiles)
+    {
+        if(null != reqFiles)
+        {
+            List<Element> fileList = reqFiles.getChildren();
+            if(null != fileList)
+            {
+                Iterator<Element> it = fileList.iterator();
+                while(it.hasNext())
+                {
+                    Element curFile = it.next();
+                    AbstractFile aFile = FileFactory.getFileFromXml(curFile);
+                    allFiles.add(aFile);
+                }
+            }
+            // else no required Targets
+        }
+        // else no required Targets
+        return allFiles;
+    }
+
+    public FileGroup addRequiredFiles(Context ctx, FileGroup allFiles)
+    {
+        Element[] cfgFiles = getConfigFile("_files.xml", ADDITIONAL_FILES_ROOT_ELEMENT_NAME);
+
+        if(null == cfgFiles)
+        {
+            // no additional files necessary
+            // -> we are done here
+            return allFiles;
+        }
+
+        for(int i = 0; i < cfgFiles.length; i++)
+        {
+            allFiles = addFiles(cfgFiles[i], allFiles);
+        }
+
+        return allFiles;
     }
 
 }

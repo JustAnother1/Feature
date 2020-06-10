@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
-import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
+import de.nomagic.puzzler.BuildSystem.BuildSystemApi;
 
 public abstract class AbstractFile
 {
@@ -54,7 +54,7 @@ public abstract class AbstractFile
 
     public abstract void writeToStream(OutputStream out) throws IOException;
 
-    public void addToBuild(BuildSystemAddApi buildSystem)
+    public void addToBuild(BuildSystemApi buildSystem)
     {
         // nothing to do.
         // Override if something needs to be done.

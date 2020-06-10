@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="log" implements="run">
+    <enum name="level">
+        <entry name="debug"/>
+    </enum>
+    <function name="execute" type="required" param0_name="level" param0_type="enum:level" param1_name="message" param1_type="string" />
+</api>

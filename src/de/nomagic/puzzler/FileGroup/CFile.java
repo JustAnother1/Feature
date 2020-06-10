@@ -2,7 +2,7 @@ package de.nomagic.puzzler.FileGroup;
 
 import java.util.List;
 
-import de.nomagic.puzzler.BuildSystem.BuildSystemAddApi;
+import de.nomagic.puzzler.BuildSystem.BuildSystemApi;
 import de.nomagic.puzzler.BuildSystem.Target;
 import de.nomagic.puzzler.solution.Function;
 
@@ -46,7 +46,7 @@ public class CFile extends TextFile
     }
 
     @Override
-    public void addToBuild(BuildSystemAddApi buildSystem)
+    public void addToBuild(BuildSystemApi buildSystem)
     {
         if(false == buildSystem.hasTargetFor("%.c"))
         {

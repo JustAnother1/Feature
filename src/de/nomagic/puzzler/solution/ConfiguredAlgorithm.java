@@ -232,19 +232,8 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         }
     }
 
-    private boolean allRequiredDataAvailable()
+    private boolean checkRequiredConfigurationParametersAvailable(Element requirements)
     {
-        addProvidedData();
-
-        Element requirements = algorithmDefinition.getChild(ALGORITHM_REQUIREMENTS_CHILD_NAME);
-        if(null == requirements)
-        {
-            LOG.trace("{} has no requirements!", algorithmDefinition);
-            return true;
-        }
-        // else :
-
-        // required configuration parameters
         List<Element> cfgReq = requirements.getChildren(REQUIRED_CFG_NAME);
         LOG.trace("{} has {} required parameters.", algorithmDefinition, cfgReq.size());
         for(int i = 0; i < cfgReq.size(); i++)
@@ -282,8 +271,11 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                 parameters.put(attrName, at.getValue());
             }
         }
+        return true;
+    }
 
-        // required children(algorithms)
+    private boolean checkRequiredChildrensAvailable(Element requirements)
+    {
         List<Element> algoReq = requirements.getChildren(REQUIRED_ALGORITHM_NAME);
         LOG.trace("{} has {} required children.", algorithmDefinition, algoReq.size());
         for(int i = 0; i < algoReq.size(); i++)
@@ -297,6 +289,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
                                 + " missing for required child element !");
                 return false;
             }
+            LOG.trace("required API for child {} is '{}'", i, reqApi);
             boolean found = false;
             Iterator<String> it = getAllChildren();
             while(it.hasNext())
@@ -311,9 +304,35 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             if(false == found)
             {
                 ctx.addError("ConfiguredAlgorithm.allRequiredDataAvailable",
-                                toString() + "required child element of type " + reqApi + " not present !");
+                                toString() + " required child element of type '" + reqApi + "' not present !");
                 return false;
             }
+        }
+        return true;
+    }
+
+    private boolean allRequiredDataAvailable()
+    {
+        addProvidedData();
+
+        Element requirements = algorithmDefinition.getChild(ALGORITHM_REQUIREMENTS_CHILD_NAME);
+        if(null == requirements)
+        {
+            LOG.trace("{} has no requirements!", algorithmDefinition);
+            return true;
+        }
+        // else :
+
+        // required configuration parameters
+        if(false == checkRequiredConfigurationParametersAvailable(requirements))
+        {
+            return false;
+        }
+
+        // required children(algorithms)
+        if(false == checkRequiredChildrensAvailable(requirements))
+        {
+            return false;
         }
 
         return true;
