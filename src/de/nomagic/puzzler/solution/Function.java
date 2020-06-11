@@ -226,7 +226,7 @@ public class Function extends CElement
             }
             else
             {
-                return  getDeclaration() + "; // from " + comment;
+                return  getDeclaration() + "; // from " + comment + lineSperator;
             }
         }
         else if(FunctionHandler.TYPE_IMPLEMENTATION == type)

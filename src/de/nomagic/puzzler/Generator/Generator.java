@@ -71,7 +71,7 @@ public abstract class Generator extends Base
     {
         return "// from " + logic + System.getProperty("line.separator")
         + Implementation + System.getProperty("line.separator")
-        + "// end of " + logic;
+        + "// end of " + logic + System.getProperty("line.separator");
     }
 
     protected abstract String fillInFunctionCall(String functionName, AlgorithmInstanceInterface logic);

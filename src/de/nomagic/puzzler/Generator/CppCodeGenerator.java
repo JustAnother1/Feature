@@ -300,6 +300,7 @@ public class CppCodeGenerator extends Generator {
                 impl = impl.trim();
                 if(0 < impl.length())
                 {
+                    sb.append(System.getProperty("line.separator"));
                     sb.append(impl);
                     log.trace("adding non element code to implmentation: {} from {}", impl, curC);
                 }
