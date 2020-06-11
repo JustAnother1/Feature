@@ -1,0 +1,85 @@
+Feature language specification
+==============================
+
+:toc:
+:numbered:
+:showcomments:
+
+== Introduction
+The Feature language can be used to specify the behavior of a software. The puzzler software can then be used to create that software from that specification.
+
+This document defines all the elements available in the Feature language. It also describes how the elements can be used and how they interact with each other.
+
+== Concepts
+This chapter describes the major concepts that the Feature language relies on.
+
+
+=== Feature is a programming language
+Feature is a way to define the behavior of a program down to a level that an implementation can be generated from it. It therefore qualifies as a programming language.
+But Feature does not create binaries but only creates software projects in another programming language. Therefore the tool chain of another programming language is always needed.
+
+=== separation of environment and solution
+Feature distinguishes between the environment and the solution.
+
+The environment describes the tools, libraries and resources that are available to the software or used to create the software.
+
+The solution is the high level design that describes the solution to the problem that the software should solve,
+
+The reason for this separation is that this enable the solution to be generic to the problem without the need to make compromises for the environment. The designer of the solution should not think about the restrictions of the environment when designing the solution.
+
+This way the designer can concentrate on the correctness of the solution. It also makes it easier to test the solution as it can be tested in a different environment to that that it should run in.
+
+=== one algorithm multiple implementations
+algorithms are the building blocks of the solutions. Each algorithm can implement one or many APIs and can provide one or many functions.
+
+Each function can have one or many implementations. If a function has more than one implementation then the best implementation for the solution can be selected by the puzzler.
+
+=== API define the interfaces
+For Algorithms to be able to interact with each other it is necessary for them to define these interactions. An API defines the functions that an algorithm must provide. Algorithms can implement one or more API and can define the API required for Algorithms they can interact with.
+
+== each element in it's own file
+managing hundreds or thousands of files is no big deal anymore. And having separate files for separate things helps once the things start to change.
+
+== Language Elements
+This chapter describes all parts of an Feature project. Only the here mentioned Elements can be used to define the software.
+
+This document only gives an overview of the Elements. For the detail description also check the Elements Specification.
+
+
+== project
+The project defines the environment and the solution for a software.
+
+=== environment
+
+=== solution
+
+==== API
+
+==== algorithm
+
+
+
+== dictionary
+
+*algorithm* ::
+a set of functions that implement a behavior.
+
+*API* ::
+defines the set of functions provided by an algorithm.
+
+*environment* ::
+defines the tools used to create the software, the libraries and resources available to the software.
+
+*library*::
+tbd
+
+*resource*::
+tbd
+
+*solution* ::
+defines all used algorithms and their interaction to define the behavior of the software.
+
+*tool* ::
+a piece of software that is used to create the software
+
+// end of file
