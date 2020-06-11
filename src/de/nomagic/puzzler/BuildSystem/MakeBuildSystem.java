@@ -39,9 +39,7 @@ public class MakeBuildSystem extends BuildSystem
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     private ArrayList<Target> targets = new ArrayList<Target>();
-    private HashMap<String, String> requiredEnvironmentVariables = new HashMap<String, String>();
     private HashMap<String, String> listVariables = new HashMap<String, String>();
-    private FileGroup buildFiles = new FileGroup();
     private int numDefaultTargets = 0;
     private TextFile makeFile;
 
@@ -110,7 +108,7 @@ public class MakeBuildSystem extends BuildSystem
             ctx.addError(this, "No Environment available !");
             return null;
         }
-        if(false == ctx.getEnvironment().configureBuild(this, requiredEnvironmentVariables))
+        if(false == e.configureBuild(this, requiredEnvironmentVariables))
         {
             ctx.addError(this, "Could not get configuration from environment !");
             return null;
@@ -254,11 +252,6 @@ public class MakeBuildSystem extends BuildSystem
     public void addRequiredVariable(String name)
     {
         requiredEnvironmentVariables.put(name, "");
-    }
-
-    public void addFile(AbstractFile newFile)
-    {
-        buildFiles.add(newFile);
     }
 
 }

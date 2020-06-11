@@ -403,7 +403,7 @@ public class PuzzlerMain
         allFiles = make.createBuildFor(allFiles);
         if(null == allFiles)
         {
-            log.error("Build environment failed to generte files !");
+            log.error("Build environment failed to generate files !");
             ctx.close();
             return null;
         }

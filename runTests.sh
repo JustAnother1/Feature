@@ -27,43 +27,6 @@ echo "========"
 rm test_out -r 2> /dev/null
 # if this failes then we do not care
 
-# Renesas S1
-echo ""
-echo "Test 2e:(Qt)"
-echo "============="
-java -jar Puzzler.jar -v -v -o test_out/qt -l res/lib/ -w tests/data/ -e res/environment/ testProject_qt.xml
-if [ $? -ne 0 ] ; then
-    echo ""
-    echo "ERROR: Creating test project for Qt failed !"
-    exit
-else
-    echo "OK:  Qt test finished !"
-fi
-
-
-echo ""
-echo ""
-echo ""
-java -jar Puzzler.jar -v -v -o test_out/qt_doc   -l res/lib/ -w tests/data/ -e res/environment/ -Ddocument_code_source=true testProject_qt.xml
-if [ $? -ne 0 ] ; then
-    echo ""
-    echo "ERROR: Creating test project for Qt with comments failed !"
-    exit
-else
-    echo "OK:  Qt with comments test finished !"
-fi
-
-
-echo ""
-echo ""
-echo "==========================="
-echo " --- All tests finished ---"
-echo "==========================="
-
-exit
-
-
-
 # Microchip (Atmel) AVR
 echo ""
 echo "Test 2a:(AVR)"
@@ -178,6 +141,32 @@ if [ $? -ne 0 ] ; then
     exit
 else
     echo "OK:  S1JA with comments test finished !"
+fi
+
+# Qt
+echo ""
+echo "Test 2e:(Qt)"
+echo "============="
+java -jar Puzzler.jar -v -v -o test_out/qt -l res/lib/ -w tests/data/ -e res/environment/ testProject_qt.xml
+if [ $? -ne 0 ] ; then
+    echo ""
+    echo "ERROR: Creating test project for Qt failed !"
+    exit
+else
+    echo "OK:  Qt test finished !"
+fi
+
+
+echo ""
+echo ""
+echo ""
+java -jar Puzzler.jar -v -v -o test_out/qt_doc   -l res/lib/ -w tests/data/ -e res/environment/ -Ddocument_code_source=true testProject_qt.xml
+if [ $? -ne 0 ] ; then
+    echo ""
+    echo "ERROR: Creating test project for Qt with comments failed !"
+    exit
+else
+    echo "OK:  Qt with comments test finished !"
 fi
 
 

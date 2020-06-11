@@ -25,10 +25,17 @@ public class BuildSystemFactory
         Environment e = ctx.getEnvironment();
         String BuldSystemType = e.getBuldSystemType();
         log.trace("Build System from environment : {}", BuldSystemType);
+
         if(true == "none".equals(BuldSystemType))
         {
             log.trace("Build System selected: no build system");
             return new NoBuildSystem();
+        }
+
+        if(true == "qmake".equals(BuldSystemType))
+        {
+            log.trace("Build System selected: Qmake");
+            return new QmakeBuildSystem(ctx);
         }
 
         // New Build Systems go here!
