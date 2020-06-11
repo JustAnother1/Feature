@@ -8,7 +8,7 @@
     <c_code>
         <function name="execute">
           <forChilds api="event">
-              <![CDATA[{€event:trigger()€]]>
+              <![CDATA[€event:trigger()€]]>
           </forChilds>
           <![CDATA[
     €bitOut:setValue(true)€

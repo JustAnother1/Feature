@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <solution>
     <app algorithm="app_main">
-        <hello algorithm="log" level="debug" msg="Hello Qt World!\n" />
-        <hello algorithm="log" level="debug" msg="Hello Feature World!\n" />
+        <hello algorithm="log" level="debug" message="Hello Qt World!\n" />
     </app>
 </solution>

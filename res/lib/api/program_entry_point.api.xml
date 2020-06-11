@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <api name="program_entry_point" >
-  <function name="main" type="required" />
+  <function name="main" type="required" result="int" />
 </api>

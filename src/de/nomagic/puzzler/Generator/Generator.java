@@ -27,7 +27,6 @@ public abstract class Generator extends Base
     public static final String ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME = "name";
     public static final String ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME = "additional";
     public static final String ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME = "include";
-    public static final String ALGORITHM_INITIALISATION_FUNCTION_NAME = "initialize";
     public static final String ALGORITHM_ADDITIONAL_FILE_CHILD_NAME = "file";
     public static final String ALGORITHM_ADDITIONAL_VARIABLE_CHILD_NAME = "variable";
 
@@ -148,41 +147,56 @@ public abstract class Generator extends Base
     protected String getFunctionParameterValue(String ParameterName,
             Element functionElement,
             String FunctionParameters )
-  {
-      // Reference to Algorithm parameter
-      // get which parameter this is (1st 2nd 3rd,..)
-      int paramIndex = 0;
-      do {
-          Attribute attr = functionElement.getAttribute("param" + paramIndex + "_name");
-          if(null == attr)
-          {
-              log.trace("Function parameter {} not found !", ParameterName);
-              return null;
-          }
-          if(true == ParameterName.equals(attr.getValue()))
-          {
-              break;
-          }
-          else
-          {
-              paramIndex++;
-          }
-      }while(true);
+    {
+        if(null == ParameterName)
+        {
+            log.error("Function parameter name is null !");
+            return null;
+        }
+        if(null == functionElement)
+        {
+            log.error("Function element is null !");
+            return null;
+        }
+        if(null == FunctionParameters)
+        {
+            log.error("Function parameters are null !");
+            return null;
+        }
+        // Reference to Algorithm parameter
+        // get which parameter this is (1st 2nd 3rd,..)
+        int paramIndex = 0;
+        do {
+            Attribute attr = functionElement.getAttribute("param" + paramIndex + "_name");
+            if(null == attr)
+            {
+                log.trace("Function parameter {} not found !", ParameterName);
+                return null;
+            }
+            if(true == ParameterName.equals(attr.getValue()))
+            {
+                break;
+            }
+            else
+            {
+                paramIndex++;
+            }
+        }while(true);
 
-      // get value for that parameter from FunctionParameters
-      String[] parameters = FunctionParameters.split(",");
-      if(paramIndex < parameters.length)
-      {
-          return parameters[paramIndex];
-      }
-      else
-      {
-          ctx.addError(this,
-                  "Could not get the " + paramIndex
-          + ". parameter to this function from the parameters given as " + FunctionParameters );
-              return null;
-      }
-  }
+        // get value for that parameter from FunctionParameters
+        String[] parameters = FunctionParameters.split(",");
+        if(paramIndex < parameters.length)
+        {
+            return parameters[paramIndex];
+        }
+        else
+        {
+            ctx.addError(this, "Could not get the " + paramIndex
+                + ". parameter to this function from the parameters given as "
+                + FunctionParameters );
+            return null;
+        }
+    }
 
     protected String replacePlaceholders(String implementation,
             String FunctionParameters,
@@ -192,6 +206,28 @@ public abstract class Generator extends Base
         int numEuros = 0;
         int numOpenBraces = 0;
         int numClosingBaces = 0;
+
+        if(null == implementation)
+        {
+            ctx.addError(this,"Implementation is null ! ");
+            return null;
+        }
+        if(null == FunctionParameters)
+        {
+            log.warn("Function Parameters are null, changing to empty String !");
+            FunctionParameters = "";
+        }
+        if(null == logic)
+        {
+            ctx.addError(this,"logic is null ! ");
+            return null;
+        }
+        if(null == functionElement)
+        {
+            ctx.addError(this,"function element is null ! ");
+            return null;
+        }
+
         for(int i = 0; i < implementation.length(); i++)
         {
             switch(implementation.charAt(i))

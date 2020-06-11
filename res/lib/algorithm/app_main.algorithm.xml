@@ -4,14 +4,11 @@
     <childElement type="run" />
   </required>
   <cpp_code>
-    <function name="main">
-    <![CDATA[int main()
-{]]>
+    <function name="main" result="int">
       <forChilds api="run">
-         <![CDATA[{€run:execute()€]]>
+         <![CDATA[€run:execute()€]]>
       </forChilds>
-<![CDATA[return 0;
-}]]>
+      <![CDATA[return 0;]]>
     </function>
   </cpp_code>
 </algorithm>

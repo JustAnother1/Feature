@@ -74,32 +74,8 @@ public class CppCodeGenerator extends Generator {
         {
             return null;
         }
-        addInitCode();
 
         return codeGroup;
-    }
-
-    private void addInitCode()
-    {
-        Element funcElement = new Element(ALGORITHM_FUNCTION_CHILD_NAME);
-        funcElement.setAttribute(Function.FUNCTION_NAME_ATTRIBUTE_NAME, ALGORITHM_INITIALISATION_FUNCTION_NAME);
-        funcElement.setAttribute(Function.FUNCTION_TYPE_ATTRIBUTE_NAME, Function.FUNCTION_REQUIRED_TYPE);
-        Function initFunc = new Function(funcElement);
-        StringBuilder sb = new StringBuilder();
-        for (String curBlock : initcode.keySet())
-        {
-            log.trace("Found init code for {}", curBlock);
-        }
-
-        for (CInitCodeBlock curBlock : initcode.values())
-        {
-            sb.append(curBlock.getImplemenation());
-            sb.append("\n");
-        }
-        initFunc.setImplementation(sb.toString());
-
-        CppFile main = (CppFile)codeGroup.getFileWithName("main.cpp");
-        main.addFunction(initFunc);
     }
 
     private CppFile createFile(String fileName)
@@ -191,7 +167,6 @@ public class CppCodeGenerator extends Generator {
             return null;
         }
 
-        handleInitFunctionOfAlgorithm(logic);
         if(false == ctx.wasSucessful())
         {
             return null;
@@ -226,43 +201,6 @@ public class CppCodeGenerator extends Generator {
         {
             return implementation;
         }
-    }
-
-    private void handleInitFunctionOfAlgorithm(AlgorithmInstanceInterface logic)
-    {
-        // check if logic has a initialize function, if so then add that to the initcode
-        Element cCode = logic.getAlgorithmElement(ALGORITHM_CPP_CODE_CHILD_NAME);
-        if(null != cCode)
-        {
-            List<Element> funcs = cCode.getChildren(ALGORITHM_FUNCTION_CHILD_NAME);
-            if(null != funcs)
-            {
-                for(int i = 0; i < funcs.size(); i++)
-                {
-                    // check all functions
-                    Element curElement = funcs.get(i);
-                    String name = curElement.getAttributeValue(ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME);
-                    if(true == ALGORITHM_INITIALISATION_FUNCTION_NAME.equals(name))
-                    {
-                        // found another init function
-                        log.trace("Found initFunctuntion in {}", logic);
-                        String id = logic.toString();
-                        String impl = getImplementationFromFunctionElement(curElement, "", logic);
-                        if(true == documentCodeSource)
-                        {
-                            impl = addCommentsToImplementation(impl, logic);
-                        }
-                        impl = impl.trim();
-                        impl = replacePlaceholders(impl, "", logic, curElement);
-                        CInitCodeBlock initB = new CInitCodeBlock(id, impl);
-                        initcode.put(id, initB);
-                    }
-                    // else not the initialize function -> ignore it.
-                }
-            }
-            // else no functions -> nothing to do
-        }
-        // else no C++-Code -> nothing to do
     }
 
     private String getImplementationFromFunctionElement(Element function, String FunctionArguments, AlgorithmInstanceInterface logic)

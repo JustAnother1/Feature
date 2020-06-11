@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <algorithm name="log" api="log">
-
-  <cpp_code>
-
-    <additional>
-      <include>QtDebug</include>
-    </additional>
-    <function  name="execute" param0_name="level" param0_type="enum:level" param1_name="message" param1_type="string">
-      <if cond="'debug' equals param(level)">
-        <include>QtDebug</include>
-        <![CDATA[qDebug() << "€message€";]]>
-      </if>
-    </function>
-
-  </cpp_code>
+    <required>
+        <parameter name="level" type="enum:level" />
+        <parameter name="message" type="string" />
+    </required>
+    <cpp_code>
+        <additional>
+            <include>QtDebug</include>
+        </additional>
+        <function  name="execute" >
+            <![CDATA[qDebug() << "€message€";]]>
+        </function>
+    </cpp_code>
 </algorithm>
