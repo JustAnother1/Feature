@@ -14,7 +14,10 @@
  */
 package de.nomagic.puzzler;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -204,5 +207,37 @@ public final class Tool
             return path + File.separator;
         }
         return path;
+    }
+
+    public static String getCommitID()
+    {
+        try
+        {
+            final InputStream s = Tool.class.getResourceAsStream("/commit-id");
+            final BufferedReader in = new BufferedReader(new InputStreamReader(s));
+            final String commitId = in.readLine();
+            final String changes = in.readLine();
+            in.close();
+            s.close();
+            if(null != changes)
+            {
+                if(0 < changes.length())
+                {
+                    return commitId + "-(" + changes + ")";
+                }
+                else
+                {
+                    return commitId;
+                }
+            }
+            else
+            {
+                return commitId;
+            }
+        }
+        catch( Exception e )
+        {
+            return e.toString();
+        }
     }
 }

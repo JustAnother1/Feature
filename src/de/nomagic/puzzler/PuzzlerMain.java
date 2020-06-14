@@ -14,10 +14,7 @@
  */
 package de.nomagic.puzzler;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
@@ -60,38 +57,6 @@ public class PuzzlerMain
         // nothing to do here
     }
 
-    public static String getCommitID()
-    {
-        try
-        {
-            final InputStream s = PuzzlerMain.class.getResourceAsStream("/commit-id");
-            final BufferedReader in = new BufferedReader(new InputStreamReader(s));
-            final String commitId = in.readLine();
-            final String changes = in.readLine();
-            in.close();
-            s.close();
-            if(null != changes)
-            {
-                if(0 < changes.length())
-                {
-                    return commitId + "-(" + changes + ")";
-                }
-                else
-                {
-                    return commitId;
-                }
-            }
-            else
-            {
-                return commitId;
-            }
-        }
-        catch( Exception e )
-        {
-            return e.toString();
-        }
-    }
-
     public void printHelp()
     {
         System.out.println("Feature Puzzler [Parameters] [Project File]");
@@ -129,7 +94,7 @@ public class PuzzlerMain
         case 2:
         default:
             setLogLevel("trace");
-            System.out.println("Build from " + getCommitID());
+            System.out.println("Build from " + Tool.getCommitID());
             break;
         }
     }
