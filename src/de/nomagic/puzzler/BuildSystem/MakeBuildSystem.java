@@ -108,7 +108,7 @@ public class MakeBuildSystem extends BuildSystem
             ctx.addError(this, "No Environment available !");
             return null;
         }
-        if(false == e.configureBuild(this, requiredEnvironmentVariables))
+        if(false == configureBuild(e, requiredEnvironmentVariables))
         {
             ctx.addError(this, "Could not get configuration from environment !");
             return null;

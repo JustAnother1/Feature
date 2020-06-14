@@ -304,6 +304,4 @@ public final class FileGetter
         return root;
     }
 
-
-
 }

@@ -18,7 +18,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -28,8 +27,6 @@ import org.slf4j.LoggerFactory;
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGetter;
-import de.nomagic.puzzler.BuildSystem.BuildSystemApi;
-import de.nomagic.puzzler.BuildSystem.Target;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.FileFactory;
 import de.nomagic.puzzler.FileGroup.FileGroup;
@@ -43,7 +40,6 @@ public class Environment extends Base
     public static final String BUILD_SYSTEM_TYPE_ATTRIBUTE_NAME = "type";
     public static final String TOOL_NAME_ATTRIBUTE_NAME = "name";
     public static final String PIN_MAPPING_ELEMENT_NAME = "resources";
-    public static final String BUILD_CFG_ROOT_ELEMENT_NAME = "build_cfg";
     public static final String ADDITIONAL_FILES_ROOT_ELEMENT_NAME = "additional";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
@@ -183,102 +179,7 @@ public class Environment extends Base
         }
     }
 
-    private void addVariables(Element reqVariables, BuildSystemApi BuildSystem)
-    {
-        if(null != reqVariables)
-        {
-            List<Element> variList = reqVariables.getChildren();
-            if(null != variList)
-            {
-                Iterator<Element> it = variList.iterator();
-                while(it.hasNext())
-                {
-                    Element curVar = it.next();
-                    BuildSystem.extendListVariable(curVar.getName(),curVar.getText());
-                }
-            }
-            // else no required Variables
-        }
-        // else no required Variables
-    }
-
-    private void addTargets(Element reqTargets, BuildSystemApi BuildSystem)
-    {
-        if(null != reqTargets)
-        {
-            List<Element> targetList = reqTargets.getChildren();
-            if(null != targetList)
-            {
-                Iterator<Element> it = targetList.iterator();
-                while(it.hasNext())
-                {
-                    Element curTarget = it.next();
-                    Target t = new Target(curTarget);
-                    BuildSystem.addTarget(t);
-                }
-            }
-            // else no required Targets
-        }
-        // else no required Targets
-    }
-
-    private void addFiles(Element reqFiles, BuildSystemApi BuildSystem)
-    {
-        if(null != reqFiles)
-        {
-            List<Element> fileList = reqFiles.getChildren();
-            if(null != fileList)
-            {
-                Iterator<Element> it = fileList.iterator();
-                while(it.hasNext())
-                {
-                    Element curFile = it.next();
-                    AbstractFile aFile = FileFactory.getFileFromXml(curFile);
-                    BuildSystem.addFile(aFile);
-                }
-            }
-            // else no required Targets
-        }
-        // else no required Targets
-    }
-
-    private boolean addConfigurationFromTo(
-            Element cfgElement,
-            BuildSystemApi BuildSystem,
-            Map<String, String> requiredEnvironmentVariables)
-    {
-        if(null == cfgElement)
-        {
-            return false;
-        }
-        // extract all "needed" stuff
-        Element required = cfgElement.getChild("required");
-        if(null != required)
-        {
-            addVariables(required.getChild("variables"), BuildSystem);
-            addTargets(required.getChild("targets"), BuildSystem);
-            addFiles(required.getChild("files"), BuildSystem);
-        }
-
-        // then extract everything mentioned in the hashmap.
-        Element variables = cfgElement.getChild("variables");
-        if(null != variables)
-        {
-            Iterator<String> it = requiredEnvironmentVariables.keySet().iterator();
-            while(it.hasNext())
-            {
-                String variName = it.next();
-                String variValue =  variables.getChildText(variName);
-                if(null != variValue)
-                {
-                    BuildSystem.extendListVariable(variName, variValue);
-                }
-            }
-        }
-        return true;
-    }
-
-    private Element[] getConfigFile(String postfix, String RootElementName)
+    public Element[] getConfigFile(String postfix, String RootElementName)
     {
         ArrayList<Element> res = new ArrayList<Element>();
         // Find configuration file for environment
@@ -344,27 +245,6 @@ public class Environment extends Base
         return res.toArray(new Element[0]);
     }
 
-    public boolean configureBuild(
-            BuildSystemApi buildSystem,
-            Map<String, String> requiredEnvironmentVariables)
-    {
-        Element[] cfgFiles = getConfigFile("_cfg_build.xml", BUILD_CFG_ROOT_ELEMENT_NAME);
-
-        if(null == cfgFiles)
-        {
-            ctx.addError(this, "No Build system configuration file found!");
-            return false;
-        }
-
-        for(int i = 0; i < cfgFiles.length; i++)
-        {
-            if( false == addConfigurationFromTo(cfgFiles[i], buildSystem, requiredEnvironmentVariables))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
 
     private FileGroup addFiles(Element reqFiles, FileGroup allFiles)
     {
