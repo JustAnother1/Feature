@@ -26,6 +26,8 @@ import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
+import de.nomagic.puzzler.FileGroup.CFile;
+import de.nomagic.puzzler.FileGroup.CppFile;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.FileGroup.TextFile;
 import de.nomagic.puzzler.configuration.Configuration;
@@ -138,9 +140,43 @@ public class MakeBuildSystem extends BuildSystem
         while(fileIt.hasNext())
         {
             AbstractFile curFile = files.getFileWithName(fileIt.next());
-            if(null != curFile)
+
+            if(true == curFile instanceof CFile)
             {
-                curFile.addToBuild(this);
+                if(false == hasTargetFor("%.c"))
+                {
+                    Target cTarget = new Target("%.c");
+                    cTarget.setOutput("%.o");
+                    cTarget.setRule(" $(CC) -c $(CFLAGS) $< -o $@");
+                    addRequiredVariable("CC");
+                    addRequiredVariable("CFLAGS");
+                    addTarget(cTarget);
+                }
+                String fileName = curFile.getFileName();
+                extendListVariable("C_SRC", fileName);
+                String objName = fileName.substring(0, fileName.length() - ".c".length()) + ".o";
+                extendListVariable("OBJS", objName);
+            }
+
+            if(true == curFile instanceof CppFile)
+            {
+                String fileName = curFile.getFileName();
+
+                String cppExtension = fileName.substring(fileName.lastIndexOf('.'));
+
+                if(false == hasTargetFor("%" + cppExtension))
+                {
+                    Target cTarget = new Target("%" + cppExtension);
+                    cTarget.setOutput("%.o");
+                    cTarget.setRule(" $(CC) -c $(CPPFLAGS) $< -o $@");
+                    addRequiredVariable("CC");
+                    addRequiredVariable("CPPFLAGS");
+                    addTarget(cTarget);
+                }
+
+                extendListVariable("CPP_SRC", fileName);
+                String objName = fileName.substring(0, fileName.length() - cppExtension.length()) + ".o";
+                extendListVariable("OBJS", objName);
             }
         }
 

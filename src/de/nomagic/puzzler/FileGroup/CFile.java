@@ -45,23 +45,6 @@ public class CFile extends TextFile
         super.addContentsOf(otherFile);
     }
 
-    @Override
-    public void addToBuild(BuildSystemApi buildSystem)
-    {
-        if(false == buildSystem.hasTargetFor("%.c"))
-        {
-            Target cTarget = new Target("%.c");
-            cTarget.setOutput("%.o");
-            cTarget.setRule(" $(CC) -c $(CFLAGS) $< -o $@");
-            buildSystem.addRequiredVariable("CC");
-            buildSystem.addRequiredVariable("CFLAGS");
-            buildSystem.addTarget(cTarget);
-        }
-        buildSystem.extendListVariable("C_SRC", fileName);
-        String objName = fileName.substring(0, fileName.length() - ".c".length()) + ".o";
-        buildSystem.extendListVariable("OBJS", objName);
-    }
-
     public void addLineWithComment(String sectionName, String line, String comment)
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))

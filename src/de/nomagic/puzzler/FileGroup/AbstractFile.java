@@ -53,10 +53,4 @@ public abstract class AbstractFile
     }
 
     public abstract void writeToStream(OutputStream out) throws IOException;
-
-    public void addToBuild(BuildSystemApi buildSystem)
-    {
-        // nothing to do.
-        // Override if something needs to be done.
-    }
 }
