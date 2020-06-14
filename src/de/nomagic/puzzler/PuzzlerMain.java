@@ -31,7 +31,6 @@ import de.nomagic.puzzler.BuildSystem.BuildSystemApi;
 import de.nomagic.puzzler.BuildSystem.BuildSystemFactory;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.FileGroup;
-import de.nomagic.puzzler.Generator.CCodeGenerator;
 import de.nomagic.puzzler.Generator.CodeGeneratorFactory;
 import de.nomagic.puzzler.Generator.Generator;
 import de.nomagic.puzzler.Generator.IDEProjectFileGenerator;
@@ -51,6 +50,8 @@ public class PuzzlerMain
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
     private Configuration cfg = null;
     private boolean successful = false;
+    private boolean foundOutputDirectory = false;
+    private boolean foundLibDirectory = false;
 
     public PuzzlerMain()
     {
@@ -63,7 +64,7 @@ public class PuzzlerMain
         System.out.println("Parameters:");
         System.out.println("-D<SettingName>=<Value>    : Set a value to a configuration variable.");
         System.out.println("                           : currently supported:");
-        System.out.println("                           : " + CCodeGenerator.CFG_DOC_CODE_SRC + "=true  : define in comments which algorithm cretaed the source code lines");
+        System.out.println("                           : " + Generator.CFG_DOC_CODE_SRC + "=true  : define in comments which algorithm cretaed the source code lines");
         System.out.println("-e /--environment_dirctory : directory with environment configuration.");
         System.out.println("-h / --help                : print this message.");
         System.out.println("-l /--library_dirctory     : directory for library of Algorithms and APIs.");
@@ -129,11 +130,79 @@ public class PuzzlerMain
         StatusPrinter.printInCaseOfErrorsOrWarnings(context);
     }
 
+    private boolean cmdln_workingDirectory(String value)
+    {
+        String workDirectory = Tool.validatePath(value);
+        if(1 > workDirectory.length())
+        {
+            System.err.println("Invalid Parameter : " + value);
+            return false;
+        }
+        cfg.setString(Configuration.ROOT_PATH_CFG, workDirectory);
+        log.trace("command Line config: work Directory {}", workDirectory);
+        return true;
+    }
+
+    private boolean cmdln_libraryDirectory(String value)
+    {
+        String libDir = Tool.validatePath(value);
+        if(1 > libDir.length())
+        {
+            System.err.println("Invalid Parameter : " + value);
+            return false;
+        }
+        cfg.setString(Configuration.LIB_PATH_CFG, libDir);
+        foundLibDirectory = true;
+        log.trace("command Line config: library Directory {}", libDir);
+        return true;
+    }
+
+    private boolean cmdln_environmentDirectory(String value)
+    {
+        String envDir = Tool.validatePath(value);
+        if(1 > envDir.length())
+        {
+            System.err.println("Invalid Parameter : " +value);
+            return false;
+        }
+        cfg.setString(Configuration.ENVIRONMENT_PATH_CFG, envDir);
+        log.trace("command Line config: environment Directory {}", envDir);
+        return true;
+    }
+
+    private boolean cmdln_outputDirectory(String value)
+    {
+        String outputDirectory = Tool.validatePath(value);
+        if(1 > outputDirectory.length())
+        {
+            System.err.println("Invalid Parameter : " + value);
+            return false;
+        }
+        cfg.setString(Configuration.OUTPUT_PATH_CFG, outputDirectory);
+        foundOutputDirectory = true;
+        log.trace("command Line config: output Directory {}", outputDirectory);
+        return true;
+    }
+
+    private boolean cmdln_zipOutput(String value)
+    {
+        String outputDirectory = Tool.validatePath(value);
+        if(1 > outputDirectory.length())
+        {
+            System.err.println("Invalid Parameter : " + value);
+            return false;
+        }
+        cfg.setString(Configuration.OUTPUT_PATH_CFG, outputDirectory);
+        cfg.setBool(Configuration.ZIP_OUTPUT, true);
+        foundOutputDirectory = true;
+        log.trace("command Line config: zip output");
+        log.trace("command Line config: output zip file name {}", outputDirectory);
+        return true;
+    }
+
     public boolean parseCommandLineParameters(String[] args)
     {
-        boolean foundOutputDirectory = false;
-        boolean foundLibDirectory = false;
-        Configuration cfg = new Configuration();
+        cfg = new Configuration();
         for(int i = 0; i < args.length; i++)
         {
             if(true == args[i].startsWith("-"))
@@ -153,71 +222,46 @@ public class PuzzlerMain
                 {
                     // working directory
                     i++;
-                    String workDirectory = Tool.validatePath(args[i]);
-                    if(1 > workDirectory.length())
+                    if(false == cmdln_workingDirectory(args[i]))
                     {
-                        System.err.println("Invalid Parameter : " + args[i]);
                         return false;
                     }
-                    cfg.setString(Configuration.ROOT_PATH_CFG, workDirectory);
-                    log.trace("command Line config: work Directory {}", workDirectory);
                 }
                 else if( (true == "-l".equals(args[i])) || (true == "--library_dirctory".equals(args[i])))
                 {
                     // Library directory
                     i++;
-                    String libDir = Tool.validatePath(args[i]);
-                    if(1 > libDir.length())
+                    if(false == cmdln_libraryDirectory(args[i]))
                     {
-                        System.err.println("Invalid Parameter : " + args[i]);
                         return false;
                     }
-                    cfg.setString(Configuration.LIB_PATH_CFG, libDir);
-                    foundLibDirectory = true;
-                    log.trace("command Line config: library Directory {}", libDir);
                 }
                 else if( (true == "-o".equals(args[i])) || (true == "--output_dirctory".equals(args[i])))
                 {
                     // output directory
                     i++;
-                    String outputDirectory = Tool.validatePath(args[i]);
-                    if(1 > outputDirectory.length())
+                    if(false == cmdln_outputDirectory(args[i]))
                     {
-                        System.err.println("Invalid Parameter : " + args[i]);
                         return false;
                     }
-                    cfg.setString(Configuration.OUTPUT_PATH_CFG, outputDirectory);
-                    foundOutputDirectory = true;
-                    log.trace("command Line config: output Directory {}", outputDirectory);
                 }
                 else if( (true == "-z".equals(args[i])) || (true == "--zip_out".equals(args[i])))
                 {
                     // zip output
                     i++;
-                    String outputDirectory = Tool.validatePath(args[i]);
-                    if(1 > outputDirectory.length())
+                    if(false == cmdln_zipOutput(args[i]))
                     {
-                        System.err.println("Invalid Parameter : " + args[i]);
                         return false;
                     }
-                    cfg.setString(Configuration.OUTPUT_PATH_CFG, outputDirectory);
-                    cfg.setBool(Configuration.ZIP_OUTPUT, true);
-                    foundOutputDirectory = true;
-                    log.trace("command Line config: zip output");
-                    log.trace("command Line config: output zip file name {}", outputDirectory);
                 }
                 else if( (true == "-e".equals(args[i])) || (true == "--environment_dirctory".equals(args[i])))
                 {
                     // environment directory
                     i++;
-                    String envDir = Tool.validatePath(args[i]);
-                    if(1 > envDir.length())
+                    if(false == cmdln_environmentDirectory(args[i]))
                     {
-                        System.err.println("Invalid Parameter : " + args[i]);
                         return false;
                     }
-                    cfg.setString(Configuration.ENVIRONMENT_PATH_CFG, envDir);
-                    log.trace("command Line config: environment Directory {}", envDir);
                 }
                 else if(true == args[i].startsWith("-D"))
                 {
@@ -269,7 +313,6 @@ public class PuzzlerMain
             cfg.setString(Configuration.LIB_PATH_CFG, cfg.getString(Configuration.ROOT_PATH_CFG) + "lib/");
         }
 
-        this.cfg = cfg;
         return true;
     }
 
