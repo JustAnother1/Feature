@@ -66,9 +66,36 @@ public class TextFile extends AbstractFile
             curData = prepareSectionData(curSection, curData);
             for(int i = 0; i < curData.size(); i++)
             {
-                out.write((curData.get(i) + getLineSperator()).getBytes());
+                if(i == curData.size() -1)
+                {
+                    // last line
+                    String line = curData.get(i);
+                    String lines[] = line.split("\\r?\\n");
+                    for(int j = 0; j < lines.length; j++)
+                    {
+                        if(j == lines.length -1)
+                        {
+                            if(0 < lines[j].length())
+                            {
+                                out.write((lines[j] + getLineSperator()).getBytes());
+                            }
+                            else
+                            {
+                                // skip empty line
+                            }
+                        }
+                        else
+                        {
+                            out.write((lines[j] + getLineSperator()).getBytes());
+                        }
+                    }
+                }
+                else
+                {
+                    out.write((curData.get(i) + getLineSperator()).getBytes());
+                }
             }
-            if((true == addSeperation) && (true == curData.isEmpty()))
+            if((true == addSeperation) && (false == curData.isEmpty()))
             {
                 out.write(getLineSperator().getBytes());
             }

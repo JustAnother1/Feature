@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
-import de.nomagic.puzzler.BuildSystem.BuildSystemApi;
 
 public abstract class AbstractFile
 {
