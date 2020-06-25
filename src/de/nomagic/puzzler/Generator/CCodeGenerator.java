@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
+import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.CFile;
 import de.nomagic.puzzler.FileGroup.FileFactory;
@@ -44,27 +45,30 @@ public class CCodeGenerator extends Generator
 
     public FileGroup generateFor(AlgorithmInstanceInterface logic)
     {
-        codeGroup = new FileGroup();
-
         if(null == logic)
         {
             ctx.addError(this, "" + logic + " : Failed to build the algorithm tree !");
             return null;
         }
 
-        if(false == logic.hasApi(REQUIRED_ROOT_API))
+        codeGroup = new FileGroup();
+        Environment e = ctx.getEnvironment();
+        String rootApi = e.getRootApi();
+
+
+        if(false == logic.hasApi(rootApi))
         {
             log.trace("root: {}", logic);
-            ctx.addError(this, "" + logic + " : Root element of the solution is not an " + REQUIRED_ROOT_API + " !");
+            ctx.addError(this, "" + logic + " : Root element of the solution is not an " + rootApi + " !");
             return null;
         }
 
         log.trace("starting to generate the C implementation for {}", logic);
 
-        Api api = Api.getFromFile(REQUIRED_ROOT_API, ctx);
+        Api api = Api.getFromFile(rootApi, ctx);
         if(null == api)
         {
-            ctx.addError(this, "" + logic + " : Failed to load the api " + REQUIRED_ROOT_API + " !");
+            ctx.addError(this, "" + logic + " : Failed to load the api " + rootApi + " !");
             return null;
         }
 

@@ -37,8 +37,10 @@ public class Environment extends Base
     public static final String ROOT_ELEMENT_NAME = "environment";
     public static final String TOOL_ELEMENT_NAME = "tool";
     public static final String BUILD_SYSTEM_ELEMENT_NAME = "build";
+    public static final String ROOT_API_ELEMENT_NAME = "root_api";
     public static final String BUILD_SYSTEM_TYPE_ATTRIBUTE_NAME = "type";
     public static final String TOOL_NAME_ATTRIBUTE_NAME = "name";
+    public static final String ROOT_API_NAME_ATTRIBUTE_NAME = "name";
     public static final String PIN_MAPPING_ELEMENT_NAME = "resources";
     public static final String ADDITIONAL_FILES_ROOT_ELEMENT_NAME = "additional";
 
@@ -96,6 +98,19 @@ public class Environment extends Base
             if(null != build)
             {
                 return build.getAttributeValue(BUILD_SYSTEM_TYPE_ATTRIBUTE_NAME);
+            }
+        }
+        return null;
+    }
+
+    public String getRootApi()
+    {
+        if(null != xmlTreeRoot)
+        {
+            Element build = xmlTreeRoot.getChild(ROOT_API_ELEMENT_NAME);
+            if(null != build)
+            {
+                return build.getAttributeValue(ROOT_API_NAME_ATTRIBUTE_NAME);
             }
         }
         return null;

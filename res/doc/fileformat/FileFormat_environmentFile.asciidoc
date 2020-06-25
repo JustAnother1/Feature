@@ -21,12 +21,14 @@ None.
 The environment element must have a exactly one "tool" element.
 The environment element can have a maximum of one "resources" element.
 The environment element can have a maximum of one "lib" element.
+The environment element can have a maximum of one "build" element.
+The environment element can have a maximum of one "root_api" element.
 
 === tool element
 This defines the platform / type of environment. This information is then used to select the right tool chain for the project.
 
 ==== Attributes
-the "name" attribute contains the name of the platform. The platform is a string that can be used as a name for a directory in the file system. It may also contain the slash('/') character. The slash then splits the platform name into separate parts. That can be used to organize platform variants.  
+the "name" attribute contains the name of the platform. The platform is a string that can be used as a name for a directory in the file system. It may also contain the slash('/') character. The slash then splits the platform name into separate parts. That can be used to organize platform variants.
 
 ==== child elements
 None.
@@ -50,7 +52,7 @@ The element needs to have the "algorithm" attribute. The "algorithm" attribute d
 None.
 
 === lib element
-Sometimes it might be necessary to provide some algorithms that are not directly referred to by the solution. These are usually algorithms that are just expected to be available by the implementations of the algorithms used in the solution. Examples are functionality provided by standard libraries. 
+Sometimes it might be necessary to provide some algorithms that are not directly referred to by the solution. These are usually algorithms that are just expected to be available by the implementations of the algorithms used in the solution. Examples are functionality provided by standard libraries.
 
 ==== Attributes
 None.

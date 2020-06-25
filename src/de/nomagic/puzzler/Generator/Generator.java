@@ -17,8 +17,6 @@ import de.nomagic.puzzler.solution.ConditionEvaluator;
 
 public abstract class Generator extends Base
 {
-    public static final String REQUIRED_ROOT_API = "program_entry_point";
-
     public static final String ALGORITHM_IF_CHILD_NAME = "if";
     public static final String ALGORITHM_FOR_CHILDS_CHILD_NAME = "forChilds";
     public static final String ALGORITHM_FOR_CHILDS_CHILD_API_ATTRIBUTE = "api";
