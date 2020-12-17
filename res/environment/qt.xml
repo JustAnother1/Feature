@@ -2,4 +2,5 @@
 <environment>
     <tool name="qt/qt" />
     <build type="qmake" />
+    <root_api name="os_main_function" />
 </environment>

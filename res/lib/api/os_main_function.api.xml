@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<api name="os_main_function" >
+  <function name="main" type="required" result="int" param0_name="argc" param0_type="int" param1_name="argv[]" param1_type="char*" />
+</api>
