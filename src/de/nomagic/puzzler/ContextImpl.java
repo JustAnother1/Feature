@@ -35,6 +35,7 @@ public class ContextImpl implements Context
     private final ProgressReport report;
     private Environment e;
     private Solution s;
+    private FileGetter fg;
 
     public ContextImpl(Configuration cfg)
     {
@@ -105,7 +106,7 @@ public class ContextImpl implements Context
             addError(this, "Must provide a stream!");
             return null;
         }
-        Document doc = FileGetter.getXmlFromStream(in, this);
+        Document doc = fg.getXmlFromStream(in);
         if(null == doc)
         {
             addError(this, "Could not read Project File ");
@@ -132,7 +133,7 @@ public class ContextImpl implements Context
             addError(this, "Invalid request! tag name missing!");
             return null;
         }
-        Document doc = FileGetter.getXmlFile(path, fileName, this);
+        Document doc = fg.getXmlFile(path, fileName);
         if(null == doc)
         {
             addError(this, "Could not read xml file " + fileName);
@@ -155,10 +156,9 @@ public class ContextImpl implements Context
     private Element resolveExternalReference(String path, String externalReferenceFileName, String elementName)
     {
         // read external Reference
-        Document externalReferenceDocument = FileGetter.getXmlFile(
+        Document externalReferenceDocument = fg.getXmlFile(
                 path,
-                externalReferenceFileName,
-                this);
+                externalReferenceFileName);
         if(null == externalReferenceDocument)
         {
             addError(this, "Could not read referenced File " + externalReferenceFileName);
@@ -208,6 +208,18 @@ public class ContextImpl implements Context
             // nothing to do
         }
         return uncheckedElement;
+    }
+
+    @Override
+    public void addFileGetter(FileGetter fg)
+    {
+        this.fg = fg;
+    }
+
+    @Override
+    public FileGetter getFileGetter()
+    {
+        return fg;
     }
 
 }

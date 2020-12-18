@@ -21,4 +21,6 @@ public interface Context
     Element getElementfrom(InputStream in, String elementName);
     Element getElementfrom(String fileName, String path, String elementName);
     Element loadElementFrom(Element uncheckedElement, String path, String elementName);
+    void addFileGetter(FileGetter fg);
+    FileGetter getFileGetter();
 }

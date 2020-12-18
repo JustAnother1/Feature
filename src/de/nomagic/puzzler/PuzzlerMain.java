@@ -103,7 +103,7 @@ public class PuzzlerMain
         case 2:
         default:
             setLogLevel("trace");
-            System.out.println("Build from " + Tool.getCommitID());
+            System.err.println("Build from " + Tool.getCommitID());
             break;
         }
     }
@@ -511,6 +511,8 @@ public class PuzzlerMain
             return;
         }
         Context ctx = new ContextImpl(cfg);
+        FileGetter fg = new FileGetter(ctx);
+        ctx.addFileGetter(fg);
 
         // open Project file
         Project pro = openProject(ctx);

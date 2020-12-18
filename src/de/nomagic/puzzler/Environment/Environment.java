@@ -167,7 +167,7 @@ public class Environment extends Base
 
     private Element getConfigurationElementFrom(String Path, String FileName, String RootElementName)
     {
-        Document comCfgDoc = FileGetter.tryToGetXmlFile(Path, FileName, false, ctx);
+        Document comCfgDoc = ctx.getFileGetter().tryToGetXmlFile(Path, FileName, false);
         if(null != comCfgDoc)
         {
             Element root = comCfgDoc.getRootElement();

@@ -47,7 +47,7 @@ public class Api extends Base
 
     public static Api getFromFile(String name, Context ctx)
     {
-        Element root = FileGetter.getApiElement(name, ctx);
+        Element root = ctx.getFileGetter().getApiElement(name);
         if(null != root)
         {
             return new Api(root, ctx);

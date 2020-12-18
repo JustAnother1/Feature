@@ -68,7 +68,7 @@ public class Algorithm extends Base
 
     public static Algorithm getFromFile(String Name, Context ctx)
     {
-        Element root = FileGetter.getAlgorithmElement(Name, ctx);
+        Element root = ctx.getFileGetter().getAlgorithmElement(Name);
         if(null == root)
         {
             return null;

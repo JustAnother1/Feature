@@ -21,13 +21,15 @@ public final class FileGetter
     public static final String API_ROOT_ELEMENT_NAME = "api";
     private static final String CLASS_NAME = "FileGetter";
 
-    private static final Logger LOG = LoggerFactory.getLogger(CLASS_NAME);
+    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
+    private final Context ctx;
 
-    private FileGetter()
+    public FileGetter(Context ctx)
     {
+        this.ctx = ctx;
     }
 
-    public static Document getXmlFromStream(InputStream in, Context ctx)
+    public Document getXmlFromStream(InputStream in)
     {
         SAXBuilder jdomBuilder = new SAXBuilder();
         Document jdomDocument = null;
@@ -38,34 +40,33 @@ public final class FileGetter
         catch(JDOMException e)
         {
             ctx.addError(CLASS_NAME, "JDOM Exception");
-            LOG.trace(Tool.fromExceptionToString(e));
+            log.trace(Tool.fromExceptionToString(e));
             jdomDocument = null;
         }
         catch (IOException e)
         {
             ctx.addError(CLASS_NAME, "IOException from stream");
             ctx.addError(CLASS_NAME, e.getMessage());
-            LOG.trace(Tool.fromExceptionToString(e));
+            log.trace(Tool.fromExceptionToString(e));
             jdomDocument = null;
         }
 
         return jdomDocument;
     }
 
-    public static Document getXmlFile(String path, String name, Context ctx)
+    public Document getXmlFile(String path, String name)
     {
-        return tryToGetXmlFile(path, name, true, ctx);
+        return tryToGetXmlFile(path, name, true);
     }
 
-    public static Document getXmlFile(String[] paths, String name, Context ctx)
+    public Document getXmlFile(String[] paths, String name)
     {
-        return tryToGetXmlFile(paths, name, true, ctx);
+        return tryToGetXmlFile(paths, name, true);
     }
 
-    public static Document tryToGetXmlFile(String path,
+    public Document tryToGetXmlFile(String path,
                                            String name,
-                                           boolean failureIsError,
-                                           Context ctx)
+                                           boolean failureIsError)
     {
         if(null == name)
         {
@@ -93,7 +94,7 @@ public final class FileGetter
         }
         SAXBuilder jdomBuilder = new SAXBuilder();
         Document jdomDocument = null;
-        // LOG.trace("trying to open {}.", xmlSource);
+        log.trace("trying to open {}.", xmlSource);
         try
         {
             jdomDocument = jdomBuilder.build(xmlSource);
@@ -102,8 +103,8 @@ public final class FileGetter
         {
             if(true == failureIsError)
             {
-                LOG.trace("path = {}", path);
-                LOG.trace("name = {}", name);
+                log.trace("path = {}", path);
+                log.trace("name = {}", name);
                 ctx.addError(CLASS_NAME, "File not found: " + xmlSource);
             }
             jdomDocument = null;
@@ -114,7 +115,7 @@ public final class FileGetter
             {
                 ctx.addError(CLASS_NAME, "JDOM Exception");
             }
-            LOG.trace(Tool.fromExceptionToString(e));
+            log.trace(Tool.fromExceptionToString(e));
             jdomDocument = null;
         }
         catch (IOException e)
@@ -124,17 +125,16 @@ public final class FileGetter
                 ctx.addError(CLASS_NAME, "IOException for file " + xmlSource);
                 ctx.addError(CLASS_NAME, e.getMessage());
             }
-            LOG.trace(Tool.fromExceptionToString(e));
+            log.trace(Tool.fromExceptionToString(e));
             jdomDocument = null;
         }
 
         return jdomDocument;
     }
 
-    public static Document tryToGetXmlFile(String[] paths,
+    public Document tryToGetXmlFile(String[] paths,
                                       String name,
-                                      boolean failureIsError,
-                                      Context ctx)
+                                      boolean failureIsError)
     {
         if(null == paths)
         {
@@ -162,11 +162,11 @@ public final class FileGetter
             {
                 xmlSource = paths[i] + File.separator + name;
             }
-            LOG.trace("trying to open {}.", xmlSource);
+            log.trace("trying to open {}.", xmlSource);
             File f = new File(xmlSource);
             if(true == f.exists())
             {
-                Document res = getXmlFile(paths[i], name, ctx);
+                Document res = getXmlFile(paths[i], name);
                 if(null != res)
                 {
                     return res;
@@ -178,11 +178,11 @@ public final class FileGetter
         return null;
     }
 
-    public static Element getFromFile(String[] paths, String[] subpaths, String fileName, Context ctx)
+    public Element getFromFile(String[] paths, String[] subpaths, String fileName)
     {
         if((null == paths) ||(null == subpaths))
         {
-            LOG.trace("no paths supplied");
+            log.trace("no paths supplied");
             return null;
         }
         Element res = null;
@@ -197,7 +197,7 @@ public final class FileGetter
                     sb.append(subpaths[k]);
                     sb.append(File.separator);
                 }
-                res = getFromFile(sb.toString(), fileName, ctx);
+                res = getFromFile(sb.toString(), fileName);
                 if(null != res)
                 {
                     return res;
@@ -207,17 +207,17 @@ public final class FileGetter
         return res;
     }
 
-    public static Element getFromFile(String[] paths, String fileName, Context ctx)
+    public Element getFromFile(String[] paths, String fileName)
     {
         if(null == paths)
         {
-            LOG.trace("no paths supplied");
+            log.trace("no paths supplied");
             return null;
         }
         Element res = null;
         for (int i = 0; i < paths.length; i++)
         {
-            res = getFromFile(paths[i], fileName, ctx);
+            res = getFromFile(paths[i], fileName);
             if(null != res)
             {
                 return res;
@@ -226,12 +226,11 @@ public final class FileGetter
         return res;
     }
 
-    public static Element getFromFile(String path, String fileName, Context ctx)
+    public Element getFromFile(String path, String fileName)
     {
-        Document algo = FileGetter.tryToGetXmlFile(path,
+        Document algo = tryToGetXmlFile(path,
                 fileName,
-                false,
-                ctx);
+                false);
         if(null == algo)
         {
             // LOG.trace("Could not load the Element from the file {}",
@@ -242,79 +241,77 @@ public final class FileGetter
         Element root = algo.getRootElement();
         if(null == root)
         {
-            LOG.trace("No root tag in the File {} ", fileName);
+            log.trace("No root tag in the File {} ", fileName);
             return null;
         }
-        LOG.trace("Loaded the Element({}) from the file {}",
+        log.trace("Loaded the Element({}) from the file {}",
                 root.getName(), path + fileName);
         return root;
     }
 
-    public static Element getApiElement(String apiName, Context ctx)
+    public Element getApiElement(String apiName)
     {
-        return getFromFile(apiName, "api", API_ROOT_ELEMENT_NAME, ctx);
+        return getFromFile(apiName, "api", API_ROOT_ELEMENT_NAME);
     }
 
-    public static Element getAlgorithmElement(String algorithmName, Context ctx)
+    public Element getAlgorithmElement(String algorithmName)
     {
         if((null == algorithmName))
         {
-            LOG.warn("AlgorithmName null !");
+            log.warn("AlgorithmName null !");
             return null;
         }
         return getFromFile(algorithmName,
                            "algorithm",
-                           ALGORITHM_ROOT_ELEMENT_NAME,
-                           ctx);
+                           ALGORITHM_ROOT_ELEMENT_NAME);
     }
 
-    private static Element getFromFile(String Name,
+    private Element getFromFile(String Name,
             String type,
-            String rootElementName,
-            Context ctx)
+            String rootElementName)
     {
         if(   (null == Name)
            || (null == type)
            || (null == rootElementName)
            || (null == ctx) )
         {
-            LOG.warn("Invalid parameters!");
-            LOG.warn("Name: {}", Name);
-            LOG.warn("type: {}", type);
-            LOG.warn("root name: {}", rootElementName);
-            LOG.warn("context: {}", ctx);
+            log.warn("Invalid parameters!");
+            log.warn("Name: {}", Name);
+            log.warn("type: {}", type);
+            log.warn("root name: {}", rootElementName);
+            log.warn("context: {}", ctx);
             return null;
         }
 
         // Get project specific
         String fileName = type + File.separator + Name + "." + type + ".xml";
-        Element root = getFromFile(ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG), fileName, ctx);
+        Element root = getFromFile(ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG), fileName);
         if(null == root)
         {
             // if that failed then the architecture specific
             String[] paths = ctx.cfg().getStringsOf(Configuration.ENVIRONMENT_PATH_CFG);
             String[] subPaths = ctx.getEnvironment().getPlatformParts();
 
-            root = getFromFile(paths, subPaths, fileName, ctx);
+            root = getFromFile(paths, subPaths, fileName);
 
             if(null == root)
             {
                 // if that also failed then the common one from the library
-                root = getFromFile(ctx.cfg().getStringsOf(Configuration.LIB_PATH_CFG), fileName, ctx);
+                root = getFromFile(ctx.cfg().getStringsOf(Configuration.LIB_PATH_CFG), fileName);
                 if(null == root)
                 {
                     ctx.addError(CLASS_NAME, "Could not find the " + type + " " + Name);
-                    LOG.info("Searched for a file named  {}", fileName);
-                    LOG.info("in the folders:");
+                    log.info("Searched for a file named  {}", fileName);
+                    log.info("in the folders:");
 
                     String[] searchedPaths = ctx.cfg().getStringsOf(Configuration.PROJECT_PATH_CFG);
                     for(int i = 0; i < searchedPaths.length; i++)
                     {
-                        LOG.info(searchedPaths[i]);
+                        log.info(searchedPaths[i]);
                     }
                     for(int i = 0; i < paths.length; i++)
                     {
-                        LOG.info(paths[i]);
+                        log.info(paths[i]);
                     }
                     return null;
                 }
@@ -323,7 +320,7 @@ public final class FileGetter
 
         if(false == rootElementName.equals(root.getName()))
         {
-            LOG.trace("Invalid root tag({}) in the {}", root.getName(), Name);
+            log.trace("Invalid root tag({}) in the {}", root.getName(), Name);
             return null;
         }
 

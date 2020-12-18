@@ -72,8 +72,8 @@ public class SolutionImpl extends Base implements Solution
                     return false;
                 }
                 // read external Reference
-                Document externalReferenceDocument = FileGetter.getXmlFile(ctx.cfg().getString(Configuration.ROOT_PATH_CFG),
-                                                                  externalReferenceFileName, ctx);
+                Document externalReferenceDocument = ctx.getFileGetter().getXmlFile(ctx.cfg().getString(Configuration.ROOT_PATH_CFG),
+                                                                  externalReferenceFileName);
                 if(null == externalReferenceDocument)
                 {
                     ctx.addError(this, "Could not read referenced File " + externalReferenceFileName);
