@@ -28,10 +28,10 @@ public class CodeGeneratorFactoryTest {
     }
 
     @Test
-    public void testC()
+    public void test_no_Api()
     {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
-        algo.setApi(CCodeGenerator.REQUIRED_ROOT_API);
+        // algo.setApi(CCodeGenerator.REQUIRED_ROOT_API);
         ContextStub ctx = new ContextStub();
         Generator[] res = CodeGeneratorFactory.getGeneratorFor(algo, ctx);
         assertNotNull(res);
