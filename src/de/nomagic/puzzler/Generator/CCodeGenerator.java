@@ -295,7 +295,8 @@ public class CCodeGenerator extends Generator
                 // Not an element, therefore can not have if conditions,
                 // therefore we can just extract all the text.
                 String impl = curC.getValue();
-                if(0 < impl.length())
+                String trimmed = impl.trim();
+                if(0 < trimmed.length())
                 {
                     sb.append(impl);
                     log.trace("adding non element code to implmentation: {} from {}", impl, curC);
