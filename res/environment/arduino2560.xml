@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <environment>
-    <tool name="avr/atmega2560"/>>
+    <tool name="avr/atmega2560" />
+    <root_api name="program_entry_point" />
     <resources>
         <greenLed algorithm="gpio" port="B" pin="7" />
     </resources>

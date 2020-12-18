@@ -360,6 +360,19 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         // else this algorithm provides nothing and that might be OK.
     }
 
+    public String getApis()
+    {
+        if(null == algorithmDefinition)
+        {
+            return null;
+        }
+        else
+        {
+            return algorithmDefinition.getApis();
+        }
+    }
+
+
     public boolean hasApi(String api)
     {
         if(null == algorithmDefinition)

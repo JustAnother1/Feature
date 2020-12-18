@@ -107,6 +107,7 @@ public class CCodeGenerator extends Generator
         for(int i = 0; i < funcs.length; i++)
         {
             CFunctionCall fc = new CFunctionCall(funcs[i].getName());
+            fc.setApi(api.toString());
             String implementation = getCImplementationOf(fc, logic);
             if(null == implementation)
             {
@@ -151,12 +152,18 @@ public class CCodeGenerator extends Generator
             return null;
         }
 
-        if( false == logic.hasApi(functionToCall.getApi()))
+        String api = functionToCall.getApi();
+        if(null != api)
         {
-            log.warn("{} : Function call to wrong API!(API: {})", logic, functionToCall.getApi());
-            log.warn("Function called: {}",  functionToCall.getName());
-            return null;
+            if(false == logic.hasApi(api))
+            {
+                log.warn("{} : Function call to wrong API!(API: {})", logic, api);
+                log.warn("valid APIs : {}",  logic.getApis());
+                log.warn("Function called: {}",  functionToCall.getName());
+                return null;
+            }
         }
+        // else API unknown -> can not check
 
         if(false == ctx.wasSucessful())
         {

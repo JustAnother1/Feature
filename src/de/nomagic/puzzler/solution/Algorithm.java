@@ -81,11 +81,24 @@ public class Algorithm extends Base
         return res;
     }
 
+    public String getApis()
+    {
+        if(null != root)
+        {
+            String apis = root.getAttributeValue(ALGORITHM_API_ATTRIBUTE_NAME);
+            return apis;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public boolean hasApi(String api)
     {
         if(null == api)
         {
-            return true;
+            return false;
         }
         if(null != root)
         {

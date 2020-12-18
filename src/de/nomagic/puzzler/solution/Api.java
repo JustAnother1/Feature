@@ -37,7 +37,7 @@ public class Api extends Base
     {
         if(null != root)
         {
-            return "Api " + root.getAttributeValue(API_NAME_ATTRIBUTE_NAME);
+            return root.getAttributeValue(API_NAME_ATTRIBUTE_NAME);
         }
         else
         {

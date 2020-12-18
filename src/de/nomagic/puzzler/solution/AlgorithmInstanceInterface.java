@@ -13,6 +13,7 @@ public interface AlgorithmInstanceInterface
     String getParameter(String name);
     String dumpParameter();
     String getBuildIn(String word);
+    String getApis();
     boolean hasApi(String api);
     Element getAlgorithmElement(String elementName);
     Iterator<String> getAllChildren();

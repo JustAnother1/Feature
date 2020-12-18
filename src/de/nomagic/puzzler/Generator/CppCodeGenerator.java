@@ -119,6 +119,7 @@ public class CppCodeGenerator extends Generator {
         for(int i = 0; i < funcs.length; i++)
         {
             CFunctionCall fc = new CFunctionCall(funcs[i].getName());
+            fc.setApi(api.toString());
             String implementation = getCppImplementationOf(fc, logic);
             if(null == implementation)
             {
@@ -271,6 +272,7 @@ public class CppCodeGenerator extends Generator {
                         if(true == curChild.hasApi(api))
                         {
                             CFunctionCall fc = new CFunctionCall(FuncToCall);
+                            fc.setApi(api.toString());
                             String implementation = getCppImplementationOf(fc, curChild);
                             if(null == implementation)
                             {

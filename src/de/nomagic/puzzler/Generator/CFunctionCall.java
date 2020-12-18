@@ -19,7 +19,7 @@ package de.nomagic.puzzler.Generator;
 
 public class CFunctionCall
 {
-    private final String api;
+    private String api;
     private final String functionName;
     private String functionArguments;
 
@@ -58,6 +58,11 @@ public class CFunctionCall
     public String getApi()
     {
         return api;
+    }
+
+    public void setApi(String api)
+    {
+        this.api = api;
     }
 
     public String getArguments()

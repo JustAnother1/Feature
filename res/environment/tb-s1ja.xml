@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <environment>
-    <tool name="ARM_Cortex-M23/R7FS1JA78"/>>
+    <tool name="ARM_Cortex-M23/R7FS1JA78"/>
+    <root_api name="program_entry_point" />
     <resources>
         <greenLed algorithm="gpio" port="2" pin="5" />
     </resources>
