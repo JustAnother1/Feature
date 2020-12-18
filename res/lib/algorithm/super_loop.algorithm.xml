@@ -3,32 +3,16 @@
   <required>
     <childElement type="run" />
   </required>
-  <provides>
-    <singleTask type="bool" value="numOfChilds equals 1"/>
-  </provides>
+  <childElement type="initialize" />
   <c_code>
     <function name="main">
-    <![CDATA[initialize();]]>
-     <if cond="true equals singleTask">
-      <![CDATA[{
-  for(;;)
-  {
-    €run:execute()€
-  }
-}]]>
-      </if>
-      <if cond="false equals singleTask">
-        <![CDATA[{
-  for(;;)
-  {
-  ]]>
+     <forChilds api="initialize"> <![CDATA[{  €initialize:initlize()€]]> </forChilds>
+        <![CDATA[  for(;;) {]]>
   <forChilds api="run">
      <![CDATA[{€run:execute()€]]>
   </forChilds>
-    <![CDATA[
-  }
-}]]>
-      </if>
+    <![CDATA[  }
+]]>
     </function>
   </c_code>
 </algorithm>

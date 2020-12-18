@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<algorithm name="gpio" api="bitOut,bitIn">
+<algorithm name="gpio" api="bitOut,bitIn,initialize">
   <required>
     <parameter name="port" type="character" />
     <parameter name="pin" type="unsigned integer" />
@@ -11,15 +11,15 @@
     </additional>
 
     <function  name="initialize">
-      <![CDATA[DDR€port€ |= (1<<DD€port€€pin€); //Set the pin €pin€ on Port€port€ to output]]>
+      <![CDATA[DDR€port€ |= (1<<DD€port€€pin€); //Set the pin €pin€ on Port €port€ to output]]>
     </function>
 
     <function  name="setValue" param0_type="bool" param0_name="on">
       <if cond="true equals param(on)">
-        <![CDATA[PORT€port€ |= (1<<PORT€port€€pin€);    // Turn bit €pin€ on Port€port€ to 1 => on]]>
+        <![CDATA[PORT€port€ |= (1<<PORT€port€€pin€);    // Turn bit €pin€ on Port €port€ to 1 => on]]>
       </if>
       <if cond="false equals param(on)">
-        <![CDATA[PORT€port€ &= ~(1<<PORT€port€€pin€);    // Turn bit €pin€ on Port€port€ to 0 => off]]>
+        <![CDATA[PORT€port€ &= ~(1<<PORT€port€€pin€);    // Turn bit €pin€ on Port €port€ to 0 => off]]>
       </if>
     </function>
 

@@ -195,7 +195,6 @@ public class CppCodeGenerator extends Generator {
             implementation = addCommentsToImplementation(implementation, logic);
         }
 
-        implementation = implementation.trim();
         implementation = replacePlaceholders(implementation, functionToCall.getArguments(), logic, functionElement);
         if(false == ctx.wasSucessful())
         {
@@ -302,7 +301,6 @@ public class CppCodeGenerator extends Generator {
                 // Not an element, therefore can not have if conditions,
                 // therefore we can just extract all the text.
                 String impl = curC.getValue();
-                impl = impl.trim();
                 if(0 < impl.length())
                 {
                     sb.append(System.getProperty("line.separator"));
@@ -312,7 +310,7 @@ public class CppCodeGenerator extends Generator {
                 // else whitespace in between tags
             }
         }
-        return (sb.toString()).trim();
+        return sb.toString();
     }
 
     private Element getFunctionElement(String searchedFunctionName, String FunctionArguments, AlgorithmInstanceInterface logic)

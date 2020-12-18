@@ -14,7 +14,8 @@ public class Configuration
     public static final String SOLUTION_FILE_CFG = "solutionFile";
     public static final String ENVIRONMENT_PATH_CFG = "environment_path";
     public static final String ZIP_OUTPUT = "zip_output";
-    
+    public static final String ZIP_OUTPUT_TO_STDOUT = "zip_output_to_stdout";
+
 
     private HashMap<String, Vector<String>> stringArraySettings = new HashMap<String,Vector<String>>();
     private HashMap<String, Boolean> boolArraySettings = new HashMap<String, Boolean>();
@@ -22,7 +23,7 @@ public class Configuration
     public Configuration()
     {
     }
-    
+
     public boolean getBool(String setting)
     {
         Boolean res = boolArraySettings.get(setting);
@@ -33,7 +34,7 @@ public class Configuration
         }
         return res;
     }
-    
+
     public void setBool(String name, Boolean value)
     {
         boolArraySettings.put(name, value);

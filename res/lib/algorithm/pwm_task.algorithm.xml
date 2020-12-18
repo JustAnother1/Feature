@@ -12,9 +12,9 @@
           </forChilds>
           <![CDATA[
     €bitOut:setValue(true)€
-    €delay:delay_ms(10 / €frequency_Hz€ * €dutyCycle_percent€)€ // Delay
+    €delay:delay_ms(10 / €frequency_Hz€ * €dutyCycle_percent€)€
     €bitOut:setValue(false)€
-    €delay:delay_ms(10 / €frequency_Hz€ * (100 - €dutyCycle_percent€))€ // Delay]]>
+    €delay:delay_ms(10 / €frequency_Hz€ * (100 - €dutyCycle_percent€))€]]>
         </function>
     </c_code>
 </algorithm>

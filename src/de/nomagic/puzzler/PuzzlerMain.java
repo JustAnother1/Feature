@@ -65,14 +65,20 @@ public class PuzzlerMain
         System.out.println("-D<SettingName>=<Value>    : Set a value to a configuration variable.");
         System.out.println("                           : currently supported:");
         System.out.println("                           : " + Generator.CFG_DOC_CODE_SRC + "=true  : define in comments which algorithm cretaed the source code lines");
-        System.out.println("-e /--environment_dirctory : directory with environment configuration.");
+        System.out.println("-e <path> /--environment_dirctory <path>");
+        System.out.println("                           : directory with environment configuration.");
         System.out.println("-h / --help                : print this message.");
-        System.out.println("-l /--library_dirctory     : directory for library of Algorithms and APIs.");
+        System.out.println("-l <path> /--library_dirctory <path>");
+        System.out.println("                           : directory for library of Algorithms and APIs.");
         System.out.println("                           : This parameter can be specified multiple times.");
-        System.out.println("-o /--output_dirctory      : directory for created data.");
+        System.out.println("-o <path> /--output_dirctory <path>");
+        System.out.println("                           : directory for created data.");
         System.out.println("-v                         : verbose output for even more messages use -v -v");
-        System.out.println("-w / --work_dirctory       : root directory for file search.");
-        System.out.println("-z / --zip_out             : zip created data.");
+        System.out.println("-w <path> / --work_dirctory <path>");
+        System.out.println("                           : root directory for file search.");
+        System.out.println("-z <filename> / --zip <filename>");
+        System.out.println("                           : zip created data (ignores output folder setting).");
+        System.out.println("--zip_to_stdout            : zip created data and write zip file to stdout.");
         System.out.println("<Projectfile>.xml          : define the project to process.");
     }
 
@@ -110,13 +116,14 @@ public class PuzzlerMain
             context.reset();
             final String logCfg =
             "<configuration>" +
-              "<appender name='STDOUT' class='ch.qos.logback.core.ConsoleAppender'>" +
+              "<appender name='STDERR' class='ch.qos.logback.core.ConsoleAppender'>" +
+              "<target>System.err</target>" +
                 "<encoder>" +
                   "<pattern>%-5level [%logger{36}] %msg%n</pattern>" +
                 "</encoder>" +
               "</appender>" +
               "<root level='" + LogLevel + "'>" +
-                "<appender-ref ref='STDOUT' />" +
+                "<appender-ref ref='STDERR' />" +
               "</root>" +
             "</configuration>";
             ByteArrayInputStream bin;
@@ -245,7 +252,7 @@ public class PuzzlerMain
                         return false;
                     }
                 }
-                else if( (true == "-z".equals(args[i])) || (true == "--zip_out".equals(args[i])))
+                else if( (true == "-z".equals(args[i])) || (true == "--zip".equals(args[i])))
                 {
                     // zip output
                     i++;
@@ -254,6 +261,14 @@ public class PuzzlerMain
                         return false;
                     }
                 }
+                else if (true == "--zip_to_stdout".equals(args[i]))
+                {
+                    // zip output to stdout
+                    cfg.setBool(Configuration.ZIP_OUTPUT_TO_STDOUT, true);
+                    foundOutputDirectory = true;
+                    log.trace("command Line config: zip output to stdout");
+                }
+
                 else if( (true == "-e".equals(args[i])) || (true == "--environment_dirctory".equals(args[i])))
                 {
                     // environment directory
@@ -440,9 +455,17 @@ public class PuzzlerMain
 
     private boolean createOutput(Context ctx, FileGroup allFiles)
     {
-        if(true == ctx.cfg().getBool(Configuration.ZIP_OUTPUT))
+        if(true == ctx.cfg().getBool(Configuration.ZIP_OUTPUT_TO_STDOUT))
         {
-            if(false ==allFiles.saveToZip(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG), ctx))
+            if(false ==allFiles.zipToStdout())
+            {
+                log.error("Failed to zip to stdout!");
+                return false;
+            }
+        }
+        else if(true == ctx.cfg().getBool(Configuration.ZIP_OUTPUT))
+        {
+            if(false ==allFiles.saveToZip(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG)))
             {
                 log.error("Failed to create the zip file!");
                 return false;
@@ -516,7 +539,10 @@ public class PuzzlerMain
         // success ?
         successful = ctx.wasSucessful();
         log.trace("successful = {}", successful);
-        System.out.println(ctx.getErrors());
+        if(false == successful)
+        {
+            log.trace("{}", ctx.getErrors());
+        }
         ctx.close();
     }
 
@@ -530,7 +556,6 @@ public class PuzzlerMain
             if(true == m.successful)
             {
                 // OK
-                System.out.println("Project created successfully!");
                 System.exit(0);
             }
             else
