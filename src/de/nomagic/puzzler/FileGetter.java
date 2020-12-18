@@ -67,7 +67,7 @@ public final class FileGetter
         }
         SAXBuilder jdomBuilder = new SAXBuilder();
         Document jdomDocument = null;
-        LOG.trace("trying to open {}.", xmlSource);
+        // LOG.trace("trying to open {}.", xmlSource);
         try
         {
             jdomDocument = jdomBuilder.build(xmlSource);
