@@ -79,7 +79,9 @@ public class PuzzlerMain
         System.out.println("-z <filename> / --zip <filename>");
         System.out.println("                           : zip created data (ignores output folder setting).");
         System.out.println("--zip_to_stdout            : zip created data and write zip file to stdout.");
+        System.out.println("--prj_name <name>          : project name tio use when zip to stdout.");
         System.out.println("<Projectfile>.xml          : define the project to process.");
+        System.out.println("                           : if missing the project is read from stdin.");
     }
 
     private void startLogging(final String[] args)
@@ -268,7 +270,12 @@ public class PuzzlerMain
                     foundOutputDirectory = true;
                     log.trace("command Line config: zip output to stdout");
                 }
-
+                else if (true == "--prj_name".equals(args[i]))
+                {
+                    // project name
+                    i++;
+                    cfg.setString(Configuration.PROJECT_NAME_CFG, args[i]);
+                }
                 else if( (true == "-e".equals(args[i])) || (true == "--environment_dirctory".equals(args[i])))
                 {
                     // environment directory
@@ -333,11 +340,26 @@ public class PuzzlerMain
 
     private Project openProject(Context ctx)
     {
-        Element proElement = ctx.getElementfrom(
-                ctx.cfg().getString(Configuration.PROJECT_FILE_CFG) + ".xml",
-                ctx.cfg().getString(Configuration.PROJECT_PATH_CFG),
-                Project.PROJECT_ROOT_ELEMENT_NAME);
         Project pro = new ProjectImpl(ctx);
+        String projectFile = ctx.cfg().getString(Configuration.PROJECT_FILE_CFG);
+        Element proElement = null;
+        if(0 < projectFile.length())
+        {
+            proElement = ctx.getElementfrom(
+                            projectFile + ".xml",
+                            ctx.cfg().getString(Configuration.PROJECT_PATH_CFG),
+                            Project.PROJECT_ROOT_ELEMENT_NAME);
+        }
+        else
+        {
+            // read project from stdin
+            String prjName = ctx.cfg().getString(Configuration.PROJECT_NAME_CFG);
+            cfg.setString(Configuration.PROJECT_FILE_CFG, prjName);
+            proElement = ctx.getElementfrom(
+                    System.in,
+                    Project.PROJECT_ROOT_ELEMENT_NAME);
+        }
+
         if(false == pro.loadFromElement(proElement))
         {
             return null;
@@ -561,7 +583,7 @@ public class PuzzlerMain
             else
             {
                 // ERROR
-                System.out.println("ERROR: Something went wrong!");
+                System.err.println("ERROR: Something went wrong!");
                 System.exit(1);
             }
         }

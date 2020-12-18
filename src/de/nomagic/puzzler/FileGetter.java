@@ -4,6 +4,7 @@ package de.nomagic.puzzler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -24,6 +25,31 @@ public final class FileGetter
 
     private FileGetter()
     {
+    }
+
+    public static Document getXmlFromStream(InputStream in, Context ctx)
+    {
+        SAXBuilder jdomBuilder = new SAXBuilder();
+        Document jdomDocument = null;
+        try
+        {
+            jdomDocument = jdomBuilder.build(in);
+        }
+        catch(JDOMException e)
+        {
+            ctx.addError(CLASS_NAME, "JDOM Exception");
+            LOG.trace(Tool.fromExceptionToString(e));
+            jdomDocument = null;
+        }
+        catch (IOException e)
+        {
+            ctx.addError(CLASS_NAME, "IOException from stream");
+            ctx.addError(CLASS_NAME, e.getMessage());
+            LOG.trace(Tool.fromExceptionToString(e));
+            jdomDocument = null;
+        }
+
+        return jdomDocument;
     }
 
     public static Document getXmlFile(String path, String name, Context ctx)

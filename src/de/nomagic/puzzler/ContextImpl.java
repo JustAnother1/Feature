@@ -15,6 +15,9 @@
 package de.nomagic.puzzler;
 
 import org.jdom2.Element;
+
+import java.io.InputStream;
+
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 
@@ -27,7 +30,7 @@ import de.nomagic.puzzler.solution.Solution;
 public class ContextImpl implements Context
 {
     public static final String EXTERNAL_REFFERENCE_ATTRIBUTE_NAME = "ref";
-    
+
     private Configuration cfg;
     private final ProgressReport report;
     private Environment e;
@@ -94,7 +97,34 @@ public class ContextImpl implements Context
     {
         return s;
     }
-    
+
+    public Element getElementfrom(InputStream in, String elementName)
+    {
+        if(null == elementName)
+        {
+            addError(this, "Must provide a stream!");
+            return null;
+        }
+        Document doc = FileGetter.getXmlFromStream(in, this);
+        if(null == doc)
+        {
+            addError(this, "Could not read Project File ");
+            return null;
+        }
+        Element root  = doc.getRootElement();
+        if(null == root)
+        {
+            addError(this, "Could not read root element from the stream");
+            return null;
+        }
+        if(false == elementName.equals(root.getName()))
+        {
+            addError(this, "Invalid root tag (expected: " + elementName + ", found:  " + root.getName() + ") !");
+            return null;
+        }
+        return loadElementFrom(root, "./", elementName);
+    }
+
     public Element getElementfrom(String fileName, String path, String elementName)
     {
         if(null == elementName)
@@ -105,13 +135,13 @@ public class ContextImpl implements Context
         Document doc = FileGetter.getXmlFile(path, fileName, this);
         if(null == doc)
         {
-            addError(this, "Could not read Project File " + fileName);
+            addError(this, "Could not read xml file " + fileName);
             return null;
         }
         Element root  = doc.getRootElement();
         if(null == root)
         {
-            addError(this, "Could not read Root Element from " + fileName);
+            addError(this, "Could not read root element from " + fileName);
             return null;
         }
         if(false == elementName.equals(root.getName()))
@@ -121,7 +151,7 @@ public class ContextImpl implements Context
         }
         return loadElementFrom(root, path, elementName);
     }
-    
+
     private Element resolveExternalReference(String path, String externalReferenceFileName, String elementName)
     {
         // read external Reference
@@ -150,7 +180,7 @@ public class ContextImpl implements Context
         }
         return extRefEleemnt;
     }
-    
+
     public Element loadElementFrom(Element uncheckedElement, String path, String elementName)
     {
         if(true == uncheckedElement.hasAttributes())

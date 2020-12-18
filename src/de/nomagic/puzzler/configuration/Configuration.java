@@ -10,6 +10,7 @@ public class Configuration
     public static final String LIB_PATH_CFG = "library_path";
     public static final String OUTPUT_PATH_CFG = "output_path";
     public static final String PROJECT_FILE_CFG = "projectName";
+    public static final String PROJECT_NAME_CFG = "zip_stdout_projectName";
     public static final String PROJECT_PATH_CFG = "projectPath";
     public static final String SOLUTION_FILE_CFG = "solutionFile";
     public static final String ENVIRONMENT_PATH_CFG = "environment_path";
