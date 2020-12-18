@@ -1,5 +1,6 @@
 package de.nomagic.puzzler.solution;
 
+import java.io.InputStream;
 import java.util.Vector;
 
 import org.jdom2.Element;
@@ -87,14 +88,20 @@ public class ContextStub implements Context
 
     @Override
     public Element getElementfrom(String fileName, String path,
-            String elementName) 
+            String elementName)
     {
         return null;
     }
 
     @Override
     public Element loadElementFrom(Element uncheckedElement, String path,
-            String elementName) 
+            String elementName)
+    {
+        return null;
+    }
+
+    @Override
+    public Element getElementfrom(InputStream in, String elementName)
     {
         return null;
     }
