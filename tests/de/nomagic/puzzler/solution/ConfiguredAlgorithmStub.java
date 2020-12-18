@@ -96,4 +96,10 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
         return null;
     }
 
+    @Override
+    public String getApis()
+    {
+        return null;
+    }
+
 }
