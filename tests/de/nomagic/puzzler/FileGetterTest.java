@@ -9,42 +9,32 @@ public class FileGetterTest {
     @Test
     public void testGetXmlFileNull()
     {
+        FileGetter fg = new FileGetter(null);
         String noString = null;
-        assertNull(FileGetter.getXmlFile(noString, null, null));
-    }
-
-    @Test
-    public void testGetXmlFileArrayNull()
-    {
-        String[] noStrings = null;
-        assertNull(FileGetter.getXmlFile(noStrings, null, null));
+        assertNull(fg.getXmlFile(noString, null));
     }
 
     @Test
     public void tesTtryToGetXmlFileNull()
     {
+        FileGetter fg = new FileGetter(null);
         String noString = null;
-        assertNull(FileGetter.tryToGetXmlFile(noString, null, false, null));
-    }
-
-    @Test
-    public void tesTtryToGetXmlFileArrayNull()
-    {
-        String[] noStrings = null;
-        assertNull(FileGetter.tryToGetXmlFile(noStrings, null, false, null));
+        assertNull(fg.tryToGetXmlFile(noString, null, false));
     }
 
     @Test
     public void tesTtryToGetXmlFileNoPathButName()
     {
+        FileGetter fg = new FileGetter(null);
         String noString = null;
-        assertNull(FileGetter.tryToGetXmlFile(noString, "", false, null));
+        assertNull(fg.tryToGetXmlFile(noString, "", false));
     }
 
     @Test
     public void tesTtryToGetXmlFileEmptyPathBut()
     {
-        assertNull(FileGetter.tryToGetXmlFile("", "", false, null));
+        FileGetter fg = new FileGetter(null);
+        assertNull(fg.tryToGetXmlFile("", "", false));
     }
 
 }

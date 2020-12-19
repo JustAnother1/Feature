@@ -6,6 +6,7 @@ import java.util.Vector;
 import org.jdom2.Element;
 
 import de.nomagic.puzzler.Context;
+import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.configuration.Configuration;
 
@@ -102,6 +103,17 @@ public class ContextStub implements Context
 
     @Override
     public Element getElementfrom(InputStream in, String elementName)
+    {
+        return null;
+    }
+
+    @Override
+    public void addFileGetter(FileGetter fg)
+    {
+    }
+
+    @Override
+    public FileGetter getFileGetter()
     {
         return null;
     }
