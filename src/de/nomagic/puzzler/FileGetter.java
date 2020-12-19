@@ -59,14 +59,9 @@ public final class FileGetter
         return tryToGetXmlFile(path, name, true);
     }
 
-    public Document getXmlFile(String[] paths, String name)
-    {
-        return tryToGetXmlFile(paths, name, true);
-    }
-
     public Document tryToGetXmlFile(String path,
-                                           String name,
-                                           boolean failureIsError)
+                                    String name,
+                                    boolean failureIsError)
     {
         if(null == name)
         {
@@ -91,6 +86,12 @@ public final class FileGetter
             {
                 xmlSource = path + name;
             }
+        }
+        // TODO
+        File xf = new File(xmlSource);
+        if(false == xf.exists())
+        {
+            return null;
         }
         SAXBuilder jdomBuilder = new SAXBuilder();
         Document jdomDocument = null;
@@ -132,53 +133,7 @@ public final class FileGetter
         return jdomDocument;
     }
 
-    public Document tryToGetXmlFile(String[] paths,
-                                      String name,
-                                      boolean failureIsError)
-    {
-        if(null == paths)
-        {
-            if(true == failureIsError)
-            {
-                if(null != ctx)
-                {
-                    ctx.addError(CLASS_NAME, "no paths supplied");
-                }
-                else
-                {
-                    System.out.println("ERROR: " + CLASS_NAME + " : no paths supplied");
-                }
-            }
-            return null;
-        }
-        for (int i = 0; i < paths.length; i++)
-        {
-            String xmlSource;
-            if(null == paths[i])
-            {
-                xmlSource = name;
-            }
-            else
-            {
-                xmlSource = paths[i] + File.separator + name;
-            }
-            log.trace("trying to open {}.", xmlSource);
-            File f = new File(xmlSource);
-            if(true == f.exists())
-            {
-                Document res = getXmlFile(paths[i], name);
-                if(null != res)
-                {
-                    return res;
-                }
-                // else try next file
-            }
-            // else try next file
-        }
-        return null;
-    }
-
-    public Element getFromFile(String[] paths, String[] subpaths, String fileName)
+    private Element getFromFile(String[] paths, String[] subpaths, String fileName)
     {
         if((null == paths) ||(null == subpaths))
         {
@@ -207,7 +162,7 @@ public final class FileGetter
         return res;
     }
 
-    public Element getFromFile(String[] paths, String fileName)
+    private Element getFromFile(String[] paths, String fileName)
     {
         if(null == paths)
         {
@@ -226,7 +181,7 @@ public final class FileGetter
         return res;
     }
 
-    public Element getFromFile(String path, String fileName)
+    private Element getFromFile(String path, String fileName)
     {
         Document algo = tryToGetXmlFile(path,
                 fileName,
@@ -249,24 +204,7 @@ public final class FileGetter
         return root;
     }
 
-    public Element getApiElement(String apiName)
-    {
-        return getFromFile(apiName, "api", API_ROOT_ELEMENT_NAME);
-    }
-
-    public Element getAlgorithmElement(String algorithmName)
-    {
-        if((null == algorithmName))
-        {
-            log.warn("AlgorithmName null !");
-            return null;
-        }
-        return getFromFile(algorithmName,
-                           "algorithm",
-                           ALGORITHM_ROOT_ELEMENT_NAME);
-    }
-
-    private Element getFromFile(String Name,
+    public Element getFromFile(String Name,
             String type,
             String rootElementName)
     {
