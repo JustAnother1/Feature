@@ -23,6 +23,7 @@ public final class FileGetter
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
     private final Context ctx;
+    private XmlRpcGetter xrg = null;
 
     public FileGetter(Context ctx)
     {
@@ -87,14 +88,22 @@ public final class FileGetter
                 xmlSource = path + name;
             }
         }
-        // TODO
+        Document jdomDocument = null;
+        if(null != xrg)
+        {
+            jdomDocument = xrg.getAsDocument(xmlSource);
+            if(null != jdomDocument)
+            {
+                return jdomDocument;
+            }
+            // else not available this way so try the normal way
+        }
         File xf = new File(xmlSource);
         if(false == xf.exists())
         {
             return null;
         }
         SAXBuilder jdomBuilder = new SAXBuilder();
-        Document jdomDocument = null;
         log.trace("trying to open {}.", xmlSource);
         try
         {
@@ -263,6 +272,11 @@ public final class FileGetter
         }
 
         return root;
+    }
+
+    public void addGetter(XmlRpcGetter xrg)
+    {
+        this.xrg = xrg;
     }
 
 }

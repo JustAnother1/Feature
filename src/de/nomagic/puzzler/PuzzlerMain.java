@@ -52,6 +52,7 @@ public class PuzzlerMain
     private boolean successful = false;
     private boolean foundOutputDirectory = false;
     private boolean foundLibDirectory = false;
+    private boolean useXCmlRpc = false;
 
     public PuzzlerMain()
     {
@@ -76,6 +77,7 @@ public class PuzzlerMain
         System.out.println("-v                         : verbose output for even more messages use -v -v");
         System.out.println("-w <path> / --work_dirctory <path>");
         System.out.println("                           : root directory for file search.");
+        System.out.println("-x                         : read from XML-RPC source.");
         System.out.println("-z <filename> / --zip <filename>");
         System.out.println("                           : zip created data (ignores output folder setting).");
         System.out.println("--zip_to_stdout            : zip created data and write zip file to stdout.");
@@ -226,6 +228,10 @@ public class PuzzlerMain
                 {
                     // verbose output
                     // already handled -> ignore
+                }
+                else if(true == "-".equals(args[i]))
+                {
+                    useXCmlRpc = true;
                 }
                 else if( (true == "-w".equals(args[i])) || (true == "--work_dirctory".equals(args[i])))
                 {
@@ -512,6 +518,11 @@ public class PuzzlerMain
         }
         Context ctx = new ContextImpl(cfg);
         FileGetter fg = new FileGetter(ctx);
+        if(true == useXCmlRpc)
+        {
+            XmlRpcGetter xrg = new XmlRpcGetter();
+            fg.addGetter(xrg);
+        }
         ctx.addFileGetter(fg);
 
         // open Project file

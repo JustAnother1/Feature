@@ -1,0 +1,98 @@
+Build from c82455d302b17bfb5c121f0f654914d9a68c2a75-( 4 files changed, 35 insertions(+), 3 deletions(-))
+TRACE [de.nomagic.puzzler.PuzzlerMain] command Line config: zip output to stdout
+TRACE [de.nomagic.puzzler.PuzzlerMain] command Line config: library Directory res/lib/
+TRACE [de.nomagic.puzzler.PuzzlerMain] command Line config: work Directory tests/data/
+TRACE [de.nomagic.puzzler.PuzzlerMain] command Line config: environment Directory feature/
+TRACE [d.n.puzzler.Environment.Environment] type : avr/atmega2560
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from tests:data:solution
+TRACE [de.nomagic.puzzler.FileGetter] trying to open tests/data/solution.xml.
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from tests:data:algorithm:super_loop.algorithm
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:atmega2560:algorithm:super_loop.algorithm
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:algorithm:super_loop.algorithm
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from res:lib:algorithm:super_loop.algorithm
+TRACE [de.nomagic.puzzler.FileGetter] trying to open res/lib/algorithm/super_loop.algorithm.xml.
+TRACE [de.nomagic.puzzler.FileGetter] Loaded the Element(algorithm) from the file res/lib/algorithm/super_loop.algorithm.xml
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from tests:data:algorithm:gpio.algorithm
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:atmega2560:algorithm:gpio.algorithm
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:algorithm:gpio.algorithm
+<?xml version="1.0" encoding="UTF-8"?>
+<algorithm name="gpio" api="bitOut, bitIn, initialize">
+  <required>
+    <parameter name="port" type="character" />
+  </required>
+</algorithm>
+TRACE [de.nomagic.puzzler.FileGetter] Loaded the Element(algorithm) from the file feature/avr/algorithm/gpio.algorithm.xml
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from tests:data:algorithm:pwm_task.algorithm
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:atmega2560:algorithm:pwm_task.algorithm
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:algorithm:pwm_task.algorithm
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from res:lib:algorithm:pwm_task.algorithm
+TRACE [de.nomagic.puzzler.FileGetter] trying to open res/lib/algorithm/pwm_task.algorithm.xml.
+TRACE [de.nomagic.puzzler.FileGetter] Loaded the Element(algorithm) from the file res/lib/algorithm/pwm_task.algorithm.xml
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from tests:data:algorithm:gpio.algorithm
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:atmega2560:algorithm:gpio.algorithm
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:algorithm:gpio.algorithm
+<?xml version="1.0" encoding="UTF-8"?>
+<algorithm name="gpio" api="bitOut, bitIn, initialize">
+  <required>
+    <parameter name="port" type="character" />
+  </required>
+</algorithm>
+TRACE [de.nomagic.puzzler.FileGetter] Loaded the Element(algorithm) from the file feature/avr/algorithm/gpio.algorithm.xml
+TRACE [ConfiguredAlgorithm] Algorithm gpio implementing bitOut, bitIn, initialize has 1 required parameters.
+TRACE [ConfiguredAlgorithm] Algorithm gpio implementing bitOut, bitIn, initialize has 0 required children.
+TRACE [ConfiguredAlgorithm] Algorithm gpio implementing bitOut, bitIn, initialize has 1 required parameters.
+TRACE [ConfiguredAlgorithm] Algorithm gpio implementing bitOut, bitIn, initialize has 0 required children.
+TRACE [ConfiguredAlgorithm] Algorithm pwm_task implementing run has 2 required parameters.
+TRACE [ConfiguredAlgorithm] Algorithm pwm_task implementing run has 1 required children.
+TRACE [ConfiguredAlgorithm] required API for child 0 is 'bitOut'
+TRACE [ConfiguredAlgorithm] Algorithm super_loop implementing program_entry_point has 0 required parameters.
+TRACE [ConfiguredAlgorithm] Algorithm super_loop implementing program_entry_point has 1 required children.
+TRACE [ConfiguredAlgorithm] required API for child 0 is 'run'
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from tests:data:api:bitOut.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:atmega2560:api:bitOut.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:api:bitOut.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from res:lib:api:bitOut.api
+TRACE [de.nomagic.puzzler.FileGetter] trying to open res/lib/api/bitOut.api.xml.
+TRACE [de.nomagic.puzzler.FileGetter] Loaded the Element(api) from the file res/lib/api/bitOut.api.xml
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from tests:data:api:bitIn.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:atmega2560:api:bitIn.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:api:bitIn.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from res:lib:api:bitIn.api
+TRACE [de.nomagic.puzzler.FileGetter] trying to open res/lib/api/bitIn.api.xml.
+TRACE [de.nomagic.puzzler.FileGetter] Loaded the Element(api) from the file res/lib/api/bitIn.api.xml
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from tests:data:api:initialize.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:atmega2560:api:initialize.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:api:initialize.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from res:lib:api:initialize.api
+TRACE [de.nomagic.puzzler.FileGetter] trying to open res/lib/api/initialize.api.xml.
+TRACE [de.nomagic.puzzler.FileGetter] Loaded the Element(api) from the file res/lib/api/initialize.api.xml
+TRACE [CodeGeneratorFactory] tree has C-Code
+TRACE [CodeGeneratorFactory] Is not a valid C++-Code tree
+TRACE [CodeGeneratorFactory] Is not a valid Verilog-Code tree
+TRACE [d.n.puzzler.Generator.CCodeGenerator] starting to generate the C implementation for os(Algorithm super_loop implementing program_entry_point)
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from tests:data:api:program_entry_point.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:atmega2560:api:program_entry_point.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:api:program_entry_point.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from res:lib:api:program_entry_point.api
+TRACE [de.nomagic.puzzler.FileGetter] trying to open res/lib/api/program_entry_point.api.xml.
+TRACE [de.nomagic.puzzler.FileGetter] Loaded the Element(api) from the file res/lib/api/program_entry_point.api.xml
+TRACE [d.n.puzzler.Generator.CCodeGenerator] getting implementation of the program_entry_point from os(Algorithm super_loop implementing program_entry_point)
+TRACE [d.n.puzzler.Generator.CCodeGenerator] getting the C implemention of the function program_entry_point:main(null) from os(Algorithm super_loop implementing program_entry_point)
+TRACE [d.n.puzzler.Generator.CCodeGenerator] func.size() : 1
+TRACE [d.n.puzzler.Generator.CCodeGenerator] func.name : main
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from tests:data:api:initialize.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:atmega2560:api:initialize.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from feature:avr:api:initialize.api
+TRACE [de.nomagic.puzzler.XmlRpcGetter] trying to read from res:lib:api:initialize.api
+TRACE [de.nomagic.puzzler.FileGetter] trying to open res/lib/api/initialize.api.xml.
+TRACE [de.nomagic.puzzler.FileGetter] Loaded the Element(api) from the file res/lib/api/initialize.api.xml
+TRACE [d.n.puzzler.Generator.CCodeGenerator] os(Algorithm super_loop implementing program_entry_point) : No function to call specified, but API(initialize) has only one function, so taking that.
+TRACE [d.n.puzzler.Generator.CCodeGenerator] getting the C implemention of the function null:initialize(null) from greenLed(Algorithm gpio implementing bitOut, bitIn, initialize)
+ERROR(de.nomagic.puzzler.Generator.CCodeGenerator) : Could not read implementation for initialize from greenLed(Algorithm gpio implementing bitOut, bitIn, initialize)
+ERROR [d.n.puzzler.Generator.CCodeGenerator] Could not get an Implementation for initialize
+ERROR(de.nomagic.puzzler.Generator.CCodeGenerator) : Could not get an Implementation for initialize
+ERROR [d.n.puzzler.Generator.CCodeGenerator] Could not get an Implementation for main
+ERROR(de.nomagic.puzzler.Generator.CCodeGenerator) : Could not get an Implementation for main
+ERROR [de.nomagic.puzzler.PuzzlerMain] Failed to generate C source code!
+ERROR [de.nomagic.puzzler.PuzzlerMain] Could not create ressources !
+ERROR: Something went wrong!
