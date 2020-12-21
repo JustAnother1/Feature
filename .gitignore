@@ -19,3 +19,6 @@ hs_err_pid*
 /cobertura.ser
 /.stignore
 /diff/
+/wiki.zip
+/wiki.sh
+/wiki.err
