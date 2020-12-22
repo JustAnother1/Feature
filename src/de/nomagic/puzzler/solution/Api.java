@@ -51,7 +51,12 @@ public class Api extends Base
         {
             return null;
         }
-        Element root = ctx.getFileGetter().getFromFile(name, "api", FileGetter.API_ROOT_ELEMENT_NAME);
+        FileGetter fg = ctx.getFileGetter();
+        if(null == fg)
+        {
+            return null;
+        }
+        Element root = fg.getFromFile(name, "api", FileGetter.API_ROOT_ELEMENT_NAME);
         if(null != root)
         {
             return new Api(root, ctx);
