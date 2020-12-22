@@ -126,6 +126,19 @@ public class AlgorithmTest {
     }
 
     @Test
+    public void testHasApi_HasManyApi()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        Element ele = new Element("good");
+        ele.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "bla, blupp, bob");
+        Algorithm cut = new Algorithm(ele, ctx);
+        assertTrue(cut.hasApi("blupp"));
+        assertTrue(cut.hasApi("bla"));
+        assertTrue(cut.hasApi("bob"));
+    }
+
+    @Test
     public void testGetChildNull()
     {
         Configuration cfg = new Configuration();
