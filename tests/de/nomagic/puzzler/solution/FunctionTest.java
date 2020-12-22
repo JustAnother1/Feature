@@ -258,7 +258,7 @@ public class FunctionTest
         dut.addComment("a comment");
         dut.setImplementation("{\n\ti++\n}");
         assertEquals("void Bob(void); // from a comment\n", dut.getCode(FunctionHandler.TYPE_DECLARATION, "\n"));
-        assertEquals("void Bob(void) // from a comment\n{\n\ti++\n}\n", dut.getCode(FunctionHandler.TYPE_IMPLEMENTATION, "\n"));
+        assertEquals("void Bob(void) // from a comment\n{\n{\n\ti++\n}\n}\n", dut.getCode(FunctionHandler.TYPE_IMPLEMENTATION, "\n"));
         assertNull(dut.getCode(FunctionHandler.TYPE_IMPLEMENTATION+1, "bla"));
     }
 }
