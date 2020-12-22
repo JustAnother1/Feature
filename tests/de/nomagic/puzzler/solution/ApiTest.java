@@ -21,7 +21,7 @@ public class ApiTest
         Element root = new Element("bla");
         root.setAttribute(Api.API_NAME_ATTRIBUTE_NAME, "Bob");
         Api dut = new Api(root, null);
-        assertEquals("Api Bob", dut.toString());
+        assertEquals("Bob", dut.toString());
     }
 
     @Test

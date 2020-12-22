@@ -90,7 +90,7 @@ public class AlgorithmTest {
         ContextImpl ctx = new ContextImpl(cfg);
         Element ele = new Element("bad");
         Algorithm cut = new Algorithm(ele, ctx);
-        assertTrue(cut.hasApi(null));
+        assertFalse(cut.hasApi(null));
     }
 
     @Test

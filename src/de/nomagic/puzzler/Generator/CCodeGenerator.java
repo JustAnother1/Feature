@@ -53,6 +53,10 @@ public class CCodeGenerator extends Generator
 
         codeGroup = new FileGroup();
         Environment e = ctx.getEnvironment();
+        if(null == e)
+        {
+            return null;
+        }
         String rootApi = e.getRootApi();
 
 
