@@ -101,4 +101,18 @@ public class DokuwikiParserTest {
                 + "</algorithm>\r\n", getXml(res));
     }
 
+    @Test
+    public void testConvertToXml_childWithContent()
+    {
+        String input = "====== GPIO Algorithm ======\r\n"
+                     + "===== include =====\r\n"
+                     + "This include <code c>avr/io.h</code> is needed to make this work.\r\n";
+        Document res = dut.convertToXml(input);
+        assertNotNull(res);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+                + "<algorithm name=\"gpio\">\r\n"
+                + "  <include><![CDATA[avr/io.h]]></include>\r\n"
+                + "</algorithm>\r\n", getXml(res));
+    }
+
 }

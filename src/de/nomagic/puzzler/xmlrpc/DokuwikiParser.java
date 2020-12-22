@@ -27,12 +27,12 @@ public class DokuwikiParser
 
     // to test regex : https://regexr.com/
 
-    // (\*\*\w+\*\*)|(\/\/(\w+|\s)+\/\/)
-    private String AttributeOrValueExpr = "(\\*\\*\\w+\\*\\*)|(\\/\\/(\\w+|\\s)+\\/\\/)";
+    // (\*\*\w+\*\*)|(\/\/(\w+|\s|\(|\))+\/\/)
+    private String AttributeOrValueExpr = "(\\*\\*\\w+\\*\\*)|(\\/\\/(\\w+|\\s|\\(|\\))+\\/\\/)";
     private Pattern AtOrValPattern = Pattern.compile(AttributeOrValueExpr);
 
-    // <\s*code((\s)|(\w))*>
-    private String CodeContentStartExpr = "<\\s*code((\\s)|(\\w))*>";
+    // <\s*code\s+((\s)|(\w))*>
+    private String CodeContentStartExpr = "<\\s*code\\s+((\\s)|(\\w))*>";
     private Pattern CodeContentStartPattern = Pattern.compile(CodeContentStartExpr);
     // <\s*\/\s*code(\s)*>
     private String CodeContentEndExpr = "<\\s*\\/\\s*code(\\s)*>";
@@ -191,11 +191,11 @@ public class DokuwikiParser
                 checkForAttributes(lines[i]);
                 checkForChildElement(lines[i]);
                 Matcher codeStart = CodeContentStartPattern.matcher(lines[i]);
-                if(codeStart.matches())
+                if(codeStart.find())
                 {
                     int startIdx = codeStart.end();
                     Matcher codeEnd = CodeContentEndPattern.matcher(lines[i]);
-                    if(codeEnd.matches())
+                    if(codeEnd.find())
                     {
                         // start and end in the same line
                         int EndIdx = codeEnd.start();

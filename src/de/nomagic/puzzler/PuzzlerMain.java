@@ -229,7 +229,7 @@ public class PuzzlerMain
                     // verbose output
                     // already handled -> ignore
                 }
-                else if(true == "-".equals(args[i]))
+                else if(true == "-x".equals(args[i]))
                 {
                     useXCmlRpc = true;
                 }
