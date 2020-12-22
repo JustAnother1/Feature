@@ -244,7 +244,7 @@ public class FunctionTest
         tag.setAttribute(Function.FUNCTION_NAME_ATTRIBUTE_NAME, "Bob");
         Function dut = new Function(tag);
         dut.addComment("a comment");
-        assertEquals("void Bob(void); // from a comment", dut.getCode(FunctionHandler.TYPE_DECLARATION, "\n"));
+        assertEquals("void Bob(void); // from a comment\n", dut.getCode(FunctionHandler.TYPE_DECLARATION, "\n"));
         assertEquals("void Bob(void) // from a comment\n\n", dut.getCode(FunctionHandler.TYPE_IMPLEMENTATION, "\n"));
         assertNull(dut.getCode(FunctionHandler.TYPE_IMPLEMENTATION+1, "bla"));
     }
@@ -257,7 +257,7 @@ public class FunctionTest
         Function dut = new Function(tag);
         dut.addComment("a comment");
         dut.setImplementation("{\n\ti++\n}");
-        assertEquals("void Bob(void); // from a comment", dut.getCode(FunctionHandler.TYPE_DECLARATION, "\n"));
+        assertEquals("void Bob(void); // from a comment\n", dut.getCode(FunctionHandler.TYPE_DECLARATION, "\n"));
         assertEquals("void Bob(void) // from a comment\n{\n\ti++\n}\n", dut.getCode(FunctionHandler.TYPE_IMPLEMENTATION, "\n"));
         assertNull(dut.getCode(FunctionHandler.TYPE_IMPLEMENTATION+1, "bla"));
     }

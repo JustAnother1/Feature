@@ -41,8 +41,8 @@ public class ConfiguredAlgorithmTest
         ctx.addSolution(s);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         String err = ctx.getErrors();
-        assertEquals(72, err.length());
         assertEquals("ConfiguredAlgorithm.getTree : No root element in the provided solution !", err);
+        assertEquals(72, err.length());
     }
 
     @Test
@@ -55,8 +55,8 @@ public class ConfiguredAlgorithmTest
         s.setRootElement(badRoot);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         String err = ctx.getErrors();
-        assertEquals(54, err.length());
         assertEquals("ConfiguredAlgorithm.getTree : invalid root tag (bad) !", err);
+        assertEquals(54, err.length());
     }
 
     @Test
@@ -69,8 +69,8 @@ public class ConfiguredAlgorithmTest
         s.setRootElement(badRoot);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         String err = ctx.getErrors();
-        assertEquals(78, err.length());
         assertEquals("ConfiguredAlgorithm.getTree : No algorithm elements in the provided solution !", err);
+        assertEquals(78, err.length());
     }
 
     @Test
@@ -85,8 +85,8 @@ public class ConfiguredAlgorithmTest
         s.setRootElement(badRoot);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         String err = ctx.getErrors();
-        assertEquals(64, err.length());
         assertEquals("ConfiguredAlgorithm.getTree : Failed to get Algorithm for null !", err);
+        assertEquals(64, err.length());
     }
 
     @Test
@@ -102,8 +102,8 @@ public class ConfiguredAlgorithmTest
         s.setRootElement(root);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
         String err = ctx.getErrors();
-        assertEquals(64, err.length());
         assertEquals("ConfiguredAlgorithm.getTree : Failed to get Algorithm for algo !", err);
+        assertEquals(64, err.length());
     }
 
     @Test
@@ -282,7 +282,7 @@ public class ConfiguredAlgorithmTest
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
-        assertEquals("Parameter:\n", dut.dumpParameter());
+        assertEquals("Parameter: <empty>", dut.dumpParameter());
     }
 
     @Test
@@ -298,7 +298,7 @@ public class ConfiguredAlgorithmTest
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
         assertEquals("dut", dut.getName());
-        assertEquals("Properties:\n", dut.dumpProperty());
+        assertEquals("Properties: <empty>", dut.dumpProperty());
     }
 
     @Test
