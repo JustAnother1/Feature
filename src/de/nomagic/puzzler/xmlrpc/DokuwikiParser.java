@@ -33,8 +33,8 @@ public class DokuwikiParser
     private String AttributeOrValueExpr = "(\\*\\*\\w+\\*\\*)|(\\/\\/(\\w+|\\s|\\(|\\))+\\/\\/)";
     private Pattern AtOrValPattern = Pattern.compile(AttributeOrValueExpr);
 
-    // <\s*code\s+((\s)|(\w))*>
-    private String CodeContentStartExpr = "<\\s*code\\s+((\\s)|(\\w))*>";
+    // <\s*code\s*((\s)|(\w))*>
+    private String CodeContentStartExpr = "<\\s*code\\s*((\\s)|(\\w))*>";
     private Pattern CodeContentStartPattern = Pattern.compile(CodeContentStartExpr);
     // <\s*\/\s*code(\s)*>
     private String CodeContentEndExpr = "<\\s*\\/\\s*code(\\s)*>";
@@ -215,11 +215,12 @@ public class DokuwikiParser
                     {
                         StringBuilder sb = new StringBuilder();
                         sb.append(lines[i].substring(startIdx));
+                        sb.append("\r\n");
                         i++;
                         while(i < lines.length)
                         {
                             codeEnd = CodeContentEndPattern.matcher(lines[i]);
-                            if(codeEnd.matches())
+                            if(codeEnd.find())
                             {
                                 // found end
                                 int EndIdx = codeEnd.start();
@@ -228,6 +229,8 @@ public class DokuwikiParser
                             }
                             else
                             {
+                                sb.append(lines[i]);
+                                sb.append("\r\n");
                                 i++;
                             }
                         }
