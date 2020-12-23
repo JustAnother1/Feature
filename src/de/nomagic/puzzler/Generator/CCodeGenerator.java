@@ -253,6 +253,7 @@ public class CCodeGenerator extends Generator
                         {
                             Function first = theApi.getFunctionIndex(0);
                             FuncToCall = first.getName();
+                            log.trace("Element: {}",Tool.getXMLRepresentationFor(curE));
                             log.trace("{} : No function to call specified, but API({}) has only one function, so taking that.", logic, api);
                         }
                         else
@@ -303,7 +304,7 @@ public class CCodeGenerator extends Generator
                 if(0 < trimmed.length())
                 {
                     sb.append(impl);
-                    log.trace("adding non element code to implmentation: {} from {}", impl, curC);
+                    log.trace("adding non element code to implmentation: '{}' from '{}'", impl, curC);
                 }
                 // else whitespace in between tags
             }

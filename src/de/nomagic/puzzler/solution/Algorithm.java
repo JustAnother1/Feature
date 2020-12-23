@@ -96,6 +96,7 @@ public class Algorithm extends Base
         }
         else
         {
+            log.trace("No API attribute.");
             return null;
         }
     }

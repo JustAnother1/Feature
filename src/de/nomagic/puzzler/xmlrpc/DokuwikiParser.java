@@ -25,6 +25,8 @@ public class DokuwikiParser
             Pattern.compile("={3}\\s*\\w+\\s*(\\w)*\\s*={3}"),
             Pattern.compile("={2}\\s*\\w+\\s*(\\w)*\\s*={2}") };
 
+    private static final int MAX_LEVEL = 4;
+
     // to test regex : https://regexr.com/
 
     // (\*\*\w+\*\*)|(\/\/(\w+|\s|\(|\))+\/\/)
@@ -55,7 +57,7 @@ public class DokuwikiParser
             {
                 // next Attribute
                 match = match.substring(2, match.length()-2);
-                curAttribute = match.toLowerCase();
+                curAttribute = match;
             }
             else
             {
@@ -82,13 +84,13 @@ public class DokuwikiParser
         String[] parts = line.split("\\s");
         if(4 == parts.length)
         {
-            Element res = new Element(parts[2].toLowerCase());
-            res.setAttribute("name", parts[1].toLowerCase());
+            Element res = new Element(parts[2]);
+            res.setAttribute("name", parts[1]);
             return res;
         }
         else if(3 == parts.length)
         {
-            Element res = new Element(parts[1].toLowerCase());
+            Element res = new Element(parts[1]);
             return res;
         }
         return null;
@@ -103,20 +105,26 @@ public class DokuwikiParser
         }
         // else something in this line -> lets see
 
+        Matcher m = null;
+
         // might be a child
-        Matcher m = levelPatterns[curLevel + 1].matcher(line);
-        if(m.matches())
+        if(MAX_LEVEL > curLevel)
         {
-            // found child element
-            Element child = getElementFromHeading(line);
-            curElement.addContent(child);
-            curLevel = curLevel + 1;
-            levelElements[curLevel] = child;
-            curElement = child;
-            curAttribute = "";
-            return;
+            m = levelPatterns[curLevel + 1].matcher(line);
+            if(m.matches())
+            {
+                // found child element
+                Element child = getElementFromHeading(line);
+                curElement.addContent(child);
+                curLevel = curLevel + 1;
+                levelElements[curLevel] = child;
+                curElement = child;
+                curAttribute = "";
+                return;
+            }
+            // else no child in this line
         }
-        // else no child in this line
+        // else the max level can not have children.
 
         // a sibling
         m = levelPatterns[curLevel].matcher(line);

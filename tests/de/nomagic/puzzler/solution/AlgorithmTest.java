@@ -136,6 +136,7 @@ public class AlgorithmTest {
         assertTrue(cut.hasApi("blupp"));
         assertTrue(cut.hasApi("bla"));
         assertTrue(cut.hasApi("bob"));
+        assertFalse(cut.hasApi("laber"));
     }
 
     @Test

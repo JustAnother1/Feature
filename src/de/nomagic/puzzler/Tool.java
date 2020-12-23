@@ -24,6 +24,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+
 /** collection of general utility functions.
  *
  * @author Lars P&ouml;tter
@@ -34,6 +38,14 @@ public final class Tool
     private Tool()
     {
         // Not used !
+    }
+
+    public static String getXMLRepresentationFor(Element tag)
+    {
+        XMLOutputter xmlOutput = new XMLOutputter();
+        xmlOutput.setFormat(Format.getPrettyFormat());
+        String res = xmlOutput.outputString(tag);
+        return res;
     }
 
     public static String curentDateTime()

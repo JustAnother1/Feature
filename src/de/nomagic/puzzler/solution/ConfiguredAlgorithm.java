@@ -295,10 +295,15 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             while(it.hasNext())
             {
                 ConfiguredAlgorithm curAlgo = cfgAlgorithms.get(it.next());
+                LOG.trace("checking child {}", curAlgo);
                 if(true == curAlgo.hasApi(reqApi))
                 {
                     found = true;
                     break; // the while
+                }
+                else
+                {
+                    LOG.trace("API {} not found in {}.",reqApi,  curAlgo.getApis());
                 }
             }
             if(false == found)
@@ -364,6 +369,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     {
         if(null == algorithmDefinition)
         {
+            LOG.trace("No algorithm available.");
             return null;
         }
         else

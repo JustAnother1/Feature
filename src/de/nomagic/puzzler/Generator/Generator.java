@@ -122,6 +122,10 @@ public abstract class Generator extends Base
                         // Not a parameter passed in the function call,
                         // but a parameter in the algorithm configuration?
                         paramValue = logic.getParameter(parts[i]);
+                        if(null != paramValue)
+                        {
+                            log.trace("Found {} as value for {} in algorithm configuration.", paramValue, parts[i]);
+                        }
                     }
 
                     if(null == paramValue)
@@ -168,7 +172,7 @@ public abstract class Generator extends Base
             Attribute attr = functionElement.getAttribute("param" + paramIndex + "_name");
             if(null == attr)
             {
-                log.trace("Function parameter {} not found !", ParameterName);
+                log.trace("Function parameter {} not found !(Algorithm configuration?)", ParameterName);
                 return null;
             }
             if(true == ParameterName.equals(attr.getValue()))
