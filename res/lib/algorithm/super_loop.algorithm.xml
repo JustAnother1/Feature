@@ -6,12 +6,12 @@
   <childElement type="initialize" />
   <c_code>
     <function name="main">
-     <forChilds api="initialize"> <![CDATA[{  €initialize:initlize()€]]> </forChilds>
-        <![CDATA[  for(;;) {]]>
-  <forChilds api="run">
-     <![CDATA[{€run:execute()€]]>
-  </forChilds>
-    <![CDATA[  }
+     <forChilds api="initialize"> <![CDATA[  €initialize:initlize()€]]> </forChilds>
+         <![CDATA[  for(;;) {]]>
+     <forChilds api="run">
+         <![CDATA[    €run:execute()€]]>
+     </forChilds>
+     <![CDATA[  }
 ]]>
     </function>
   </c_code>

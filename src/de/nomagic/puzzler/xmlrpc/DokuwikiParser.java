@@ -40,6 +40,9 @@ public class DokuwikiParser
     private String CodeContentEndExpr = "<\\s*\\/\\s*code(\\s)*>";
     private Pattern CodeContentEndPattern = Pattern.compile(CodeContentEndExpr);
 
+    // ''end''
+    private String EndOfElementExpr = "''end''";
+    private Pattern EndOfElementPattern = Pattern.compile(EndOfElementExpr);
 
 
     public DokuwikiParser()
@@ -157,6 +160,18 @@ public class DokuwikiParser
         }
     }
 
+    private void checkForExplicitEndOfElement(String line)
+    {
+        Matcher m = EndOfElementPattern.matcher(line);
+        if(m.matches())
+        {
+            // end this element and go back to its parent.
+            curElement = levelElements[curLevel - 1];
+            curAttribute = "";
+            curLevel = curLevel -1;
+        }
+    }
+
     public Document convertToXml(String result)
     {
         if(null == result)
@@ -196,8 +211,11 @@ public class DokuwikiParser
             }
             else if(true == foundSomething)
             {
+                // TODO if one check found something then I probably do not have to do the other ones, right?
                 checkForAttributes(lines[i]);
                 checkForChildElement(lines[i]);
+                checkForExplicitEndOfElement(lines[i]);
+                // check for Code sections:
                 Matcher codeStart = CodeContentStartPattern.matcher(lines[i]);
                 if(codeStart.find())
                 {
