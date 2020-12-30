@@ -112,7 +112,12 @@
     </target>
 
     <target name="compile" depends="prepare" description="compile *.java to *.class">
-        <javac srcdir="${srcDir}" destdir="${destDir}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
+        <javac srcdir="${srcDir}"
+               destdir="${destDir}"
+               source="1.8" target="1.8"
+               includeantruntime="false"
+               debug="true"
+               debuglevel="lines,vars,source">
             <classpath refid="project.class.path"/>
         </javac>
     </target>

@@ -16,7 +16,7 @@ public class Configuration
     public static final String ENVIRONMENT_PATH_CFG = "environment_path";
     public static final String ZIP_OUTPUT = "zip_output";
     public static final String ZIP_OUTPUT_TO_STDOUT = "zip_output_to_stdout";
-
+    public static final String XML_RPC_URL = "xml_rpc_url";
 
     private HashMap<String, Vector<String>> stringArraySettings = new HashMap<String,Vector<String>>();
     private HashMap<String, Boolean> boolArraySettings = new HashMap<String, Boolean>();

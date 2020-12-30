@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.configuration.Configuration;
+import de.nomagic.puzzler.xmlrpc.XmlRpcGetter;
 
 public final class FileGetter
 {

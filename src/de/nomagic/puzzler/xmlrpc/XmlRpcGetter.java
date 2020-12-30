@@ -1,12 +1,10 @@
-package de.nomagic.puzzler;
+package de.nomagic.puzzler.xmlrpc;
 
 import org.jdom2.Document;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import de.nomagic.puzzler.xmlrpc.DokuwikiParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,12 +22,12 @@ public class XmlRpcGetter
     private final XmlRpcClientConfigImpl config;
     private final DokuwikiParser parser;
 
-    public XmlRpcGetter()
+    public XmlRpcGetter(String url)
     {
         parser = new DokuwikiParser();
         config = new XmlRpcClientConfigImpl();
         try {
-            config.setServerURL(new URL("http://localhost/lib/exe/xmlrpc.php"));
+            config.setServerURL(new URL(url));
             client = new XmlRpcClient();
             client.setConfig(config);
         }

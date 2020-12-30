@@ -1,10 +1,12 @@
-package de.nomagic.puzzler;
+package de.nomagic.puzzler.xmlrpc;
 
 import static org.junit.Assert.*;
 
 import org.jdom2.Document;
 import org.junit.Before;
 import org.junit.Test;
+
+import de.nomagic.puzzler.xmlrpc.XmlRpcGetter;
 
 public class XmlRpcGetterTest
 {

@@ -38,6 +38,7 @@ import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
 import de.nomagic.puzzler.solution.Solution;
 import de.nomagic.puzzler.solution.SolutionImpl;
+import de.nomagic.puzzler.xmlrpc.XmlRpcGetter;
 
 /** Main function of puzzler.
  *
@@ -77,7 +78,7 @@ public class PuzzlerMain
         System.out.println("-v                         : verbose output for even more messages use -v -v");
         System.out.println("-w <path> / --work_dirctory <path>");
         System.out.println("                           : root directory for file search.");
-        System.out.println("-x                         : read from XML-RPC source.");
+        System.out.println("-x <URL>                   : read from XML-RPC source at URL.");
         System.out.println("-z <filename> / --zip <filename>");
         System.out.println("                           : zip created data (ignores output folder setting).");
         System.out.println("--zip_to_stdout            : zip created data and write zip file to stdout.");
@@ -139,6 +140,18 @@ public class PuzzlerMain
           // StatusPrinter will handle this
         }
         StatusPrinter.printInCaseOfErrorsOrWarnings(context);
+    }
+
+    private boolean cmdln_xmlRpcUrl(String value)
+    {
+        if(1 > value.length())
+        {
+            System.err.println("Invalid XML-RPC URL !");
+            return false;
+        }
+        cfg.setString(Configuration.XML_RPC_URL, value);
+        log.trace("command Line config: xml-rpc url {}", value);
+        return true;
     }
 
     private boolean cmdln_workingDirectory(String value)
@@ -232,6 +245,11 @@ public class PuzzlerMain
                 else if(true == "-x".equals(args[i]))
                 {
                     useXCmlRpc = true;
+                    i++;
+                    if(false == cmdln_xmlRpcUrl(args[i]))
+                    {
+                        return false;
+                    }
                 }
                 else if( (true == "-w".equals(args[i])) || (true == "--work_dirctory".equals(args[i])))
                 {
@@ -520,7 +538,8 @@ public class PuzzlerMain
         FileGetter fg = new FileGetter(ctx);
         if(true == useXCmlRpc)
         {
-            XmlRpcGetter xrg = new XmlRpcGetter();
+            String url = cfg.getString(Configuration.XML_RPC_URL);
+            XmlRpcGetter xrg = new XmlRpcGetter(url);
             fg.addGetter(xrg);
         }
         ctx.addFileGetter(fg);
