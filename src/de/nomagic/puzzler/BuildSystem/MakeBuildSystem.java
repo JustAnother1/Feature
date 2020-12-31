@@ -37,6 +37,7 @@ public class MakeBuildSystem extends BuildSystem
     public static final String MAKEFILE_FILE_COMMENT_SECTION_NAME = "FileHeader";
     public static final String MAKEFILE_FILE_VARIABLES_SECTION_NAME = "Variables";
     public static final String MAKEFILE_FILE_TARGET_SECTION_NAME = "targets";
+    public static final String CFG_SPLIT_MAKEFILE_IN_SECTIONS = "split_makefile";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -44,6 +45,8 @@ public class MakeBuildSystem extends BuildSystem
     private HashMap<String, String> listVariables = new HashMap<String, String>();
     private int numDefaultTargets = 0;
     private TextFile makeFile;
+    private TextFile FilesMkFile;
+    private TextFile VariablesMkFile;
 
 
     public MakeBuildSystem(Context ctx)
@@ -96,27 +99,8 @@ public class MakeBuildSystem extends BuildSystem
 
     }
 
-    public FileGroup createBuildFor(FileGroup files)
+    private void createMakeFiles()
     {
-        if(null == files)
-        {
-            return null;
-        }
-        // get hardware configuration
-        // add the stuff required by the hardware (targets, variables, files)
-        Environment e = ctx.getEnvironment();
-        if(null == e)
-        {
-            ctx.addError(this, "No Environment available !");
-            return null;
-        }
-        if(false == configureBuild(e, requiredEnvironmentVariables))
-        {
-            ctx.addError(this, "Could not get configuration from environment !");
-            return null;
-        }
-        files.addAll(buildFiles);
-
         //create the Makefile
         makeFile = new TextFile("Makefile");
         makeFile.separateSectionWithEmptyLine(true);
@@ -127,10 +111,47 @@ public class MakeBuildSystem extends BuildSystem
 
         // there should be a file comment explaining what this is
         makeFile.addLines(MAKEFILE_FILE_COMMENT_SECTION_NAME,
-                       new String[] {"# automatically created makefile",
+                       new String[] {"# automatically created Makefile",
                                      "# created at: " + Tool.curentDateTime(),
                                      "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
 
+        if("true".equals(ctx.cfg().getString(CFG_SPLIT_MAKEFILE_IN_SECTIONS)))
+        {
+            // a separate file to list the file used in this project
+            FilesMkFile = new TextFile("filetree.mk");
+            FilesMkFile.separateSectionWithEmptyLine(true);
+            FilesMkFile.createSections(new String[]
+                    { MAKEFILE_FILE_COMMENT_SECTION_NAME,
+                      MAKEFILE_FILE_VARIABLES_SECTION_NAME     });
+
+            // there should be a file comment explaining what this is
+            FilesMkFile.addLines(MAKEFILE_FILE_COMMENT_SECTION_NAME,
+                           new String[] {"# automatically created filetree.mk",
+                                         "# created at: " + Tool.curentDateTime(),
+                                         "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
+
+            // a separate file to contain all the variables used.
+            VariablesMkFile = new TextFile("dashboard.mk");
+            VariablesMkFile.separateSectionWithEmptyLine(true);
+            VariablesMkFile.createSections(new String[]
+                    { MAKEFILE_FILE_COMMENT_SECTION_NAME,
+                      MAKEFILE_FILE_VARIABLES_SECTION_NAME });
+
+            // there should be a file comment explaining what this is
+            VariablesMkFile.addLines(MAKEFILE_FILE_COMMENT_SECTION_NAME,
+                           new String[] {"# automatically created dashboard.mk",
+                                         "# created at: " + Tool.curentDateTime(),
+                                         "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
+
+            // include the files from the main Makefile
+            makeFile.addLines(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
+                    new String[] { "include filetree.mk",
+                                   "include dashboard.mk" });
+        }
+    }
+
+    private FileGroup updateFromProjectFiles(FileGroup files)
+    {
         Iterator<String> fileIt = files.getFileIterator();
         if(false == fileIt.hasNext())
         {
@@ -179,19 +200,21 @@ public class MakeBuildSystem extends BuildSystem
                 extendListVariable("OBJS", objName);
             }
         }
+        return files;
+    }
 
-        // add generic stuff:
-
+    private boolean handleProjectName()
+    {
         String projectName = ctx.cfg().getString(Configuration.PROJECT_FILE_CFG);
         if(null == projectName)
         {
             ctx.addError(this, "No project name provided !");
-            return null;
+            return false;
         }
         if(1 > projectName.length())
         {
             ctx.addError(this, "Empty project name provided !");
-            return null;
+            return false;
         }
         if(true == projectName.contains(File.separator))
         {
@@ -199,15 +222,44 @@ public class MakeBuildSystem extends BuildSystem
             projectName = projectName.substring(projectName.lastIndexOf(File.separator) + 1);
         }
         listVariables.put("project", projectName);
+        return true;
+    }
 
+    private void handleVariables()
+    {
         Iterator<String> itVariables = listVariables.keySet().iterator();
-        while(itVariables.hasNext())
+        if("true".equals(ctx.cfg().getString(CFG_SPLIT_MAKEFILE_IN_SECTIONS)))
         {
-            String name = itVariables.next();
-            makeFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
-                    name + " = " + listVariables.get(name));
+            while(itVariables.hasNext())
+            {
+                String name = itVariables.next();
+                if(   ("C_SRC".equals(name))
+                   || ("CPP_SRC".equals(name))
+                   || ("OBJS".equals(name))     )
+                {
+                    FilesMkFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
+                            name + " = " + listVariables.get(name));
+                }
+                else
+                {
+                    VariablesMkFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
+                            name + " = " + listVariables.get(name));
+                }
+            }
         }
+        else
+        {
+            while(itVariables.hasNext())
+            {
+                String name = itVariables.next();
+                makeFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
+                        name + " = " + listVariables.get(name));
+            }
+        }
+    }
 
+    private void handleTargets()
+    {
         if(0 == numDefaultTargets)
         {
             log.warn("No target has been defined as beeing default!");
@@ -231,8 +283,53 @@ public class MakeBuildSystem extends BuildSystem
         }
 
         addGenericTargets();
+    }
+
+    public FileGroup createBuildFor(FileGroup files)
+    {
+        if(null == files)
+        {
+            return null;
+        }
+        // get hardware configuration
+        // add the stuff required by the hardware (targets, variables, files)
+        Environment e = ctx.getEnvironment();
+        if(null == e)
+        {
+            ctx.addError(this, "No Environment available !");
+            return null;
+        }
+        if(false == configureBuild(e, requiredEnvironmentVariables))
+        {
+            ctx.addError(this, "Could not get configuration from environment !");
+            return null;
+        }
+        files.addAll(buildFiles);
+
+        createMakeFiles();
+
+        files = updateFromProjectFiles(files);
+        if(null == files)
+        {
+            return null;
+        }
+
+        // add generic stuff:
+
+        if(false == handleProjectName())
+        {
+            return null;
+        }
+
+        handleVariables();
+        handleTargets();
 
         files.add(makeFile);
+        if("true".equals(ctx.cfg().getString(CFG_SPLIT_MAKEFILE_IN_SECTIONS)))
+        {
+            files.add(FilesMkFile);
+            files.add(VariablesMkFile);
+        }
         return files;
     }
 

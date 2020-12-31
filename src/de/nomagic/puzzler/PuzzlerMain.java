@@ -29,6 +29,7 @@ import org.jdom2.Element;
 
 import de.nomagic.puzzler.BuildSystem.BuildSystemApi;
 import de.nomagic.puzzler.BuildSystem.BuildSystemFactory;
+import de.nomagic.puzzler.BuildSystem.MakeBuildSystem;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.Generator.CodeGeneratorFactory;
@@ -67,6 +68,7 @@ public class PuzzlerMain
         System.out.println("-D<SettingName>=<Value>    : Set a value to a configuration variable.");
         System.out.println("                           : currently supported:");
         System.out.println("                           : " + Generator.CFG_DOC_CODE_SRC + "=true  : define in comments which algorithm cretaed the source code lines");
+        System.out.println("                           : " + MakeBuildSystem.CFG_SPLIT_MAKEFILE_IN_SECTIONS + "=true  : split Makefile into files for each section.");
         System.out.println("-e <path> /--environment_dirctory <path>");
         System.out.println("                           : directory with environment configuration.");
         System.out.println("-h / --help                : print this message.");
