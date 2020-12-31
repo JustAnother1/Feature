@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <environment>
-    <tool name="ARM_Cortex-M4F/STM32F407"/>
+    <tool name="ARM_Cortex-M/4F/STM32F407"/>
     <root_api name="program_entry_point" />
     <resources>
         <greenLed algorithm="gpio" port="D" pin="12" />
