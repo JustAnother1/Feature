@@ -130,4 +130,26 @@ public class DokuwikiParserTest {
                 + "</algorithm>\r\n", getXml(res));
     }
 
+    @Test
+    public void testConvert_multipleChilds()
+    {
+        String input = "====== environment ======\r\n"
+                + "===== ARM_Cortex-M4F/STM32F407 tool =====\r\n"
+                + "===== program_entry_point root_api =====\r\n"
+                + "===== resources =====\r\n"
+                + "==== user_led ====\r\n"
+                + "the **algorithm** used is //gpio//.\r\n"
+                + "The led is connected to **port** //D// on **pin** //12//.\r\n";
+        Document res = dut.convertToXml(input);
+        assertNotNull(res);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+                + "<environment>\r\n"
+                + "  <tool name=\"ARM_Cortex-M4F/STM32F407\" />\r\n"
+                + "  <root_api name=\"program_entry_point\" />\r\n"
+                + "  <resources>\r\n"
+                + "    <user_led algorithm=\"gpio\" port=\"D\" pin=\"12\" />\r\n"
+                + "  </resources>\r\n"
+                + "</environment>\r\n", getXml(res));
+    }
+
 }

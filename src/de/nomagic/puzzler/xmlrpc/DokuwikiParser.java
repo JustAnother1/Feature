@@ -19,11 +19,11 @@ public class DokuwikiParser
     private Element[] levelElements = {null, null, null, null, null};
 
     private Pattern[] levelPatterns = {
-            Pattern.compile("={6}\\s*\\w+\\s*(\\w)*\\s*={6}"),
-            Pattern.compile("={5}\\s*\\w+\\s*(\\w)*\\s*={5}"),
-            Pattern.compile("={4}\\s*\\w+\\s*(\\w)*\\s*={4}"),
-            Pattern.compile("={3}\\s*\\w+\\s*(\\w)*\\s*={3}"),
-            Pattern.compile("={2}\\s*\\w+\\s*(\\w)*\\s*={2}") };
+            Pattern.compile("={6}\\s*(\\w|-|/)+\\s*(\\w)*\\s*={6}"),
+            Pattern.compile("={5}\\s*(\\w|-|/)+\\s*(\\w)*\\s*={5}"),
+            Pattern.compile("={4}\\s*(\\w|-|/)+\\s*(\\w)*\\s*={4}"),
+            Pattern.compile("={3}\\s*(\\w|-|/)+\\s*(\\w)*\\s*={3}"),
+            Pattern.compile("={2}\\s*(\\w|-|/)+\\s*(\\w)*\\s*={2}") };
 
     private static final int MAX_LEVEL = 4;
 

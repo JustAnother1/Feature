@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.FileFactory;
 import de.nomagic.puzzler.FileGroup.FileGroup;
