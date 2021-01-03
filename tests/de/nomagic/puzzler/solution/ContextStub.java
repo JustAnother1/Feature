@@ -1,6 +1,5 @@
 package de.nomagic.puzzler.solution;
 
-import java.io.InputStream;
 import java.util.Vector;
 
 import org.jdom2.Element;

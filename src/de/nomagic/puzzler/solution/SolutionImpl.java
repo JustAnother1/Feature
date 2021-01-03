@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Project;
 import de.nomagic.puzzler.configuration.Configuration;
 
@@ -72,7 +71,7 @@ public class SolutionImpl extends Base implements Solution
                     return false;
                 }
                 // read external Reference
-                Document externalReferenceDocument = ctx.getFileGetter().getXmlFile(ctx.cfg().getString(Configuration.ROOT_PATH_CFG),
+                Document externalReferenceDocument = ctx.getFileGetter().getXmlFile(ctx.cfg().getString(Configuration.SOLUTION_PATH_CFG),
                                                                   externalReferenceFileName);
                 if(null == externalReferenceDocument)
                 {
@@ -101,6 +100,11 @@ public class SolutionImpl extends Base implements Solution
                 // no external Reference - all data in this node
                 ctx.cfg().setString(Configuration.SOLUTION_FILE_CFG, ctx.cfg().getString(Configuration.PROJECT_FILE_CFG));
             }
+        }
+        else
+        {
+            // no external Reference - all data in this node
+            ctx.cfg().setString(Configuration.SOLUTION_FILE_CFG, ctx.cfg().getString(Configuration.PROJECT_FILE_CFG));
         }
         return true;
     }

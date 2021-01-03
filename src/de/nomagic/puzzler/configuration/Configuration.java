@@ -6,7 +6,7 @@ import java.util.Vector;
 public class Configuration
 {
     // names of Settings
-    public static final String ROOT_PATH_CFG = "work_directory";
+    public static final String SOLUTION_PATH_CFG = "solution_directory";
     public static final String LIB_PATH_CFG = "library_path";
     public static final String OUTPUT_PATH_CFG = "output_path";
     public static final String PROJECT_FILE_CFG = "projectName";

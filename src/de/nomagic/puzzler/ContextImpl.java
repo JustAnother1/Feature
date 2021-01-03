@@ -134,7 +134,7 @@ public class ContextImpl implements Context
         Document doc = fg.getXmlFile(path, fileName);
         if(null == doc)
         {
-            addError(this, "Could not read xml file " + fileName);
+            addError(this, "Could not read xml file " + path +  fileName);
             return null;
         }
         Element root  = doc.getRootElement();
