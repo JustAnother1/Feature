@@ -102,7 +102,7 @@ public class ContextStub implements Context
     }
 
     @Override
-    public Element getElementfrom(InputStream in, String elementName)
+    public Element getElementfrom(String in, String elementName)
     {
         return null;
     }
