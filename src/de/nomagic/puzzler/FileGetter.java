@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -29,6 +30,32 @@ public final class FileGetter
     public FileGetter(Context ctx)
     {
         this.ctx = ctx;
+    }
+
+    public Document getXmlFromString(String in)
+    {
+        StringReader sr = new StringReader(in);
+        SAXBuilder jdomBuilder = new SAXBuilder();
+        Document jdomDocument = null;
+        try
+        {
+            jdomDocument = jdomBuilder.build(sr);
+        }
+        catch(JDOMException e)
+        {
+            ctx.addError(CLASS_NAME, "JDOM Exception");
+            log.trace(Tool.fromExceptionToString(e));
+            jdomDocument = null;
+        }
+        catch (IOException e)
+        {
+            ctx.addError(CLASS_NAME, "IOException from stream");
+            ctx.addError(CLASS_NAME, e.getMessage());
+            log.trace(Tool.fromExceptionToString(e));
+            jdomDocument = null;
+        }
+
+        return jdomDocument;
     }
 
     public Document getXmlFromStream(InputStream in)

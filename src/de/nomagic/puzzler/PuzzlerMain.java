@@ -14,7 +14,12 @@
  */
 package de.nomagic.puzzler;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
@@ -364,6 +369,36 @@ public class PuzzlerMain
         return true;
     }
 
+    private String getInputFromInputStream()
+    {
+        StringBuilder sb = new StringBuilder();
+        InputStream in = System.in;
+        Reader inputStreamReader = new InputStreamReader(in);
+        BufferedReader br = new BufferedReader(inputStreamReader);
+        for(;;)
+        {
+            String line;
+            try {
+                line = br.readLine();
+                if(false == line.startsWith("<<<EOF>>>"))
+                {
+                    sb.append(line);
+                    sb.append("\n");
+                }
+                else
+                {
+                    break;
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                break;
+            }
+        }
+        return sb.toString();
+    }
+
     private Project openProject(Context ctx)
     {
         Project pro = new ProjectImpl(ctx);
@@ -381,8 +416,10 @@ public class PuzzlerMain
             // read project from stdin
             String prjName = ctx.cfg().getString(Configuration.PROJECT_NAME_CFG);
             cfg.setString(Configuration.PROJECT_FILE_CFG, prjName);
+            String input = getInputFromInputStream();
+            log.trace("Input from stdin was: {}", input);
             proElement = ctx.getElementfrom(
-                    System.in,
+                    input,
                     Project.PROJECT_ROOT_ELEMENT_NAME);
         }
 

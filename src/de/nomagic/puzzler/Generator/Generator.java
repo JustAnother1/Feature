@@ -216,7 +216,8 @@ public abstract class Generator extends Base
         }
         if(null == FunctionParameters)
         {
-            log.warn("Function Parameters are null, changing to empty String !");
+            log.trace("Function Parameters are null, changing to empty String !");
+            log.trace("Implementation is : {} !", implementation);
             FunctionParameters = "";
         }
         if(null == logic)

@@ -16,8 +16,6 @@ package de.nomagic.puzzler;
 
 import org.jdom2.Element;
 
-import java.io.InputStream;
-
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 
@@ -99,14 +97,14 @@ public class ContextImpl implements Context
         return s;
     }
 
-    public Element getElementfrom(InputStream in, String elementName)
+    public Element getElementfrom(String in, String elementName)
     {
         if(null == elementName)
         {
             addError(this, "Must provide a stream!");
             return null;
         }
-        Document doc = fg.getXmlFromStream(in);
+        Document doc = fg.getXmlFromString(in);
         if(null == doc)
         {
             addError(this, "Could not read Project File ");
