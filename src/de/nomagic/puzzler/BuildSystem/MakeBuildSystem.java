@@ -304,6 +304,7 @@ public class MakeBuildSystem extends BuildSystem
             ctx.addError(this, "Could not get configuration from environment !");
             return null;
         }
+        log.trace("adding {} files.", buildFiles.numEntries());
         files.addAll(buildFiles);
 
         createMakeFiles();

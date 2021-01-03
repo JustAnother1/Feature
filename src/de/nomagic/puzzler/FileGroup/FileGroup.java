@@ -21,6 +21,11 @@ public class FileGroup
     {
     }
 
+    public int numEntries()
+    {
+        return files.size();
+    }
+
     public void add(AbstractFile aFile)
     {
         if(null != aFile)

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.jdom2.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
@@ -19,6 +21,8 @@ public abstract class BuildSystem extends Base implements BuildSystemApi
 {
     public static final String BUILD_CFG_ROOT_ELEMENT_NAME = "build_cfg";
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
+
     protected FileGroup buildFiles = new FileGroup();
     protected HashMap<String, String> requiredEnvironmentVariables = new HashMap<String, String>();
 
@@ -30,6 +34,7 @@ public abstract class BuildSystem extends Base implements BuildSystemApi
     @Override
     public void addFile(AbstractFile newFile)
     {
+        log.trace("adding the file {}", newFile.getFileName());
         buildFiles.add(newFile);
     }
 

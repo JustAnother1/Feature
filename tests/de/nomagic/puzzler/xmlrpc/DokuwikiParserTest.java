@@ -58,6 +58,16 @@ public class DokuwikiParserTest {
     }
 
     @Test
+    public void testConvertToXml_specialCharacters()
+    {
+        String input = "====== vendor/gpio-usb.h algorithm ======";
+        Document res = dut.convertToXml(input);
+        assertNotNull(res);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+                + "<algorithm name=\"vendor/gpio-usb.h\" />\r\n", getXml(res));
+    }
+
+    @Test
     public void testConvertToXml_attributeWithManyValues()
     {
         String input = "====== gpio algorithm ======\r\n"
