@@ -496,7 +496,7 @@ public class PuzzlerMain
     {
         if(true == ctx.cfg().getBool(Configuration.ZIP_OUTPUT_TO_STDOUT))
         {
-            if(false ==allFiles.zipToStdout())
+            if(false ==allFiles.zipToStdout(ctx.cfg().getString(Configuration.PROJECT_FILE_CFG)))
             {
                 log.error("Failed to zip to stdout!");
                 return false;
@@ -504,7 +504,8 @@ public class PuzzlerMain
         }
         else if(true == ctx.cfg().getBool(Configuration.ZIP_OUTPUT))
         {
-            if(false ==allFiles.saveToZip(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG)))
+            if(false ==allFiles.saveToZip(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG),
+                                          ctx.cfg().getString(Configuration.PROJECT_FILE_CFG)))
             {
                 log.error("Failed to create the zip file!");
                 return false;

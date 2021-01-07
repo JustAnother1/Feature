@@ -60,12 +60,12 @@ public class FileGroup
         return true;
     }
 
-    public boolean zipToStdout()
+    public boolean zipToStdout(String ProjectFolderName)
     {
-        return zipToStream(System.out);
+        return zipToStream(System.out, ProjectFolderName);
     }
 
-    private boolean zipToStream(OutputStream out)
+    private boolean zipToStream(OutputStream out, String ProjectFolderName)
     {
         boolean res = true;
         ZipOutputStream zipOut = null;
@@ -78,7 +78,7 @@ public class FileGroup
             {
                 Entry<String, AbstractFile> pair = it.next();
 
-                ZipEntry zipEntry = new ZipEntry(pair.getKey());
+                ZipEntry zipEntry = new ZipEntry(ProjectFolderName  + File.separator + pair.getKey());
                 zipOut.putNextEntry(zipEntry);
 
                 AbstractFile af = pair.getValue();
@@ -105,14 +105,14 @@ public class FileGroup
         return res;
     }
 
-    public boolean saveToZip(String filename)
+    public boolean saveToZip(String filename, String ProjectFolderName)
     {
         boolean res = true;
         FileOutputStream fos = null;
         try
         {
             fos = new FileOutputStream(filename);
-            zipToStream(fos);
+            zipToStream(fos, ProjectFolderName);
         }
         catch (IOException e)
         {
