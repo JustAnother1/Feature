@@ -45,13 +45,15 @@ public class MakeBuildSystem extends BuildSystem
     private HashMap<String, String> listVariables = new HashMap<String, String>();
     private int numDefaultTargets = 0;
     private TextFile makeFile;
-    private TextFile FilesMkFile;
-    private TextFile VariablesMkFile;
+    private TextFile filesMkFile;
+    private TextFile variablesMkFile;
 
 
     public MakeBuildSystem(Context ctx)
     {
         super(ctx);
+        addVariable("SOURCE_DIR", "$(dir $(lastword $(MAKEFILE_LIST)))");
+        addVariable("VPATH", "$(SOURCE_DIR)");
     }
 
     private void addGenericTargets()
@@ -118,27 +120,27 @@ public class MakeBuildSystem extends BuildSystem
         if("true".equals(ctx.cfg().getString(CFG_SPLIT_MAKEFILE_IN_SECTIONS)))
         {
             // a separate file to list the file used in this project
-            FilesMkFile = new TextFile("filetree.mk");
-            FilesMkFile.separateSectionWithEmptyLine(true);
-            FilesMkFile.createSections(new String[]
+            filesMkFile = new TextFile("filetree.mk");
+            filesMkFile.separateSectionWithEmptyLine(true);
+            filesMkFile.createSections(new String[]
                     { MAKEFILE_FILE_COMMENT_SECTION_NAME,
                       MAKEFILE_FILE_VARIABLES_SECTION_NAME     });
 
             // there should be a file comment explaining what this is
-            FilesMkFile.addLines(MAKEFILE_FILE_COMMENT_SECTION_NAME,
+            filesMkFile.addLines(MAKEFILE_FILE_COMMENT_SECTION_NAME,
                            new String[] {"# automatically created filetree.mk",
                                          "# created at: " + Tool.curentDateTime(),
                                          "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
 
             // a separate file to contain all the variables used.
-            VariablesMkFile = new TextFile("dashboard.mk");
-            VariablesMkFile.separateSectionWithEmptyLine(true);
-            VariablesMkFile.createSections(new String[]
+            variablesMkFile = new TextFile("dashboard.mk");
+            variablesMkFile.separateSectionWithEmptyLine(true);
+            variablesMkFile.createSections(new String[]
                     { MAKEFILE_FILE_COMMENT_SECTION_NAME,
                       MAKEFILE_FILE_VARIABLES_SECTION_NAME });
 
             // there should be a file comment explaining what this is
-            VariablesMkFile.addLines(MAKEFILE_FILE_COMMENT_SECTION_NAME,
+            variablesMkFile.addLines(MAKEFILE_FILE_COMMENT_SECTION_NAME,
                            new String[] {"# automatically created dashboard.mk",
                                          "# created at: " + Tool.curentDateTime(),
                                          "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
@@ -237,12 +239,12 @@ public class MakeBuildSystem extends BuildSystem
                    || ("CPP_SRC".equals(name))
                    || ("OBJS".equals(name))     )
                 {
-                    FilesMkFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
+                    filesMkFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
                             name + " = " + listVariables.get(name));
                 }
                 else
                 {
-                    VariablesMkFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
+                    variablesMkFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
                             name + " = " + listVariables.get(name));
                 }
             }
@@ -328,8 +330,8 @@ public class MakeBuildSystem extends BuildSystem
         files.add(makeFile);
         if("true".equals(ctx.cfg().getString(CFG_SPLIT_MAKEFILE_IN_SECTIONS)))
         {
-            files.add(FilesMkFile);
-            files.add(VariablesMkFile);
+            files.add(filesMkFile);
+            files.add(variablesMkFile);
         }
         return files;
     }
