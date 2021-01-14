@@ -122,7 +122,7 @@ function generate_project()
     {
         $projectName = "blinky";
     }
-    else if (!preg_match($regex, $projectName)) 
+    else if (!preg_match($regex, $projectName))
     {
         $projectName = "blinky";
     }
@@ -174,7 +174,7 @@ function generate_project()
         echo "command line : " . $cmd . "<br/>\n";
         $InStream = str_replace("<", "&lt;", $InStream);
         echo "In Stream : <pre><code>" . $InStream . "</code></pre> <br />\n";
-        
+
         $post_str = print_r($_POST,$return = true);
         $post_str = str_replace("<", "&lt;", $post_str);
         echo "POST Data : <pre><code>" .$post_str . "</code></pre> <br />\n";
@@ -229,33 +229,36 @@ function generate_project()
         $done = false;
         $l_err = 0;
         $l_out = 0;
+        $l_total = 0;
         do
         {
-            sleep(1);
+            sleep(2);
             $data = "";
-            do {                
+            do {
                 $chunk = fread($pipes[2], 4096);
                 $data = $data . $chunk;
             } while(0 < strlen($chunk));
             $l_err = strlen($data);
             if(0 != $l_err)
             {
+                $l_total += $l_err;
                 echo "<br/> log : + " . strlen($data) . " bytes !<br/>\n";
             }
             $content_stderr = $content_stderr . $data;
 
             $data = "";
-            do {                
+            do {
                 $chunk = fread($pipes[1], 4096);
                 $data = $data . $chunk;
             } while(0 < strlen($chunk));
             $l_out = strlen($data);
             if( 0 != $l_out)
             {
+                $l_total += $l_out;
                 echo "<br/> project : + " . strlen($data) . " bytes !<br/>\n";
             }
             $content_stdout = $content_stdout . $data;
-            if((0 == $l_err) && (0 == $l_out))
+            if((0 == $l_err) && (0 == $l_out) && (0 != $l_total))
             {
                 $done = true;
             }
@@ -328,15 +331,15 @@ function download_zip()
 }
 
 
-if( array_key_exists('hasData', $_POST)) 
+if( array_key_exists('hasData', $_POST))
 {
     generate_project();
 }
-else if( array_key_exists('stderr', $_POST)) 
+else if( array_key_exists('stderr', $_POST))
 {
     download_log();
 }
-else if( array_key_exists('zip', $_POST)) 
+else if( array_key_exists('zip', $_POST))
 {
     download_zip();
 }
