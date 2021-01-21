@@ -287,6 +287,9 @@ function generate_project()
             echo '  <input type="submit" name="download" value="download log" />';
             echo '  <input type="hidden" name="stderr" value ="' . htmlspecialchars($content_stderr) . '" />';
             echo '</form>';
+            echo '<form method="POST" action="' . $_SERVER['SCRIPT_NAME'] .'" >';
+            echo '  <input type="submit" name="create different project" value="create different project" />';
+            echo '</form>';
             echo "</div>";
             endHtml();
         }
@@ -295,11 +298,17 @@ function generate_project()
             // failed
             // startHtml();
             echo "<br/>ERROR ($return_value) Failed to create project !<br/>";
+            echo "<br/><br/>";
             echo "command line : " . $cmd . "<br/>";
+            echo "<br/><br/>";
             echo "POST Data : ";
             print_r($_POST);
+            echo "<br/><br/>";
             $msg = str_replace("<", "&lt;", $content_stderr);
             echo "<pre><code>$msg</code></pre>";
+            echo '<form method="POST" action="' . $_SERVER['SCRIPT_NAME'] .'" >';
+            echo '  <input type="submit" name="create different project" value="create different project" />';
+            echo '</form>';
             echo "</div>";
             endHtml();
         }

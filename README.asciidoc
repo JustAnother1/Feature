@@ -1,11 +1,4 @@
-Feature
--------
-
-image::https://github.com/JustAnother1/Feature/workflows/Java build/badge.svg[build state]
-
-image::https://github.com/JustAnother1/Feature/workflows/Java unit test/badge.svg[unit test state]
-
-image::https://github.com/JustAnother1/Feature/workflows/run%20%22runTests.sh%22/badge.svg[run tests state]
+= Feature
 
 Feature allows you to define your software in a new way. It covers the only a part of the process of software creation. Feature is starting with high level algorithms down to the smallest implementation details.
 
@@ -19,8 +12,19 @@ Feature tries to split the different parts of a software solution up into very s
 
 To explain the process further an link:res/doc/example.asciidoc[example] is provided.
 
-How to use
----------
+
+image::https://github.com/JustAnother1/Feature/workflows/Java build/badge.svg[build state]
+
+image::https://github.com/JustAnother1/Feature/workflows/Java unit test/badge.svg[unit test state]
+
+image::https://github.com/JustAnother1/Feature/workflows/run%20%22runTests.sh%22/badge.svg[run tests state]
+
+
+== Libre projects
+
+Libre projects is a web site that creates simple embedded projects. It uses Feature to do that. You can test it https://ing-poetter.de/libreprojects.php[here]
+
+== How to use
 
 Puzzler is a command line tool to translate the software definition into C source code.
 ----
@@ -41,14 +45,11 @@ Parameters:
 ----
 
 
-How to build
-------------
+== How to build
 
 You can build Feature using ant with the supplied build.xml file.
 
-
-License
--------
+== License
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 2
