@@ -224,6 +224,10 @@ public class CCodeGenerator extends Generator
                         String impl = active.getText();
                         log.trace("adding the conditioned parts to the implementation : {}", impl);
                         sb.append(impl);
+                        if(false == impl.endsWith("\n"))
+                        {
+                            sb.append("\n");
+                        }
                     }
                     else
                     {
@@ -283,6 +287,10 @@ public class CCodeGenerator extends Generator
                                 implementation = implementation + "\n";
                                 getAdditionalsFrom(curChild);
                                 sb.append(implementation);
+                                if(false == implementation.endsWith("\n"))
+                                {
+                                    sb.append("\n");
+                                }
                             }
                         }
                         // else don't care for that child
@@ -292,6 +300,10 @@ public class CCodeGenerator extends Generator
                 {
                     String impl = curE.getText();
                     sb.append(impl);
+                    if(false == impl.endsWith("\n"))
+                    {
+                        sb.append("\n");
+                    }
                     log.warn("Adding non conditional Element data to implementation ! text:  {} element: {}", impl, curE);
                 }
             }
@@ -304,6 +316,10 @@ public class CCodeGenerator extends Generator
                 if(0 < trimmed.length())
                 {
                     sb.append(impl);
+                    if(false == trimmed.endsWith("\n"))
+                    {
+                        sb.append("\n");
+                    }
                     log.trace("adding non element code to implmentation: '{}' from '{}'", impl, curC);
                 }
                 // else whitespace in between tags
