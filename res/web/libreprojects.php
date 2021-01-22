@@ -53,7 +53,7 @@ function ask_user_for_parameters()
     &lt;tool name="avr/atmega2560" />
     &lt;root_api name="program_entry_point" />
     &lt;resources>
-        &lt;user_led algorithm="gpio" port="B" pin="7" />
+        &lt;user_led algorithm="gpo" port="B" pin="7" />
     &lt;/resources>
 &lt;/environment>
 </textarea>
