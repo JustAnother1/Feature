@@ -29,8 +29,6 @@ public abstract class Generator extends Base
     public static final String ALGORITHM_ADDITIONAL_VARIABLE_CHILD_NAME = "variable";
 
     public static final String IMPLEMENTATION_PLACEHOLDER_REGEX = "€";
-    // configuration
-    public static final String CFG_DOC_CODE_SRC = "document_code_source";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -54,7 +52,7 @@ public abstract class Generator extends Base
         {
             return;
         }
-        if("true".equals(cfg.getString(CFG_DOC_CODE_SRC)))
+        if("true".equals(cfg.getString(Configuration.CFG_DOC_CODE_SRC)))
         {
             log.trace("Switching on documentation of source code");
             documentCodeSource = true;

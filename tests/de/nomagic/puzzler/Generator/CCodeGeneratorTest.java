@@ -18,7 +18,7 @@ public class CCodeGeneratorTest
         CCodeGenerator gen = new CCodeGenerator(null);
         assertNotNull(gen);
     }
-    
+
     @Test
     public void testLanguageName()
     {
@@ -52,7 +52,7 @@ public class CCodeGeneratorTest
         CCodeGenerator gen = new CCodeGenerator(ctx);
         assertNotNull(gen);
         Configuration cfg = new Configuration();
-        cfg.setString(CCodeGenerator.CFG_DOC_CODE_SRC, "true");
+        cfg.setString(Configuration.CFG_DOC_CODE_SRC, "true");
         gen.configure(cfg);
     }
 
@@ -65,7 +65,7 @@ public class CCodeGeneratorTest
         FileGroup fg = gen.generateFor(null);
         assertNull(fg);
     }
-    
+
     @Test
     public void testGenerateForNotRoot()
     {

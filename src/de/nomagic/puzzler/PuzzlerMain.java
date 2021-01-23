@@ -34,7 +34,6 @@ import org.jdom2.Element;
 
 import de.nomagic.puzzler.BuildSystem.BuildSystemApi;
 import de.nomagic.puzzler.BuildSystem.BuildSystemFactory;
-import de.nomagic.puzzler.BuildSystem.MakeBuildSystem;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.Generator.CodeGeneratorFactory;
@@ -47,10 +46,6 @@ import de.nomagic.puzzler.solution.SolutionImpl;
 import de.nomagic.puzzler.xmlrpc.XmlRpcGetter;
 
 /** Main function of puzzler.
- *
- * @author Lars P&ouml;tter
- * (<a href=mailto:Lars_Poetter@gmx.de>Lars_Poetter@gmx.de</a>)
- *
  */
 public class PuzzlerMain
 {
@@ -71,9 +66,7 @@ public class PuzzlerMain
         System.out.println("Feature Puzzler [Parameters] [Project File]");
         System.out.println("Parameters:");
         System.out.println("-D<SettingName>=<Value>    : Set a value to a configuration variable.");
-        System.out.println("                           : currently supported:");
-        System.out.println("                           : " + Generator.CFG_DOC_CODE_SRC + "=true  : define in comments which algorithm cretaed the source code lines");
-        System.out.println("                           : " + MakeBuildSystem.CFG_SPLIT_MAKEFILE_IN_SECTIONS + "=true  : split Makefile into files for each section.");
+        System.out.println("-list_conf_variables       : list all currently supported configuration variables.");
         System.out.println("-e <path> /--environment_directory <path>");
         System.out.println("                           : directory with environment configuration.");
         System.out.println("-h / --help                : print this message.");
@@ -270,6 +263,13 @@ public class PuzzlerMain
                     {
                         return false;
                     }
+                }
+                else if (true == "-list_conf_variables".equals(args[i]))
+                {
+                    // list currently supported configuration variables
+                    System.out.println("currently supported configuration variables:");
+                    System.out.println(Configuration.listAllConfigurationVariables());
+                    return false;
                 }
                 else if(true == args[i].startsWith("-D"))
                 {

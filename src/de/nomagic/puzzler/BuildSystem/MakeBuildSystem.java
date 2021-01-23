@@ -117,7 +117,7 @@ public class MakeBuildSystem extends BuildSystem
                                      "# created at: " + Tool.curentDateTime(),
                                      "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
 
-        if("true".equals(ctx.cfg().getString(CFG_SPLIT_MAKEFILE_IN_SECTIONS)))
+        if("true".equals(ctx.cfg().getString(Configuration.CFG_EMBEETLE_PROJECT)))
         {
             // a separate file to list the file used in this project
             filesMkFile = new TextFile("filetree.mk");
@@ -230,7 +230,7 @@ public class MakeBuildSystem extends BuildSystem
     private void handleVariables()
     {
         Iterator<String> itVariables = listVariables.keySet().iterator();
-        if("true".equals(ctx.cfg().getString(CFG_SPLIT_MAKEFILE_IN_SECTIONS)))
+        if("true".equals(ctx.cfg().getString(Configuration.CFG_EMBEETLE_PROJECT)))
         {
             while(itVariables.hasNext())
             {
@@ -328,7 +328,7 @@ public class MakeBuildSystem extends BuildSystem
         handleTargets();
 
         files.add(makeFile);
-        if("true".equals(ctx.cfg().getString(CFG_SPLIT_MAKEFILE_IN_SECTIONS)))
+        if("true".equals(ctx.cfg().getString(Configuration.CFG_EMBEETLE_PROJECT)))
         {
             files.add(filesMkFile);
             files.add(variablesMkFile);
