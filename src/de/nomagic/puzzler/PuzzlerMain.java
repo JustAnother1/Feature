@@ -66,7 +66,7 @@ public class PuzzlerMain
         System.out.println("Feature Puzzler [Parameters] [Project File]");
         System.out.println("Parameters:");
         System.out.println("-D<SettingName>=<Value>    : Set a value to a configuration variable.");
-        System.out.println("-list_conf_variables       : list all currently supported configuration variables.");
+        System.out.println("--list_conf_variables      : list all currently supported configuration variables.");
         System.out.println("-e <path> /--environment_directory <path>");
         System.out.println("                           : directory with environment configuration.");
         System.out.println("-h / --help                : print this message.");
@@ -81,6 +81,8 @@ public class PuzzlerMain
         System.out.println("-s <path> / --solution_directory <path>");
         System.out.println("                           : directory that contains the solution.");
         System.out.println("-x <URL>                   : read from XML-RPC source at URL.");
+        System.out.println("--dump_remote_ressource <path>");
+        System.out.println("                           : print the content of the linked ressource.");
         System.out.println("-z <filename> / --zip <filename>");
         System.out.println("                           : zip created data (ignores output folder setting).");
         System.out.println("--zip_to_stdout            : zip created data and write zip file to stdout.");
@@ -264,11 +266,19 @@ public class PuzzlerMain
                         return false;
                     }
                 }
-                else if (true == "-list_conf_variables".equals(args[i]))
+                else if (true == "--list_conf_variables".equals(args[i]))
                 {
                     // list currently supported configuration variables
                     System.out.println("currently supported configuration variables:");
                     System.out.println(Configuration.listAllConfigurationVariables());
+                    return false;
+                }
+                else if (true == "--dump_remote_ressource".equals(args[i]))
+                {
+                    i++;
+                    String ressource = args[i];
+                    XmlRpcGetter xrg = new XmlRpcGetter(cfg.getString(Configuration.XML_RPC_URL));
+                    xrg.getAsDocument(ressource);
                     return false;
                 }
                 else if(true == args[i].startsWith("-D"))
