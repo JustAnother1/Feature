@@ -117,56 +117,55 @@ public final class FileGetter
             }
         }
         Document jdomDocument = null;
-        if(null != xrg)
+        File xf = new File(xmlSource + ".xml");
+        if(true == xf.exists())
         {
-            jdomDocument = xrg.getAsDocument(xmlSource);
-            if(null != jdomDocument)
+            SAXBuilder jdomBuilder = new SAXBuilder();
+            log.trace("trying to open {}.xml", xmlSource);
+            try
             {
-                return jdomDocument;
+                jdomDocument = jdomBuilder.build(xmlSource + ".xml");
             }
-            // else not available this way so try the normal way
-        }
-        File xf = new File(xmlSource);
-        if(false == xf.exists())
-        {
-            return null;
-        }
-        SAXBuilder jdomBuilder = new SAXBuilder();
-        log.trace("trying to open {}.", xmlSource);
-        try
-        {
-            jdomDocument = jdomBuilder.build(xmlSource);
-        }
-        catch(FileNotFoundException e)
-        {
-            if(true == failureIsError)
+            catch(FileNotFoundException e)
             {
-                log.trace("path = {}", path);
-                log.trace("name = {}", name);
-                ctx.addError(CLASS_NAME, "File not found: " + xmlSource);
+                if(true == failureIsError)
+                {
+                    log.trace("path = {}", path);
+                    log.trace("name = {}", name);
+                    ctx.addError(CLASS_NAME, "File not found: " + xmlSource + ".xml");
+                }
+                jdomDocument = null;
             }
-            jdomDocument = null;
-        }
-        catch(JDOMException e)
-        {
-            if(true == failureIsError)
+            catch(JDOMException e)
             {
-                ctx.addError(CLASS_NAME, "JDOM Exception");
+                if(true == failureIsError)
+                {
+                    ctx.addError(CLASS_NAME, "JDOM Exception");
+                }
+                log.trace(Tool.fromExceptionToString(e));
+                jdomDocument = null;
             }
-            log.trace(Tool.fromExceptionToString(e));
-            jdomDocument = null;
-        }
-        catch (IOException e)
-        {
-            if(true == failureIsError)
+            catch (IOException e)
             {
-                ctx.addError(CLASS_NAME, "IOException for file " + xmlSource);
-                ctx.addError(CLASS_NAME, e.getMessage());
+                if(true == failureIsError)
+                {
+                    ctx.addError(CLASS_NAME, "IOException for file " + xmlSource + ".xml");
+                    ctx.addError(CLASS_NAME, e.getMessage());
+                }
+                log.trace(Tool.fromExceptionToString(e));
+                jdomDocument = null;
             }
-            log.trace(Tool.fromExceptionToString(e));
-            jdomDocument = null;
         }
-
+        // else no local file -> look elsewhere (jdomDocument is still null)
+        if(null == jdomDocument)
+        {
+            // not found locally so try other sources
+            if(null != xrg)
+            {
+                // we could try to read it from the wiki
+                jdomDocument = xrg.getAsDocument(xmlSource);
+            }
+        }
         return jdomDocument;
     }
 
