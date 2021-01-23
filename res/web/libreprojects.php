@@ -91,8 +91,8 @@ function ask_user_for_parameters()
             <p>
               <input type="checkbox" id="docCode" name="docCode" value="docCode">
               <label for="docCode">document the use of algorithms.</label>
-              <input type="checkbox" id="splitMakefile" name="splitMakefile" value="splitMakefile">
-              <label for="splitMakefile">split makefile into several files.</label>
+              <input type="checkbox" id="embeetle" name="embeetle" value="embeetle">
+              <label for="embeetle">create a <a href="https://embeetle.com/">Embetle IDE</a> project</label>
             </p>
             <p>
               <input type="checkbox" id="debug" name="debug" value="debug">
@@ -133,9 +133,9 @@ function generate_project()
     {
         $addPara = $addPara . "-Ddocument_code_source=true ";
     }
-    if(array_key_exists("splitMakefile", $_POST))
+    if(array_key_exists("embeetle", $_POST))
     {
-        $addPara = $addPara . "-Dsplit_makefile=true ";
+        $addPara = $addPara . "-Dembeetle_project=true ";
     }
 
     $solText = "";
@@ -168,7 +168,7 @@ function generate_project()
 
     include '../puzzler/cfg.inc';
 
-    $cmd = 'java -jar ' . $jarLocation . ' -x ' . $wikiUrl . ' --zip_to_stdout --prj_name ' . $projectName . ' -l lib/ -s solutions/ -p /home/lars/public_html/ -e devices/ ' . $addPara;
+    $cmd = 'java -jar ' . $jarLocation . ' -x ' . $wikiUrl . ' --zip_to_stdout --prj_name ' . $projectName . ' -l lib/ -s solutions/ -e devices/ ' . $addPara;
     if(array_key_exists("debug", $_POST))
     {
         echo "command line : " . $cmd . "<br/>\n";
