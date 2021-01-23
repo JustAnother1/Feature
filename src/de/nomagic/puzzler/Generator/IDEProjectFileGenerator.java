@@ -387,6 +387,93 @@ public class IDEProjectFileGenerator
         return dotProject;
     }
 
+    private static TextFile createEmbeetle_buttons_btl()
+    {
+        TextFile buttons = new TextFile(".beetle/buttons.btl");
+        buttons.createSection(SECTION_NAME);
+        buttons.addLine(SECTION_NAME, "# BUTTON DEFINITIONS");
+        buttons.addLine(SECTION_NAME, "# ===================");
+        buttons.addLine(SECTION_NAME, "# Modify this file to change/add buttons in the top toolbar.");
+        buttons.addLine(SECTION_NAME, "# Tip: refer to icons in the 'beetle_core/resources/icons/' folder,");
+        buttons.addLine(SECTION_NAME, "# in your Embeetle installation directory.");
+        buttons.addLine(SECTION_NAME, "{");
+        buttons.addLine(SECTION_NAME, "    \"clean\":");
+        buttons.addLine(SECTION_NAME, "    {");
+        buttons.addLine(SECTION_NAME, "        \"icon\": \"icons/gen/clean.png\",");
+        buttons.addLine(SECTION_NAME, "        \"hover-text\": \"Run 'clean' target in makefile\",");
+        buttons.addLine(SECTION_NAME, "        \"help-text\": \"Run 'clean' target in makefile\"");
+        buttons.addLine(SECTION_NAME, "    },");
+        buttons.addLine(SECTION_NAME, "");
+        buttons.addLine(SECTION_NAME, "    \"build\":");
+        buttons.addLine(SECTION_NAME, "    {");
+        buttons.addLine(SECTION_NAME, "    \"icon\": \"icons/gen/build.png\",");
+        buttons.addLine(SECTION_NAME, "    \"hover-text\": \"Run 'build' target in makefile\",");
+        buttons.addLine(SECTION_NAME, "    \"help-text\": \"Run 'build' target in makefile\"");
+        buttons.addLine(SECTION_NAME, "    },");
+        buttons.addLine(SECTION_NAME, "");
+        buttons.addLine(SECTION_NAME, "    \"flash\":");
+        buttons.addLine(SECTION_NAME, "    {");
+        buttons.addLine(SECTION_NAME, "        \"icon\": \"icons/gen/flash.png\",");
+        buttons.addLine(SECTION_NAME, "        \"hover-text\": \"Run 'flash' target in makefile\",");
+        buttons.addLine(SECTION_NAME, "        \"help-text\": \"Run 'flash' target in makefile\"");
+        buttons.addLine(SECTION_NAME, "    }");
+        buttons.addLine(SECTION_NAME, "}");
+        return buttons;
+    }
+
+    private static TextFile createEmbeetle_dashboard_config_btl(String ProjectName)
+    {
+        TextFile buttons = new TextFile(".beetle/buttons.btl");
+        buttons.createSection(SECTION_NAME);
+        buttons.addLine(SECTION_NAME, "'''============================================''' ");
+        buttons.addLine(SECTION_NAME, "'''     Embeetle generated dashboard config    ''' ");
+        buttons.addLine(SECTION_NAME, "'''============================================''' ");
+        buttons.addLine(SECTION_NAME, "# Compatible with Embeetle makefile interface version 2");
+        buttons.addLine(SECTION_NAME, "");
+        buttons.addLine(SECTION_NAME, "# 1. Chip ");
+        buttons.addLine(SECTION_NAME, "# --------");
+        buttons.addLine(SECTION_NAME, "chip_name = 'STM32F407VG'");
+        buttons.addLine(SECTION_NAME, " ");
+        buttons.addLine(SECTION_NAME, "# 2. Board ");
+        buttons.addLine(SECTION_NAME, "# -----------");
+        buttons.addLine(SECTION_NAME, "board = 'CUSTOM'");
+        buttons.addLine(SECTION_NAME, "");
+        buttons.addLine(SECTION_NAME, "# 3. Probe ");
+        buttons.addLine(SECTION_NAME, "# -----------");
+        buttons.addLine(SECTION_NAME, "probe_name         = 'STLINK_V2'");
+        buttons.addLine(SECTION_NAME, "transport_protocol = 'HLA_SWD' # Protocol for communication between Probe and Microcontroller.");
+        buttons.addLine(SECTION_NAME, "");
+        buttons.addLine(SECTION_NAME, "# 4. RTOS ");
+        buttons.addLine(SECTION_NAME, "# --------");
+        buttons.addLine(SECTION_NAME, "rtos_name = 'BAREMETAL'");
+        buttons.addLine(SECTION_NAME, "");
+        buttons.addLine(SECTION_NAME, "# 5. Project Layout");
+        buttons.addLine(SECTION_NAME, "# -----------------");
+        buttons.addLine(SECTION_NAME, "DOT_BEETLE_DIR       = '.beetle'");
+        buttons.addLine(SECTION_NAME, "SOURCE_DIR           = 'source'");
+        buttons.addLine(SECTION_NAME, "BUILD_DIR            = 'build'");
+        buttons.addLine(SECTION_NAME, "BIN_FILE             = 'build/" + ProjectName + ".bin'");
+        buttons.addLine(SECTION_NAME, "ELF_FILE             = 'build/" + ProjectName + ".elf'");
+        buttons.addLine(SECTION_NAME, "BOOTLOADER_FILE      = 'None'");
+        buttons.addLine(SECTION_NAME, "LINKERSCRIPT         = 'config/linkerscript.ld'");
+        buttons.addLine(SECTION_NAME, "MAKEFILE             = 'config/makefile'");
+        buttons.addLine(SECTION_NAME, "GDB_FLASHFILE        = 'config/.gdbinit'");
+        buttons.addLine(SECTION_NAME, "OPENOCD_CHIPFILE     = 'config/openocd_chip.cfg'");
+        buttons.addLine(SECTION_NAME, "OPENOCD_PROBEFILE    = 'config/openocd_probe.cfg'");
+        buttons.addLine(SECTION_NAME, "PYOCD_FILE           = 'None'");
+        buttons.addLine(SECTION_NAME, "BUTTONS_BTL          = '.beetle/buttons.btl'");
+        buttons.addLine(SECTION_NAME, "DASHBOARDCFG_BTL     = '.beetle/dashboard_config.btl'");
+        buttons.addLine(SECTION_NAME, "FILETREECFG_BTL      = '.beetle/filetree_config.btl'");
+        buttons.addLine(SECTION_NAME, "WINDOWCFG_BTL        = '.beetle/window_config.btl'");
+        buttons.addLine(SECTION_NAME, "CACHE_DIR            = '.beetle/.cache'");
+        buttons.addLine(SECTION_NAME, "");
+        buttons.addLine(SECTION_NAME, "# 6. Tools ");
+        buttons.addLine(SECTION_NAME, "# ---------");
+        buttons.addLine(SECTION_NAME, "COMPILER_TOOLCHAIN   = 'gnu_avr_toolchain_5.4.0_64b'");
+        buttons.addLine(SECTION_NAME, "BUILD_AUTOMATION     = 'gnu_make_4.2.1_64b'");
+        buttons.addLine(SECTION_NAME, "FLASH_DEBUG_SERVER   = 'openocd_0.10.0_devNone_64b'");
+        return buttons;
+    }
 
     public static FileGroup generateFileInto(Context ctx, FileGroup files)
     {
@@ -416,6 +503,11 @@ public class IDEProjectFileGenerator
 
         files.add(createEclipse_dot_project(projectName));
         files.add(createEclipse_dot_cproject(projectName));
+        if("true".equals(ctx.cfg().getString(Configuration.CFG_EMBEETLE_PROJECT)))
+        {
+            files.add(createEmbeetle_buttons_btl());
+            files.add(createEmbeetle_dashboard_config_btl(projectName));
+        }
         return files;
     }
 
