@@ -30,7 +30,7 @@ public class NoBuildSystem implements BuildSystemApi
     }
 
     @Override
-    public void addRequiredVariable(String string)
+    public void addRequiredVariable(String name)
     {
         // nothing to do here
     }
@@ -52,6 +52,13 @@ public class NoBuildSystem implements BuildSystemApi
     {
         // we do not need to add anything
         return files;
+    }
+
+    @Override
+    public void addFileVariable(String FileName, String VariableName,
+            String Value)
+    {
+        // nothing to do here
     }
 
 }

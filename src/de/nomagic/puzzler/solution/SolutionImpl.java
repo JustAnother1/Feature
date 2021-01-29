@@ -75,21 +75,21 @@ public class SolutionImpl extends Base implements Solution
                                                                   externalReferenceFileName);
                 if(null == externalReferenceDocument)
                 {
-                    ctx.addError(this, "Could not read referenced File " + externalReferenceFileName);
+                    ctx.addError(this, "Could not read referenced File : " + externalReferenceFileName);
                     return false;
                 }
 
                 Element extRefEleemnt  = externalReferenceDocument.getRootElement();
                 if(null == extRefEleemnt)
                 {
-                    ctx.addError(this, "Could not read Root Element from " + externalReferenceFileName);
+                    ctx.addError(this, "Could not read Root Element from : " + externalReferenceFileName);
                     return false;
                 }
 
                 if(false == Project.SOLUTION_ELEMENT_NAME.equals(extRefEleemnt.getName()))
                 {
-                    ctx.addError(this, "Solution File " + externalReferenceFileName
-                            + " has an invalid root tag (" + extRefEleemnt.getName() + ") !");
+                    ctx.addError(this, "Solution File '" + externalReferenceFileName
+                            + "' has an invalid root tag (" + extRefEleemnt.getName() + ") !");
                     return false;
                 }
                 solutionRoot = extRefEleemnt;
@@ -115,7 +115,7 @@ public class SolutionImpl extends Base implements Solution
         if(null == algoAttr)
         {
             // no reference to algorithm -> Failure !
-            log.trace("Element {} does not have an algorithm attribute!", cfgElement.getName());
+            log.trace("Element '{}' does not have an algorithm attribute!", cfgElement.getName());
             return false;
         }
         else
@@ -149,7 +149,7 @@ public class SolutionImpl extends Base implements Solution
             // this needs to be supplied by the environment
             if(false == ctx.getEnvironment().provides(curElement.getName()))
             {
-                ctx.addError(this, "The environment does not have the device " + curElement.getName());
+                ctx.addError(this, "The environment does not have the device : " + curElement.getName());
                 return false;
             }
             else

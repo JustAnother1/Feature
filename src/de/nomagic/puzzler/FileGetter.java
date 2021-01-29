@@ -116,6 +116,11 @@ public final class FileGetter
                 xmlSource = path + name;
             }
         }
+        if(true == xmlSource.endsWith(".xml"))
+        {
+            // remove the .xml
+            xmlSource = xmlSource.substring(0, xmlSource.length() -4);
+        }
         Document jdomDocument = null;
         File xf = new File(xmlSource + ".xml");
         if(true == xf.exists())
@@ -155,6 +160,10 @@ public final class FileGetter
                 log.trace(Tool.fromExceptionToString(e));
                 jdomDocument = null;
             }
+        }
+        else
+        {
+            log.trace("the file {}.xml does not exist locally.", xmlSource);
         }
         // else no local file -> look elsewhere (jdomDocument is still null)
         if(null == jdomDocument)

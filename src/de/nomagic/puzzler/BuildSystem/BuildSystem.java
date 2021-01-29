@@ -16,26 +16,57 @@ import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.FileFactory;
 import de.nomagic.puzzler.FileGroup.FileGroup;
+import de.nomagic.puzzler.FileGroup.PatternFile;
 
 public abstract class BuildSystem extends Base implements BuildSystemApi
 {
     public static final String BUILD_CFG_ROOT_ELEMENT_NAME = "build_cfg";
+    public static final String VARIABLE_TYPE_ATTRIBUTE = "type";
+    public static final String VARIABLE_FILE_ATTRIBUTE = "file";
+    public static final String VARIABLE_TYPE_PATTERN = "pattern";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     protected FileGroup buildFiles = new FileGroup();
     protected HashMap<String, String> requiredEnvironmentVariables = new HashMap<String, String>();
+    protected HashMap<String, PatternFile> patternFiles = new HashMap<String, PatternFile>();
 
     public BuildSystem(Context ctx)
     {
         super(ctx);
     }
 
+    public void addFileVariable(String FileName, String VariableName, String Value)
+    {
+        log.trace("adding the variable '{}' to the file '{}'", VariableName, FileName);
+        PatternFile pf = patternFiles.get(FileName);
+        if(null == pf)
+        {
+            log.trace("pattern file '{}' not yet available! creating it!", FileName);
+            pf = new PatternFile(FileName);
+        }
+        pf.addVariable(VariableName, Value);
+    }
+
     @Override
     public void addFile(AbstractFile newFile)
     {
-        log.trace("adding the file {}", newFile.getFileName());
-        buildFiles.add(newFile);
+        if(null == newFile)
+        {
+            return;
+        }
+        if(newFile instanceof PatternFile)
+        {
+            PatternFile pFile = (PatternFile)newFile;
+            log.trace("adding the pattern file {}", pFile.getFileName());
+            patternFiles.put(pFile.getFileName(), pFile);
+            buildFiles.add(newFile);
+        }
+        else
+        {
+            log.trace("adding the file {}", newFile.getFileName());
+            buildFiles.add(newFile);
+        }
     }
 
     private void addVariables(Element reqVariables)
@@ -49,7 +80,18 @@ public abstract class BuildSystem extends Base implements BuildSystemApi
                 while(it.hasNext())
                 {
                     Element curVar = it.next();
-                    extendListVariable(curVar.getName(),curVar.getText());
+                    String type = curVar.getAttributeValue(VARIABLE_TYPE_ATTRIBUTE);
+                    if(true == VARIABLE_TYPE_PATTERN.equals(type))
+                    {
+                        // Pattern file variable
+                        String file = curVar.getAttributeValue(VARIABLE_FILE_ATTRIBUTE);
+                        addFileVariable(file, curVar.getName(), curVar.getText());
+                    }
+                    else
+                    {
+                        // normal build variable
+                        extendListVariable(curVar.getName(), curVar.getText());
+                    }
                 }
             }
             // else no required Variables

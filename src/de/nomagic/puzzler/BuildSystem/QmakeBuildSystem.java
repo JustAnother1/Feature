@@ -40,7 +40,7 @@ public class QmakeBuildSystem extends BuildSystem
     }
 
     @Override
-    public void addRequiredVariable(String string)
+    public void addRequiredVariable(String name)
     {
         // TODO Auto-generated method stub
     }

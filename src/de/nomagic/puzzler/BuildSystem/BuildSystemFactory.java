@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Environment.Environment;
+import de.nomagic.puzzler.configuration.Configuration;
 
 public class BuildSystemFactory
 {
@@ -41,8 +42,16 @@ public class BuildSystemFactory
         // New Build Systems go here!
 
         // Default is Make
-        log.trace("Build System selected: make");
-        return new MakeBuildSystem(ctx);
+        if("true".equals(ctx.cfg().getString(Configuration.CFG_EMBEETLE_PROJECT)))
+        {
+            log.trace("Build System selected: Embeetle make");
+            return new EmbeetleMakeBuildSystem(ctx);
+        }
+        else
+        {
+            log.trace("Build System selected: make");
+            return new MakeBuildSystem(ctx);
+        }
     }
 
 }

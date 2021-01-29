@@ -138,7 +138,7 @@ public class Environment extends Base
         // maybe more ???
 
         // the searched thing is not in the environment,..
-        ctx.addError(this, "The ressource " + name + " could not be found in the environment !");
+        ctx.addError(this, "The ressource '" + name + "' could not be found in the environment !");
         return false;
     }
 
@@ -157,10 +157,10 @@ public class Environment extends Base
                 }
                 // else continue search
             }
-            log.trace("No ressource with the name {} !", algoName);
+            log.trace("No ressource with the name '{}' !", algoName);
         }
         // ...maybe more ???
-        log.trace("could find nothing with the name {} !", algoName);
+        log.trace("could find nothing with the name '{}' !", algoName);
         return null;
     }
 
