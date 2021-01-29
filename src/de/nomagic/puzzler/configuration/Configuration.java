@@ -19,6 +19,9 @@ public class Configuration
     public static final String ZIP_OUTPUT = "zip_output";
     public static final String ZIP_OUTPUT_TO_STDOUT = "zip_output_to_stdout";
     public static final String XML_RPC_URL = "xml_rpc_url";
+    public static final String USE_XML_RPC = "XML-RPC";
+
+
     // -D
     public static final String CFG_DOC_CODE_SRC = "document_code_source";
     public static final String CFG_EMBEETLE_PROJECT = "embeetle_project";
