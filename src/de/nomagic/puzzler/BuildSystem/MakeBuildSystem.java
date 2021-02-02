@@ -37,7 +37,6 @@ public class MakeBuildSystem extends BuildSystem
     public static final String MAKEFILE_FILE_COMMENT_SECTION_NAME = "FileHeader";
     public static final String MAKEFILE_FILE_VARIABLES_SECTION_NAME = "Variables";
     public static final String MAKEFILE_FILE_TARGET_SECTION_NAME = "targets";
-    public static final String CFG_SPLIT_MAKEFILE_IN_SECTIONS = "split_makefile";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -45,8 +44,6 @@ public class MakeBuildSystem extends BuildSystem
     private HashMap<String, String> listVariables = new HashMap<String, String>();
     private int numDefaultTargets = 0;
     private TextFile makeFile;
-    private TextFile filesMkFile;
-    private TextFile variablesMkFile;
 
 
     public MakeBuildSystem(Context ctx)
@@ -101,7 +98,7 @@ public class MakeBuildSystem extends BuildSystem
 
     }
 
-    private void createMakeFiles()
+    private void createMakeFile()
     {
         //create the Makefile
         makeFile = new TextFile("Makefile");
@@ -116,40 +113,6 @@ public class MakeBuildSystem extends BuildSystem
                        new String[] {"# automatically created Makefile",
                                      "# created at: " + Tool.curentDateTime(),
                                      "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
-
-        if("true".equals(ctx.cfg().getString(Configuration.CFG_EMBEETLE_PROJECT)))
-        {
-            // a separate file to list the file used in this project
-            filesMkFile = new TextFile("filetree.mk");
-            filesMkFile.separateSectionWithEmptyLine(true);
-            filesMkFile.createSections(new String[]
-                    { MAKEFILE_FILE_COMMENT_SECTION_NAME,
-                      MAKEFILE_FILE_VARIABLES_SECTION_NAME     });
-
-            // there should be a file comment explaining what this is
-            filesMkFile.addLines(MAKEFILE_FILE_COMMENT_SECTION_NAME,
-                           new String[] {"# automatically created filetree.mk",
-                                         "# created at: " + Tool.curentDateTime(),
-                                         "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
-
-            // a separate file to contain all the variables used.
-            variablesMkFile = new TextFile("dashboard.mk");
-            variablesMkFile.separateSectionWithEmptyLine(true);
-            variablesMkFile.createSections(new String[]
-                    { MAKEFILE_FILE_COMMENT_SECTION_NAME,
-                      MAKEFILE_FILE_VARIABLES_SECTION_NAME });
-
-            // there should be a file comment explaining what this is
-            variablesMkFile.addLines(MAKEFILE_FILE_COMMENT_SECTION_NAME,
-                           new String[] {"# automatically created dashboard.mk",
-                                         "# created at: " + Tool.curentDateTime(),
-                                         "# created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG) });
-
-            // include the files from the main Makefile
-            makeFile.addLines(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
-                    new String[] { "include filetree.mk",
-                                   "include dashboard.mk" });
-        }
     }
 
     private FileGroup updateFromProjectFiles(FileGroup files)
@@ -230,34 +193,13 @@ public class MakeBuildSystem extends BuildSystem
     private void handleVariables()
     {
         Iterator<String> itVariables = listVariables.keySet().iterator();
-        if("true".equals(ctx.cfg().getString(Configuration.CFG_EMBEETLE_PROJECT)))
+        while(itVariables.hasNext())
         {
-            while(itVariables.hasNext())
-            {
-                String name = itVariables.next();
-                if(   ("C_SRC".equals(name))
-                   || ("CPP_SRC".equals(name))
-                   || ("OBJS".equals(name))     )
-                {
-                    filesMkFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
-                            name + " = " + listVariables.get(name));
-                }
-                else
-                {
-                    variablesMkFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
-                            name + " = " + listVariables.get(name));
-                }
-            }
+            String name = itVariables.next();
+            makeFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
+                    name + " = " + listVariables.get(name));
         }
-        else
-        {
-            while(itVariables.hasNext())
-            {
-                String name = itVariables.next();
-                makeFile.addLine(MAKEFILE_FILE_VARIABLES_SECTION_NAME,
-                        name + " = " + listVariables.get(name));
-            }
-        }
+
     }
 
     private void handleTargets()
@@ -306,10 +248,11 @@ public class MakeBuildSystem extends BuildSystem
             ctx.addError(this, "Could not get configuration from environment !");
             return null;
         }
+
         log.trace("adding {} files.", buildFiles.numEntries());
         files.addAll(buildFiles);
 
-        createMakeFiles();
+        createMakeFile();
 
         files = updateFromProjectFiles(files);
         if(null == files)
@@ -328,11 +271,6 @@ public class MakeBuildSystem extends BuildSystem
         handleTargets();
 
         files.add(makeFile);
-        if("true".equals(ctx.cfg().getString(Configuration.CFG_EMBEETLE_PROJECT)))
-        {
-            files.add(filesMkFile);
-            files.add(variablesMkFile);
-        }
         return files;
     }
 

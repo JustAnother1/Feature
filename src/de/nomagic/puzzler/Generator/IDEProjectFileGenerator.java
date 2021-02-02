@@ -423,7 +423,7 @@ public class IDEProjectFileGenerator
 
     private static TextFile createEmbeetle_dashboard_config_btl(String ProjectName)
     {
-        TextFile buttons = new TextFile(".beetle/buttons.btl");
+        TextFile buttons = new TextFile(".beetle/dashboard_config.btl");
         buttons.createSection(SECTION_NAME);
         buttons.addLine(SECTION_NAME, "'''============================================''' ");
         buttons.addLine(SECTION_NAME, "'''     Embeetle generated dashboard config    ''' ");
@@ -501,8 +501,11 @@ public class IDEProjectFileGenerator
             projectName = projectName.substring(projectName.lastIndexOf(File.separator) + 1);
         }
 
+        // Eclipse project files
         files.add(createEclipse_dot_project(projectName));
         files.add(createEclipse_dot_cproject(projectName));
+
+        // Embeetle project files.
         if("true".equals(ctx.cfg().getString(Configuration.CFG_EMBEETLE_PROJECT)))
         {
             files.add(createEmbeetle_buttons_btl());

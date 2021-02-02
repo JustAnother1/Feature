@@ -13,6 +13,7 @@ public class CommandLineParser
     private boolean foundOutputDirectory = false;
     private boolean foundLibDirectory = false;
     private String[] args = null;
+    int idx = 0;
 
     public CommandLineParser()
     {
@@ -80,7 +81,7 @@ public class CommandLineParser
         return true;
     }
 
-    private boolean parseSwitches(int idx)
+    private boolean parseSwitches()
     {
         switch(args[idx])
         {
@@ -220,13 +221,13 @@ public class CommandLineParser
 
     public boolean parse(String[] args)
     {
+        idx = 0;
         this.args = args;
-        int idx = 0;
         while(idx < args.length)
         {
             if(true == args[idx].startsWith("-"))
             {
-                if(false == parseSwitches(idx))
+                if(false == parseSwitches())
                 {
                     return false;
                 }

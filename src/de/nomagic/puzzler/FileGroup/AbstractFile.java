@@ -28,6 +28,11 @@ public abstract class AbstractFile
         return fileName;
     }
 
+    public void setFileName(String newName)
+    {
+        fileName = newName;
+    }
+
     public boolean saveToFolder(String folder, Context ctx)
     {
         FileOutputStream fout;

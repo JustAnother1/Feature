@@ -43,7 +43,7 @@ function ask_user_for_parameters()
                 <input type="radio" id="wiki" name="environment" value="asReference" checked="checked" >
                 <label for="wiki"> from Wiki</label>
                 <input type="text" name="env_wiki" size=30 value="arduino2560" />
-                name one from the <a href=https://wiki.ing-poetter.de/doku.php?id=devices:devices_overview>full list of supported environments</a>.
+                name one from the <a href=https://wiki.ing-poetter.de/doku.php?id=devices:board>full list of supported environments</a>.
                 </p>
                 <p>
                 <input type="radio" id="user" name="environment" value="userDefined">
