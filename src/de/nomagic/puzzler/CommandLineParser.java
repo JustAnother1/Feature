@@ -14,6 +14,7 @@ public class CommandLineParser
     private boolean foundLibDirectory = false;
     private String[] args = null;
     int idx = 0;
+    int num_args = 0;
 
     public CommandLineParser()
     {
@@ -87,6 +88,11 @@ public class CommandLineParser
         {
         case "--dump_remote_ressource":
             idx++;
+            if(idx == num_args)
+            {
+                System.err.println("ERROR: missing parameter for " + args[idx-1]);
+                return false;
+            }
             String ressource = args[idx];
             XmlRpcGetter xrg = new XmlRpcGetter(cfg.getString(Configuration.XML_RPC_URL));
             xrg.getAsDocument(ressource);
@@ -96,6 +102,11 @@ public class CommandLineParser
         case "--environment_dirctory":
             // environment directory
             idx++;
+            if(idx == num_args)
+            {
+                System.err.println("ERROR: missing parameter for " + args[idx-1]);
+                return false;
+            }
             if(false == cmdln_handleDirectory(args[idx], Configuration.ENVIRONMENT_PATH_CFG))
             {
                 return false;
@@ -112,6 +123,11 @@ public class CommandLineParser
         case "--library_directory":
             // Library directory
             idx++;
+            if(idx == num_args)
+            {
+                System.err.println("ERROR: missing parameter for " + args[idx-1]);
+                return false;
+            }
             if(false == cmdln_handleDirectory(args[idx], Configuration.LIB_PATH_CFG))
             {
                 return false;
@@ -128,6 +144,11 @@ public class CommandLineParser
         case "--output_directory":
             // output directory
             idx++;
+            if(idx == num_args)
+            {
+                System.err.println("ERROR: missing parameter for " + args[idx-1]);
+                return false;
+            }
             if(false == cmdln_handleDirectory(args[idx], Configuration.OUTPUT_PATH_CFG))
             {
                 return false;
@@ -137,6 +158,11 @@ public class CommandLineParser
         case "--prj_name":
             // project name
             idx++;
+            if(idx == num_args)
+            {
+                System.err.println("ERROR: missing parameter for " + args[idx-1]);
+                return false;
+            }
             cfg.setString(Configuration.PROJECT_NAME_CFG, args[idx]);
             break;
 
@@ -144,6 +170,11 @@ public class CommandLineParser
         case "--project_directory":
             // project directory
             idx++;
+            if(idx == num_args)
+            {
+                System.err.println("ERROR: missing parameter for " + args[idx-1]);
+                return false;
+            }
             if(false == cmdln_handleDirectory(args[idx], Configuration.PROJECT_PATH_CFG))
             {
                 return false;
@@ -154,6 +185,11 @@ public class CommandLineParser
         case "--solution_directory":
             // solution directory
             idx++;
+            if(idx == num_args)
+            {
+                System.err.println("ERROR: missing parameter for " + args[idx-1]);
+                return false;
+            }
             if(false == cmdln_handleDirectory(args[idx], Configuration.SOLUTION_PATH_CFG))
             {
                 return false;
@@ -168,6 +204,11 @@ public class CommandLineParser
         case "-x":
             cfg.setBool(Configuration.USE_XML_RPC, true);
             idx++;
+            if(idx == num_args)
+            {
+                System.err.println("ERROR: missing parameter for " + args[idx-1]);
+                return false;
+            }
             if(false == cmdln_xmlRpcUrl(args[idx]))
             {
                 return false;
@@ -178,6 +219,11 @@ public class CommandLineParser
         case "--zip":
             // zip output
             idx++;
+            if(idx == num_args)
+            {
+                System.err.println("ERROR: missing parameter for " + args[idx-1]);
+                return false;
+            }
             if(false == cmdln_handleDirectory(args[idx], Configuration.ZIP_OUTPUT))
             {
                 return false;
@@ -222,8 +268,9 @@ public class CommandLineParser
     public boolean parse(String[] args)
     {
         idx = 0;
+        num_args = args.length;
         this.args = args;
-        while(idx < args.length)
+        while(idx < num_args)
         {
             if(true == args[idx].startsWith("-"))
             {
