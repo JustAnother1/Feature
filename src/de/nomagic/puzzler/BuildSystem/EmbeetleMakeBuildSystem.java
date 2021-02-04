@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
@@ -16,6 +19,8 @@ public class EmbeetleMakeBuildSystem extends BuildSystem
     public static final String MAKEFILE_FILE_COMMENT_SECTION_NAME = "FileHeader";
     public static final String MAKEFILE_FILE_VARIABLES_SECTION_NAME = "Variables";
     public static final String MAKEFILE_FILE_TARGET_SECTION_NAME = "targets";
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
     private HashMap<String, String> listVariables = new HashMap<String, String>();
     private ArrayList<Target> targets = new ArrayList<Target>();
@@ -1224,13 +1229,17 @@ public class EmbeetleMakeBuildSystem extends BuildSystem
             return null;
         }
 
+        log.trace("adding {} files.", buildFiles.numEntries());
+        files.addAll(buildFiles);
+
         FileGroup out = new FileGroup();
-        // restructure Files
+        log.trace("restructure Files");
         Iterator<String> names = files.getFileIterator();
         while(names.hasNext())
         {
             String name = names.next();
             AbstractFile f = files.getFileWithName(name);
+            log.trace("looking at {}", name);
 
             if(true == name.endsWith(".ld"))
             {
@@ -1244,8 +1253,10 @@ public class EmbeetleMakeBuildSystem extends BuildSystem
                 // all sources go into the source folder
                 f.setFileName("source/" + name);
             }
+            log.trace("adding as {}", f.getFileName());
             out.add(f);
         }
+        log.trace("restructure done.");
 
         // create the Makefile
         out.add(createMakeFile());
