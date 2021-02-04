@@ -242,7 +242,7 @@ function generate_project()
             if(0 != $l_err)
             {
                 $l_total += $l_err;
-                echo "<br/> log : + " . strlen($data) . " bytes !<br/>\n";
+                echo "<br/> log : + " . number_format(strlen($data)) . " bytes !<br/>\n";
             }
             $content_stderr = $content_stderr . $data;
 
@@ -255,7 +255,7 @@ function generate_project()
             if( 0 != $l_out)
             {
                 $l_total += $l_out;
-                echo "<br/> project : + " . strlen($data) . " bytes !<br/>\n";
+                echo "<br/> project : + " . number_format(strlen($data)) . " bytes !<br/>\n";
             }
             $content_stdout = $content_stdout . $data;
             if((0 == $l_err) && (0 == $l_out) && (0 != $l_total))
@@ -276,13 +276,13 @@ function generate_project()
             // OK
             // startHtml();
             echo "<br/> OK: project has been created !<br/>\n";
-            echo "<br/> project : " . strlen($content_stdout) . " bytes!<br/>\n";
+            echo "<br/> project : " . number_format(strlen($content_stdout)) . " bytes!<br/>\n";
             echo '<form method="POST" action="' . $_SERVER['SCRIPT_NAME'] .'" >';
             echo '  <input type="submit" name="download" value="download project" />';
             echo '  <input type="hidden" name="project_name" value ="' . htmlspecialchars($projectName) . '" />';
             echo '  <input type="hidden" name="zip" value ="' . bin2hex($content_stdout) . '" />';
             echo '</form>';
-            echo "<br/> log : " . strlen($content_stderr) . " bytes!<br/>\n";
+            echo "<br/> log : " . number_format(strlen($content_stderr)) . " bytes!<br/>\n";
             echo '<form method="POST" action="' . $_SERVER['SCRIPT_NAME'] .'" >';
             echo '  <input type="submit" name="download" value="download log" />';
             echo '  <input type="hidden" name="stderr" value ="' . htmlspecialchars($content_stderr) . '" />';
