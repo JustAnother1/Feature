@@ -30,8 +30,8 @@ public class DokuwikiParser
 
     // to test regex : https://regexr.com/
 
-    // (\*\*\w+\*\*)|(\/\/(\w+|\s|\(|\))+\/\/)
-    private String AttributeOrValueExpr = "(\\*\\*\\w+\\*\\*)|(\\/\\/(\\w+|\\s|\\(|\\))+\\/\\/)";
+    // (\*\*\w+\*\*)|(\/\/(\w+|\s|\(|\)|\.)+\/\/)
+    private String AttributeOrValueExpr = "(\\*\\*\\w+\\*\\*)|(\\/\\/(\\w+|\\s|\\(|\\)|\\.)+\\/\\/)";
     private Pattern AtOrValPattern = Pattern.compile(AttributeOrValueExpr);
 
     // <\s*code\s*((\s)|(\w))*>

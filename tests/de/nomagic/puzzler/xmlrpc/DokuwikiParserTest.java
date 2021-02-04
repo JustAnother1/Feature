@@ -82,6 +82,29 @@ public class DokuwikiParserTest {
     }
 
     @Test
+    public void testConvertToXml_attributeWithDot()
+    {
+        String input = "====== SOME_VARIABLE ======\r\n"
+                + "This variable shall be inserted into the **file** //stm32.ld//.\r\n";
+        Document res = dut.convertToXml(input);
+        assertNotNull(res);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+                + "<SOME_VARIABLE file=\"stm32.ld\" />\r\n", getXml(res));
+    }
+
+    @Test
+    public void testConvertToXml_twoattributesinOneLine()
+    {
+        String input = "====== SOME_VARIABLE ======\r\n"
+                + "This variable shall be inserted into the **file** named //stm32.ld//."
+                + " It therefore must be of **type** //pattern//.\r\n";
+        Document res = dut.convertToXml(input);
+        assertNotNull(res);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+                + "<SOME_VARIABLE file=\"stm32.ld\" type=\"pattern\" />\r\n", getXml(res));
+    }
+
+    @Test
     public void testConvertToXml_childAttribute()
     {
         String input = "====== gpio algorithm ======\r\n"
