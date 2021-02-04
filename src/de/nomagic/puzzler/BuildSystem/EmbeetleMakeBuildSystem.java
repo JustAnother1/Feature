@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
+import de.nomagic.puzzler.FileGroup.EmptyFolder;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.FileGroup.TextFile;
 import de.nomagic.puzzler.configuration.Configuration;
@@ -1266,6 +1267,9 @@ public class EmbeetleMakeBuildSystem extends BuildSystem
 
         // create the dash board file
         out.add(createDashboardFile());
+
+        // add empty build folder
+        out.add(new EmptyFolder("build/"));
         return out;
     }
 
