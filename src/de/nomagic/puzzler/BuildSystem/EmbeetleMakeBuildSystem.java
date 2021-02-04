@@ -1157,8 +1157,25 @@ public class EmbeetleMakeBuildSystem extends BuildSystem
         {
             ldflags = "";
         }
+        // remove the initial refernce to the linker file (the linker file has been renamed)
+        String[] parts = ldflags.split(" ");
+        StringBuffer linkerFlags = new StringBuffer();
+        for(int i = 0; i < parts.length; i++)
+        {
+            String curPart = parts[i];
+            if(true == curPart.startsWith("-T"))
+            {
+                // do not add this
+            }
+            else
+            {
+                linkerFlags.append(curPart);
+                linkerFlags.append(" ");
+            }
+        }
+
         variablesMkFile.addLine(MAKEFILE_FILE_COMMENT_SECTION_NAME, "# CPU specific linker flags");
-        variablesMkFile.addLine(MAKEFILE_FILE_COMMENT_SECTION_NAME, "TARGET_LDFLAGS = " + ldflags + " \\");
+        variablesMkFile.addLine(MAKEFILE_FILE_COMMENT_SECTION_NAME, "TARGET_LDFLAGS = " + linkerFlags.toString() + "\\");
         variablesMkFile.addLine(MAKEFILE_FILE_COMMENT_SECTION_NAME, "                 -T $(LINKERSCRIPT) \\");
         variablesMkFile.addLine(MAKEFILE_FILE_COMMENT_SECTION_NAME, "                 -L $(dir $(LINKERSCRIPT)) \\");
         variablesMkFile.addLine(MAKEFILE_FILE_COMMENT_SECTION_NAME, "                 -L $(MAKEFILE_DIR) \\");

@@ -474,9 +474,9 @@ public class IDEProjectFileGenerator
         buttons.addLine(SECTION_NAME, "");
         buttons.addLine(SECTION_NAME, "# 6. Tools ");
         buttons.addLine(SECTION_NAME, "# ---------");
-        buttons.addLine(SECTION_NAME, "COMPILER_TOOLCHAIN   = 'gnu_avr_toolchain_5.4.0_64b'");
+        buttons.addLine(SECTION_NAME, "COMPILER_TOOLCHAIN   = 'gnu_arm_toolchain_9.3.1_9-2020-q2-update_32b'");
         buttons.addLine(SECTION_NAME, "BUILD_AUTOMATION     = 'gnu_make_4.2.1_64b'");
-        buttons.addLine(SECTION_NAME, "FLASH_DEBUG_SERVER   = 'openocd_0.10.0_devNone_64b'");
+        buttons.addLine(SECTION_NAME, "FLASH_DEBUG_SERVER   = 'openocd_0.10.0_dev01438_64b'");
         return buttons;
     }
 
