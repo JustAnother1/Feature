@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Context;
+import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.FileGroup.TextFile;
 import de.nomagic.puzzler.configuration.Configuration;
@@ -16,6 +17,10 @@ public class IDEProjectFileGenerator
     private static final Logger LOG = LoggerFactory.getLogger(CLASS_NAME);
     private static final String SECTION_NAME = "data";
 
+    private IDEProjectFileGenerator()
+    {
+        // this class is static
+    }
 
     private static TextFile createEclipse_dot_cproject(String ProjectName)
     {
@@ -421,7 +426,7 @@ public class IDEProjectFileGenerator
         return buttons;
     }
 
-    private static TextFile createEmbeetle_dashboard_config_btl(String ProjectName)
+    private static TextFile createEmbeetle_dashboard_config_btl(String ProjectName, String ChipName)
     {
         TextFile buttons = new TextFile(".beetle/dashboard_config.btl");
         buttons.createSection(SECTION_NAME);
@@ -432,7 +437,7 @@ public class IDEProjectFileGenerator
         buttons.addLine(SECTION_NAME, "");
         buttons.addLine(SECTION_NAME, "# 1. Chip ");
         buttons.addLine(SECTION_NAME, "# --------");
-        buttons.addLine(SECTION_NAME, "chip_name = 'STM32F407VG'");
+        buttons.addLine(SECTION_NAME, "chip_name = '" + ChipName + "'");
         buttons.addLine(SECTION_NAME, " ");
         buttons.addLine(SECTION_NAME, "# 2. Board ");
         buttons.addLine(SECTION_NAME, "# -----------");
@@ -508,8 +513,12 @@ public class IDEProjectFileGenerator
         // Embeetle project files.
         if("true".equals(ctx.cfg().getString(Configuration.CFG_EMBEETLE_PROJECT)))
         {
+            Environment e = ctx.getEnvironment();
+            String[] parts = e.getPlatformParts();
+            String DeviceName  = parts[parts.length -1]; // last element
+
             files.add(createEmbeetle_buttons_btl());
-            files.add(createEmbeetle_dashboard_config_btl(projectName));
+            files.add(createEmbeetle_dashboard_config_btl(projectName, DeviceName));
         }
         return files;
     }
