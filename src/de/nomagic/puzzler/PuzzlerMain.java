@@ -283,16 +283,6 @@ public class PuzzlerMain
             return null;
         }
 
-        // the environment may specify files that it needs - create those now
-        Environment e = ctx.getEnvironment();
-        allFiles = e.addRequiredFiles(ctx, allFiles);
-        if(null == allFiles)
-        {
-            log.error("Failed to generate required files provided by the environment !");
-            ctx.close();
-            return null;
-        }
-
         return allFiles;
     }
 

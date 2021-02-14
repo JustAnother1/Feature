@@ -16,8 +16,6 @@ package de.nomagic.puzzler.Environment;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -26,9 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.FileGroup.AbstractFile;
-import de.nomagic.puzzler.FileGroup.FileFactory;
-import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
 
 public class Environment extends Base
@@ -257,47 +252,6 @@ public class Environment extends Base
         res.add(commonElement);
         res.add(deviceElement);
         return res.toArray(new Element[0]);
-    }
-
-
-    private FileGroup addFiles(Element reqFiles, FileGroup allFiles)
-    {
-        if(null != reqFiles)
-        {
-            List<Element> fileList = reqFiles.getChildren();
-            if(null != fileList)
-            {
-                Iterator<Element> it = fileList.iterator();
-                while(it.hasNext())
-                {
-                    Element curFile = it.next();
-                    AbstractFile aFile = FileFactory.getFileFromXml(curFile);
-                    allFiles.add(aFile);
-                }
-            }
-            // else no required Targets
-        }
-        // else no required Targets
-        return allFiles;
-    }
-
-    public FileGroup addRequiredFiles(Context ctx, FileGroup allFiles)
-    {
-        Element[] cfgFiles = getConfigFile("_files.xml", ADDITIONAL_FILES_ROOT_ELEMENT_NAME);
-
-        if(null == cfgFiles)
-        {
-            // no additional files necessary
-            // -> we are done here
-            return allFiles;
-        }
-
-        for(int i = 0; i < cfgFiles.length; i++)
-        {
-            allFiles = addFiles(cfgFiles[i], allFiles);
-        }
-
-        return allFiles;
     }
 
 }

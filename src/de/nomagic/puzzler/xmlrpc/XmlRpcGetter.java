@@ -21,6 +21,7 @@ public class XmlRpcGetter
     private XmlRpcClient client;
     private final XmlRpcClientConfigImpl config;
     private final DokuwikiParser parser;
+    private boolean logXmlFile = false;
 
     public XmlRpcGetter(String url)
     {
@@ -56,12 +57,14 @@ public class XmlRpcGetter
         {
             String result = (String) client.execute(DokuwikiParser.GET_INFO, params);
             Document jdomDocument = parser.convertToXml(result);
-            if(null != jdomDocument)
+            if( (true == logXmlFile) && (null != jdomDocument) )
             {
+                // we have an XML file and we should log it.
                 XMLOutputter xmlOutput = new XMLOutputter();
                 xmlOutput.setFormat(Format.getPrettyFormat());
                 xmlOutput.output(jdomDocument, System.err);
             }
+            // else don't log it.
             return jdomDocument;
         }
         catch (XmlRpcException | IOException e)

@@ -1,6 +1,7 @@
 
 package de.nomagic.puzzler.Generator;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,6 +30,8 @@ public class CCodeGenerator extends Generator
     public static final String ALGORITHM_C_CODE_CHILD_NAME = "c_code";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
+
+    private HashSet<AlgorithmInstanceInterface> extraAlgoList = new HashSet<AlgorithmInstanceInterface>();
 
     private CFile sourceFile;
 
@@ -135,6 +138,8 @@ public class CCodeGenerator extends Generator
                 sourceFile.addFunction(funcs[i]);
             }
         }
+
+        addAllAdditionals();
 
         codeGroup.add(sourceFile);
     }
@@ -480,84 +485,101 @@ public class CCodeGenerator extends Generator
 
     private void getAdditionalsFrom(AlgorithmInstanceInterface logic)
     {
-        Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
-        if(null == cCode)
+        extraAlgoList.add(logic);
+    }
+
+    private void addAllAdditionals()
+    {
+        Iterator<AlgorithmInstanceInterface> it = extraAlgoList.iterator();
+        while(it.hasNext())
         {
-            ctx.addError(this,
-                "Could not read implementation from " + logic.toString());
-            return;
-        }
-        Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME);
-        if(null == additional)
-        {
-            log.trace("no addionals for algorithm {}", logic);
-            return;
-        }
-        List<Element> addlist = additional.getChildren();
-        if(null == addlist)
-        {
-            log.trace("empty addionals tag for algorithm {}", logic);
-            return;
-        }
-        for(int i = 0; i < addlist.size(); i++)
-        {
-            Element curElement = addlist.get(i);
-            String type = curElement.getName();
-            switch(type)
+            AlgorithmInstanceInterface logic = it.next();
+
+            Element cCode = logic.getAlgorithmElement(ALGORITHM_C_CODE_CHILD_NAME);
+            if(null == cCode)
             {
-            case ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME:
-                String include = curElement.getText();
-                log.trace("adding include {}", include);
-                if(true == documentCodeSource)
-                {
-                    sourceFile.addLineWithComment(CFile.C_FILE_INCLUDE_SECTION_NAME,
-                            include, logic.toString());
-                }
-                else
-                {
-                    sourceFile.addLine(CFile.C_FILE_INCLUDE_SECTION_NAME, include);
-                }
-                break;
+                ctx.addError(this,
+                    "Could not read implementation from " + logic.toString());
+                return;
+            }
+            Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME);
+            if(null == additional)
+            {
+                log.trace("no addionals for algorithm {}", logic);
+                return;
+            }
+            List<Element> addlist = additional.getChildren();
+            if(null == addlist)
+            {
+                log.trace("empty addionals tag for algorithm {}", logic);
+                return;
+            }
 
-            case ALGORITHM_FUNCTION_CHILD_NAME:
-                Function func = new Function(curElement);
+            log.trace("adding addionals for algorithm {}", logic);
+            for(int i = 0; i < addlist.size(); i++)
+            {
+                Element curElement = addlist.get(i);
+                String type = curElement.getName();
 
-                CFunctionCall fc = new CFunctionCall(func.getName());
-                String implementation = getCImplementationOf(fc, logic);
-                if(null == implementation)
+                switch(type)
                 {
-                    String error = "Could not get an Implementation for " + func.getName();
-                    log.error(error);
-                    ctx.addError(this, error);
-                    return;
-                }
-                else
-                {
-                    func.setImplementation(implementation);
-                }
+                case ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME:
+                    String include = curElement.getText();
+                    log.trace("adding include {}", include);
+                    if(true == documentCodeSource)
+                    {
+                        sourceFile.addLineWithComment(CFile.C_FILE_INCLUDE_SECTION_NAME,
+                                include, logic.toString());
+                    }
+                    else
+                    {
+                        sourceFile.addLine(CFile.C_FILE_INCLUDE_SECTION_NAME, include);
+                    }
+                    break;
 
-                if(true == documentCodeSource)
-                {
-                    sourceFile.addFunction(func, logic.toString());
+                case ALGORITHM_FUNCTION_CHILD_NAME:
+                    Function func = new Function(curElement);
+
+                    CFunctionCall fc = new CFunctionCall(func.getName());
+                    String implementation = getCImplementationOf(fc, logic);
+                    if(null == implementation)
+                    {
+                        String error = "Could not get an Implementation for " + func.getName();
+                        log.error(error);
+                        ctx.addError(this, error);
+                        return;
+                    }
+                    else
+                    {
+                        func.setImplementation(implementation);
+                    }
+
+                    if(true == documentCodeSource)
+                    {
+                        sourceFile.addFunction(func, logic.toString());
+                    }
+                    else
+                    {
+                        sourceFile.addFunction(func);
+                    }
+                    break;
+
+                case ALGORITHM_ADDITIONAL_FILE_CHILD_NAME:
+                    AbstractFile aFile = FileFactory.getFileFromXml(curElement);
+                    codeGroup.add(aFile);
+                    log.trace("adding file {}", aFile.getFileName());
+                    break;
+
+                case ALGORITHM_ADDITIONAL_VARIABLE_CHILD_NAME:
+                    String line = curElement.getText();
+                    sourceFile.addLine(CFile.C_FILE_GLOBAL_VAR_SECTION_NAME, line);
+                    log.trace("adding variable ({})", line);
+                    break;
+
+                default: // ignore
+                    log.warn("invalid type '{}' for algorithm '{}' !", type, logic);
+                    break;
                 }
-                else
-                {
-                    sourceFile.addFunction(func);
-                }
-                break;
-
-            case ALGORITHM_ADDITIONAL_FILE_CHILD_NAME:
-                AbstractFile aFile = FileFactory.getFileFromXml(curElement);
-                codeGroup.add(aFile);
-                break;
-
-            case ALGORITHM_ADDITIONAL_VARIABLE_CHILD_NAME:
-                sourceFile.addLine(CFile.C_FILE_GLOBAL_VAR_SECTION_NAME, curElement.getText());
-                break;
-
-            default: // ignore
-                log.warn("invalid type '{}' for algorithm '{}' !", type, logic);
-                break;
             }
         }
     }
