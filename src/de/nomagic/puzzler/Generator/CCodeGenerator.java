@@ -490,6 +490,7 @@ public class CCodeGenerator extends Generator
 
     private void addAllAdditionals()
     {
+        log.trace("starting to add addionals:");
         Iterator<AlgorithmInstanceInterface> it = extraAlgoList.iterator();
         while(it.hasNext())
         {
@@ -500,19 +501,19 @@ public class CCodeGenerator extends Generator
             {
                 ctx.addError(this,
                     "Could not read implementation from " + logic.toString());
-                return;
+                continue;
             }
             Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_C_CODE_CHILD_NAME);
             if(null == additional)
             {
                 log.trace("no addionals for algorithm {}", logic);
-                return;
+                continue;
             }
             List<Element> addlist = additional.getChildren();
             if(null == addlist)
             {
                 log.trace("empty addionals tag for algorithm {}", logic);
-                return;
+                continue;
             }
 
             log.trace("adding addionals for algorithm {}", logic);
@@ -547,7 +548,7 @@ public class CCodeGenerator extends Generator
                         String error = "Could not get an Implementation for " + func.getName();
                         log.error(error);
                         ctx.addError(this, error);
-                        return;
+                        continue;
                     }
                     else
                     {
@@ -582,6 +583,7 @@ public class CCodeGenerator extends Generator
                 }
             }
         }
+        log.trace("added all addionals.");
     }
 
     private CFile createFile(String fileName)
