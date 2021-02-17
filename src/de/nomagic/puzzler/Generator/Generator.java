@@ -40,7 +40,7 @@ public abstract class Generator extends Base
     protected ConditionEvaluator condiEval;
     protected HashMap<String, CInitCodeBlock> initcode = new HashMap<String, CInitCodeBlock>();
 
-    public Generator(Context ctx)
+    protected Generator(Context ctx)
     {
         super(ctx);
         condiEval = new ConditionEvaluator(ctx);

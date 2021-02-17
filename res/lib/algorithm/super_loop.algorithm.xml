@@ -11,8 +11,7 @@
      <forChilds api="run">
          <![CDATA[    €run:execute()€]]>
      </forChilds>
-     <![CDATA[  }
-]]>
+     <![CDATA[  }]]>
     </function>
   </c_code>
 </algorithm>

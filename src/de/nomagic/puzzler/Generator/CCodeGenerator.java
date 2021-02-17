@@ -126,7 +126,6 @@ public class CCodeGenerator extends Generator
             else
             {
                 funcs[i].setImplementation(implementation);
-                getAdditionalsFrom(logic);
             }
 
             if(true == documentCodeSource)
@@ -138,6 +137,8 @@ public class CCodeGenerator extends Generator
                 sourceFile.addFunction(funcs[i]);
             }
         }
+
+        getAdditionalsFrom(logic);
 
         addAllAdditionals();
 
