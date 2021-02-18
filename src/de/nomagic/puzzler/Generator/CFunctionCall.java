@@ -17,7 +17,7 @@
  */
 package de.nomagic.puzzler.Generator;
 
-public class CFunctionCall
+public class CFunctionCall implements FunctionCall
 {
     private String api;
     private final String functionName;

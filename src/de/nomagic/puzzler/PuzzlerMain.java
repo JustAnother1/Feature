@@ -246,7 +246,6 @@ public class PuzzlerMain
         for(int i = 0; i < gen.length; i++)
         {
             Generator curGen = gen[i];
-            curGen.configure(cfg);
             // give solution to code creator to create code project
             FileGroup files = curGen.generateFor(algoTree);
             if(null == files)

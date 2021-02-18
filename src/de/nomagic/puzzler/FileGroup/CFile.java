@@ -3,7 +3,7 @@ package de.nomagic.puzzler.FileGroup;
 import java.util.List;
 import de.nomagic.puzzler.solution.Function;
 
-public class CFile extends TextFile
+public class CFile extends SourceFile
 {
     public static final String C_FILE_FILE_COMMENT_SECTION_NAME              = "FileHeader";
     public static final String C_FILE_INCLUDE_SECTION_NAME                   = "include";
@@ -90,12 +90,6 @@ public class CFile extends TextFile
             return sectionData;
         }
 
-    }
-
-    public void addFunction(Function func, String description)
-    {
-        func.addComment(description);
-        functions.add(func);
     }
 
     public void addFunction(Function func)

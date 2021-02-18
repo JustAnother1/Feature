@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 import org.jdom2.Element;
 
+import de.nomagic.puzzler.Generator.FunctionCall;
+
 public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
 {
     private HashMap<String, String> properties = new HashMap<String, String>();
@@ -98,6 +100,18 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
 
     @Override
     public String getApis()
+    {
+        return null;
+    }
+
+    @Override
+    public String getImplementationOf(FunctionCall fc)
+    {
+        return null;
+    }
+
+    @Override
+    public Iterable<AlgorithmInstanceInterface> getAdditionals()
     {
         return null;
     }

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.FileGroup.FileGroup;
+import de.nomagic.puzzler.FileGroup.SourceFile;
 import de.nomagic.puzzler.FileGroup.VerilogFile;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
@@ -25,6 +26,7 @@ public class VerilogCodeGenerator extends Generator
     public VerilogCodeGenerator(Context ctx)
     {
         super(ctx);
+        ROOT_FILE_NAME = "top.v";
     }
 
     @Override
@@ -40,16 +42,11 @@ public class VerilogCodeGenerator extends Generator
 
         log.trace("starting to generate the verilog implementation for {}", logic);
         // we will need at least one *.c file. So create that now.
-        VerilogFile sourceFile = createFile("top.v");
+        SourceFile sourceFile = createFile("top.v");
 
         Element res = logic.getAlgorithmElement(VerilogCodeGenerator.ALGORITHM_VERILOG_CODE_CHILD_NAME);
         if(null != res)
         {
-            if(true == documentCodeSource)
-            {
-                sourceFile.addLine(VerilogFile.VERILOG_FILE_MODULE_SECTION_NAME,
-                        "// start modules from " + logic);
-            }
             List<Element> l = res.getChildren("module");
             Iterator<Element> it = l.iterator();
             while(it.hasNext())
@@ -58,42 +55,10 @@ public class VerilogCodeGenerator extends Generator
                 sourceFile.addLine(VerilogFile.VERILOG_FILE_MODULE_SECTION_NAME,
                         curE.getText());
             }
-            if(true == documentCodeSource)
-            {
-                sourceFile.addLine(VerilogFile.VERILOG_FILE_MODULE_SECTION_NAME,
-                        "// end modules from " + logic);
-            }
         }
 
         codeGroup.add(sourceFile);
         return codeGroup;
-    }
-
-    @Override
-    public void configure(Configuration cfg)
-    {
-        if(null == cfg)
-        {
-            return;
-        }
-        if("true".equals(cfg.getString(CFG_DOC_CODE_SRC)))
-        {
-            log.trace("Switching on documentation of source code");
-            documentCodeSource = true;
-        }
-    }
-
-    private VerilogFile createFile(String fileName)
-    {
-        VerilogFile aFile = new VerilogFile(fileName);
-
-        // there should be a file comment explaining what this is
-        aFile.addLines(VerilogFile.VERILOG_FILE_FILE_COMMENT_SECTION_NAME,
-                       new String[] {"// automatically created " + fileName,
-                                     "// created at: " + Tool.curentDateTime(),
-                                     "//created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
-                                     });
-        return aFile;
     }
 
     @Override
@@ -108,5 +73,24 @@ public class VerilogCodeGenerator extends Generator
         return null;
     }
 
+    @Override
+    protected void addAllAdditionals(AlgorithmInstanceInterface algo)
+    {
+        // nothing to do
+    }
+
+    @Override
+    protected SourceFile createFile(String fileName)
+    {
+        VerilogFile aFile = new VerilogFile(fileName);
+
+        // there should be a file comment explaining what this is
+        aFile.addLines(VerilogFile.VERILOG_FILE_FILE_COMMENT_SECTION_NAME,
+                       new String[] {"// automatically created " + fileName,
+                                     "// created at: " + Tool.curentDateTime(),
+                                     "//created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
+                                     });
+        return aFile;
+    }
 
 }

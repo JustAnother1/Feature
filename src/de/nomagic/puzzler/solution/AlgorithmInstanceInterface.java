@@ -4,6 +4,8 @@ import java.util.Iterator;
 
 import org.jdom2.Element;
 
+import de.nomagic.puzzler.Generator.FunctionCall;
+
 public interface AlgorithmInstanceInterface
 {
     String getName();
@@ -18,4 +20,6 @@ public interface AlgorithmInstanceInterface
     Element getAlgorithmElement(String elementName);
     Iterator<String> getAllChildren();
     ConfiguredAlgorithm getChild(String name);
+    String getImplementationOf(FunctionCall fc);
+    Iterable<AlgorithmInstanceInterface> getAdditionals();
 }

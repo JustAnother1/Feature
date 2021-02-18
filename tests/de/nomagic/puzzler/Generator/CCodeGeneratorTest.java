@@ -27,36 +27,6 @@ public class CCodeGeneratorTest
     }
 
     @Test
-    public void testConfigureNull()
-    {
-        ContextStub ctx = new ContextStub();
-        CCodeGenerator gen = new CCodeGenerator(ctx);
-        assertNotNull(gen);
-        gen.configure(null);
-    }
-
-    @Test
-    public void testConfigure()
-    {
-        ContextStub ctx = new ContextStub();
-        CCodeGenerator gen = new CCodeGenerator(ctx);
-        assertNotNull(gen);
-        Configuration cfg = new Configuration();
-        gen.configure(cfg);
-    }
-
-    @Test
-    public void testConfigureDocMode()
-    {
-        ContextStub ctx = new ContextStub();
-        CCodeGenerator gen = new CCodeGenerator(ctx);
-        assertNotNull(gen);
-        Configuration cfg = new Configuration();
-        cfg.setString(Configuration.CFG_DOC_CODE_SRC, "true");
-        gen.configure(cfg);
-    }
-
-    @Test
     public void testGenerateForNull()
     {
         ContextStub ctx = new ContextStub();
