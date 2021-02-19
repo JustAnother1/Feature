@@ -116,4 +116,15 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
         return null;
     }
 
+    @Override
+    public void addExtraAlgo(AlgorithmInstanceInterface algo)
+    {
+    }
+
+    @Override
+    public ConfigurationHandler getCfgHandler()
+    {
+        return null;
+    }
+
 }

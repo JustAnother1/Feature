@@ -19,7 +19,9 @@ public interface AlgorithmInstanceInterface
     boolean hasApi(String api);
     Element getAlgorithmElement(String elementName);
     Iterator<String> getAllChildren();
-    ConfiguredAlgorithm getChild(String name);
+    AlgorithmInstanceInterface getChild(String name);
     String getImplementationOf(FunctionCall fc);
+    void addExtraAlgo(AlgorithmInstanceInterface algo);
     Iterable<AlgorithmInstanceInterface> getAdditionals();
+    ConfigurationHandler getCfgHandler();
 }

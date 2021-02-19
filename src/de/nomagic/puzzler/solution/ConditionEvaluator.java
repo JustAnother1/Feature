@@ -10,10 +10,7 @@ import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.nomagic.puzzler.Base;
-import de.nomagic.puzzler.Context;
-
-public class ConditionEvaluator extends Base
+public class ConditionEvaluator
 {
     public static final String CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME = "cond";
 
@@ -37,20 +34,14 @@ public class ConditionEvaluator extends Base
     public static final String KEY_MULTIPLY = "*";
     public static final String KEY_DEVIDE = "/";
 
+    private static final Logger log = LoggerFactory.getLogger("ConditionEvaluator");
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-    private boolean valid;
-    private AlgorithmInstanceInterface algo;
-    private String functionArguments;
-    private Element function;
-
-
-    public ConditionEvaluator(Context ctx)
+    private ConditionEvaluator()
     {
-        super(ctx);
+        // not used
     }
 
-    public Element getBest(List<Element> conditions,
+    public static Element getBest(List<Element> conditions,
                            AlgorithmInstanceInterface algo,
                            String functionArguments,
                            Element function)
@@ -63,10 +54,7 @@ public class ConditionEvaluator extends Base
         {
             return null;
         }
-        valid = true;
-        this.functionArguments = functionArguments;
-        this.function = function;
-        this.algo = algo;
+        boolean valid = true;
 
         // check condition
         ArrayList<Element> valids = new ArrayList<Element>();
@@ -76,13 +64,21 @@ public class ConditionEvaluator extends Base
             Element curE = it.next();
             String conditionText = curE.getAttributeValue(CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME);
             log.trace("evaluating condition {}", conditionText);
-            if(true == KEY_TRUE.equals(evaluateConditionParenthesis(conditionText, algo, functionArguments, function)))
+            CondEvalResult res = evaluateConditionParenthesis(conditionText, algo, functionArguments, function);
+            if(true == res.isValid())
             {
-                valids.add(curE);
+                if(true == KEY_TRUE.equals(res.getResult()))
+                {
+                    valids.add(curE);
+                }
+                else
+                {
+                    log.trace("condition not met");
+                }
             }
             else
             {
-                log.trace("condition not met");
+                valid = false;
             }
         }
         if(false == valid)
@@ -102,16 +98,16 @@ public class ConditionEvaluator extends Base
         return conditions.get(0);
     }
 
-    public Element getBest(
+    public static Element getBest(
             Element conditions,
             AlgorithmInstanceInterface algo,
             String functionArguments,
             Element function)
     {
-
         String conditionText = conditions.getAttributeValue(CONDITION_EVALUATOR_CONDITION_ATTRIBUTE_NAME);
         log.trace("evaluating condition {}", conditionText);
-        if(true == KEY_TRUE.equals(evaluateConditionParenthesis(conditionText, algo, functionArguments, function)))
+        CondEvalResult res = evaluateConditionParenthesis(conditionText, algo, functionArguments, function);
+        if((true == res.isValid()) && (true == KEY_TRUE.equals(res.getResult())))
         {
             return conditions;
         }
@@ -122,7 +118,7 @@ public class ConditionEvaluator extends Base
         }
     }
 
-    public String evaluateConditionParenthesis(
+    public static CondEvalResult evaluateConditionParenthesis(
             String condition,
             AlgorithmInstanceInterface algo,
             String functionArguments,
@@ -130,20 +126,20 @@ public class ConditionEvaluator extends Base
     {
         if( (null == condition) || (null == algo) )
         {
-            return KEY_FALSE;
+            CondEvalResult res = new CondEvalResult();
+            res.setValid(false);
+            res.addErrorLine("required parameter is null !");
+            return res;
         }
-        this.functionArguments = functionArguments;
-        this.function = function;
-        this.algo = algo;
         if(false == condition.contains("("))
         {
-            return evaluateConditionText(condition);
+            return evaluateConditionText(condition, algo, functionArguments, function);
         }
         else
         {
             int numOpenP = 0;
-            Vector<StringBuffer> sections = new Vector<StringBuffer>();
-            StringBuffer curSection = new StringBuffer();
+            Vector<StringBuilder> sections = new Vector<StringBuilder>();
+            StringBuilder curSection = new StringBuilder();
             sections.add(curSection);
 
             for(int i = 0; i < condition.length(); i++)
@@ -165,25 +161,37 @@ public class ConditionEvaluator extends Base
                         // -> no need to delete it
                         // -> we are done here
                     }
-                    curSection = new StringBuffer();
+                    curSection = new StringBuilder();
                     sections.add(curSection);
                     break;
 
                 case ')':
                     if(0 == numOpenP)
                     {
-                        valid = false;
-                        ctx.addError(this,
-                                "Parenthesis mismatch in condition : " + condition);
-                        return KEY_FALSE;
+                        CondEvalResult res = new CondEvalResult();
+                        res.setValid(false);
+                        res.addErrorLine("Parenthesis mismatch in condition : " + condition);
+                        return res;
                     }
                     // else:
-                    String sectionResult = evaluateConditionText(curSection.toString());
-                    sections.remove(numOpenP);
-                    numOpenP--;
-                    curSection = sections.get(numOpenP);
-                    curSection.append(sectionResult);
-                    curSection.append(")");
+                    CondEvalResult res = evaluateConditionText(
+                            curSection.toString(),
+                            algo,
+                            functionArguments,
+                            function);
+                    if(false == res.isValid())
+                    {
+                        return res;
+                    }
+                    else
+                    {
+                        String sectionResult = res.getResult();
+                        sections.remove(numOpenP);
+                        numOpenP--;
+                        curSection = sections.get(numOpenP);
+                        curSection.append(sectionResult);
+                        curSection.append(")");
+                    }
                     break;
 
                 default:
@@ -195,33 +203,38 @@ public class ConditionEvaluator extends Base
             // so first some sanity checks
             if(0 != numOpenP)
             {
-                valid = false;
-                ctx.addError(this,
-                        "Parenthesis mismatch at end of condition : " + condition);
-                return KEY_FALSE;
+                CondEvalResult res = new CondEvalResult();
+                res.setValid(false);
+                res.addErrorLine("Parenthesis mismatch at end of condition : " + condition);
+                return res;
             }
             if(1 != sections.size())
             {
-                valid = false;
-                ctx.addError(this,
-                        "Parenthesis Section mismatch at end of condition : " + condition);
-                return KEY_FALSE;
+                CondEvalResult res = new CondEvalResult();
+                res.setValid(false);
+                res.addErrorLine("Parenthesis Section mismatch at end of condition : " + condition);
+                return res;
             }
-            StringBuffer resultSection = sections.get(0);
-            return evaluateConditionText(resultSection.toString());
+            StringBuilder resultSection = sections.get(0);
+            return evaluateConditionText(resultSection.toString(), algo, functionArguments, function);
         }
     }
 
-    private String evaluateFunction(String Word)
+    private static CondEvalResult evaluateFunction(
+            String Word,
+            AlgorithmInstanceInterface algo,
+            String functionArguments,
+            Element function )
     {
         int indexOpeningBrace = Word.indexOf('(');
         int indexClosingBrace = Word.indexOf(')');
         String functionName = Word.substring(0, indexOpeningBrace);
         String parameter = Word.substring(indexOpeningBrace + 1, indexClosingBrace);
+        CondEvalResult res = new CondEvalResult();
         if(1 > functionName.length())
         {
             // just additional braces -> remove those and evaluate the rest
-            return  evaluateWord(parameter);  // Caution : Recursion! So don't over do it with the unneeded braces!
+            return evaluateWord(parameter, algo, functionArguments, function);  // Caution : Recursion! So don't over do it with the unneeded braces!
         }
         switch(functionName)
         {
@@ -229,11 +242,13 @@ public class ConditionEvaluator extends Base
             // Parameter may already be evaluated
             if(KEY_TRUE.equals(parameter))
             {
-                return KEY_TRUE;
+                res.setResultValid(KEY_TRUE);
+                break;
             }
             if(KEY_FALSE.equals(parameter))
             {
-                return KEY_FALSE;
+                res.setResultValid(KEY_FALSE);
+                break;
             }
             // If not then evaluate now
             if(true == parameter.contains("'"))
@@ -247,115 +262,122 @@ public class ConditionEvaluator extends Base
             }
             if(null == test)
             {
-                return KEY_FALSE;
+                res.setResultValid(KEY_FALSE);
             }
             else
             {
-                return KEY_TRUE;
+                res.setResultValid(KEY_TRUE);
             }
+            break;
 
         case KEY_IS:
             // Parameter may already be evaluated
             if(KEY_TRUE.equals(parameter))
             {
-                return KEY_TRUE;
+                res.setResultValid(KEY_TRUE);
+                break;
             }
             if(KEY_FALSE.equals(parameter))
             {
-                return KEY_FALSE;
+                res.setResultValid(KEY_FALSE);
+                break;
             }
             // If not then evaluate now
-            String res = algo.getProperty(parameter);
-            if(null == res)
+            String resStr = algo.getProperty(parameter);
+            if(null == resStr)
             {
-                res = algo.getBuildIn(parameter);
+                resStr = algo.getBuildIn(parameter);
             }
-            if(null == res)
+            if(null == resStr)
             {
                 // there is something wrong here
-                valid = false;
-                ctx.addError(this,
-                        "unknown property : " + parameter);
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("unknown property : " + parameter);
             }
             else
             {
-                if(KEY_TRUE.equals(res))
+                if(KEY_TRUE.equals(resStr))
                 {
-                    return KEY_TRUE;
+                    res.setResultValid(KEY_TRUE);
                 }
                 else
                 {
-                    return KEY_FALSE;
+                    res.setResultValid(KEY_FALSE);
                 }
             }
+            break;
 
         case KEY_PARAM:
             // Parameter may already be evaluated
             if(KEY_TRUE.equals(parameter))
             {
-                return KEY_TRUE;
+                res.setResultValid(KEY_TRUE);
+                break;
             }
             if(KEY_FALSE.equals(parameter))
             {
-                return KEY_FALSE;
+                res.setResultValid(KEY_FALSE);
             }
             // If not then evaluate now
             log.trace("parameter is {}", parameter);
-            String value = getParameter(parameter);
-            log.trace("parameter value is {}", value);
-            if(null == value)
+            CondEvalResult resRes = getParameter(parameter, functionArguments, function);
+            if(false == resRes.isValid())
             {
                 // there is something wrong here
-                valid = false;
-                ctx.addError(this,
-                        "unknown parameter : " + parameter);
-                ctx.addError(this,
-                        algo.dumpParameter());
-                ctx.addError(this,
-                        algo.toString());
-                return KEY_FALSE;
+                resRes.addErrorLine("unknown parameter : " + parameter);
+                resRes.addErrorLine(algo.dumpParameter());
+                resRes.addErrorLine(algo.toString());
+                return resRes;
             }
             else
             {
+                String value = resRes.getResult();
+                log.trace("parameter value is {}", value);
                 if(KEY_TRUE.equals(value))
                 {
-                    return KEY_TRUE;
+                    res.setResultValid(KEY_TRUE);
+                    break;
                 }
                 if(KEY_FALSE.equals(value))
                 {
-                    return KEY_FALSE;
+                    res.setResultValid(KEY_FALSE);
+                    break;
                 }
                 log.trace("unparseable parameter value: {}", value);
-                return value;
+                res.setResultValid(value);
             }
+            break;
 
         default:
             // there is something wrong here
-            valid = false;
-            ctx.addError(this,
-                    "unknown function : '" + functionName  + "' in '" + Word + "'");
-            return KEY_FALSE;
+            res.setValid(false);
+            res.addErrorLine("unknown function : '" + functionName  + "' in '" + Word + "'");
         }
+        return res;
     }
 
-    private String getParameter(String name)
+    private static CondEvalResult getParameter(String name, String functionArguments, Element function)
     {
+        CondEvalResult res = new CondEvalResult();
         if(null == name)
         {
-            ctx.addError(this, "could not get parameter value: name is null!");
-            return null;
+            res.setValid(false);
+            res.addErrorLine("could not get parameter value: name is null!");
+            return res;
         }
         if(null == function)
         {
-            ctx.addError(this, "could not get parameter value: function element is null!");
-            return null;
+            res.setValid(false);
+            res.addErrorLine("could not get parameter value: function element is null!");
+            return res;
         }
         if(null == functionArguments)
         {
-            ctx.addError(this, "could not get parameter value: function arguments are null!");
-            return null;
+            res.setValid(false);
+            res.addErrorLine("could not get parameter value: function arguments are null!");
+            return res;
         }
+
         int i = 0;
         String paramName = null;
         do
@@ -364,22 +386,23 @@ public class ConditionEvaluator extends Base
             if(null != att)
             {
                 paramName = att.getValue();
-                if(null != paramName)
+                if((null != paramName) && (true == name.equals(paramName)))
                 {
-                    if(true == name.equals(paramName))
+                    // i is the parameter index (0, 1, 2,.. )
+                    String[] arguments = functionArguments.split(",");
+                    if(i < arguments.length)
                     {
-                        // i is the parameter index (0, 1, 2,.. )
-                        String[] arguments = functionArguments.split(",");
-                        if(i < arguments.length)
-                        {
-                            return arguments[i];
-                        }
+                        res.setResultValid(arguments[i]);
+                        return res;
                     }
                 }
             }
         }while(paramName != null);
+
         // Parameter with that name was not found
-        return null;
+        res.setValid(false);
+        res.addErrorLine("Parameter with the name '" + name + "' was not found");
+        return res;
     }
 
     /**
@@ -403,22 +426,29 @@ public class ConditionEvaluator extends Base
      * @param conditionText
      * @return
      */
-    private String evaluateWord(String Word)
+    private static CondEvalResult evaluateWord(
+            String Word,
+            AlgorithmInstanceInterface algo,
+            String functionArguments,
+            Element function)
     {
+        CondEvalResult res = new CondEvalResult();
         // constants
         if(KEY_TRUE.equals(Word))
         {
-            return KEY_TRUE;
+            res.setResultValid(KEY_TRUE);
+            return res;
         }
         if(KEY_FALSE.equals(Word))
         {
-            return KEY_FALSE;
+            res.setResultValid(KEY_FALSE);
+            return res;
         }
 
         // functions
         if((true == Word.contains("(")) && (true == Word.contains(")")))
         {
-            return evaluateFunction(Word);
+            return evaluateFunction(Word, algo, functionArguments, function);
         }
 
         //configuration Attributes
@@ -430,23 +460,26 @@ public class ConditionEvaluator extends Base
         }
         if(null != val)
         {
-            return val;
+            res.setResultValid(val);
+            return res;
         }
 
         // This happens if we try to evaluate a parameter to a function defined here (e.g: "has(bla)" )
         val = algo.getParameter(Word);
         if(null != val)
         {
-            return val;
+            res.setResultValid(val);
+            return res;
         }
         else
         {
             // we give up. Returning the word for better error messages.
-            return Word;
+            res.setResultValid(Word);
+            return res;
         }
     }
 
-    private boolean isFunctionWord(String Word)
+    private static boolean isFunctionWord(String Word)
     {
         if(KEY_AND.equals(Word))
         {
@@ -491,17 +524,27 @@ public class ConditionEvaluator extends Base
         return false;
     }
 
-    private String evaluateConditionText(String conditionText)
+    private static CondEvalResult evaluateConditionText(
+            String conditionText,
+            AlgorithmInstanceInterface algo,
+            String functionArguments,
+            Element function )
     {
         // parse condition
         String[] parts = conditionText.split("\\s"); // all whitespace splits
         if(null == parts)
         {
-            return KEY_FALSE;
+            CondEvalResult res = new CondEvalResult();
+            res.setValid(false);
+            res.addErrorLine("required parameter 'parts' is null !");
+            return res;
         }
         if(1 > parts.length)
         {
-            return KEY_FALSE;
+            CondEvalResult res = new CondEvalResult();
+            res.setValid(false);
+            res.addErrorLine("required parameter 'parts' length is 0 !");
+            return res;
         }
         // evaluate condition
         String first = null;
@@ -512,16 +555,25 @@ public class ConditionEvaluator extends Base
             {
                 if(i+1 < parts.length)
                 {
-                    first = evaluateFunction(curPart, first, parts[i+1]);
-                    i++;
+                    CondEvalResult res =  evaluateFunction(curPart, first, parts[i+1], algo, functionArguments, function);
+                    if(true == res.isValid())
+                    {
+                        first = res.getResult();
+                        i++;
+                    }
+                    else
+                    {
+                        // res is already invalid and has the error.
+                        return res;
+                    }
                 }
                 else
                 {
                     // last word missing
-                    valid = false;
-                    ctx.addError(this,
-                            "last word missing in : " + conditionText);
-                    return KEY_FALSE;
+                    CondEvalResult res = new CondEvalResult();
+                    res.setValid(false);
+                    res.addErrorLine("last word missing in : " + conditionText);
+                    return res;
                 }
             }
             else
@@ -533,69 +585,90 @@ public class ConditionEvaluator extends Base
                 else
                 {
                     // there is something wrong here
-                    valid = false;
-                    ctx.addError(this,
-                            "two non function words(" + first + ", " + curPart + ") in : " + conditionText);
-                    ctx.addError(this, "Algorithm: " + algo.toString());
-                    ctx.addError(this, algo.dumpParameter());
-                    ctx.addError(this, algo.dumpProperty());
-                    return KEY_FALSE;
+                    CondEvalResult res = new CondEvalResult();
+                    res.setValid(false);
+                    res.addErrorLine("two non function words(" + first + ", " + curPart + ") in : " + conditionText);
+                    res.addErrorLine("Algorithm: " + algo.toString());
+                    res.addErrorLine(algo.dumpParameter());
+                    res.addErrorLine(algo.dumpProperty());
+                    return res;
                 }
             }
         }
         // finish up
-        String result = evaluateWord(first);
-        return result;
+        CondEvalResult res = evaluateWord(first, algo, functionArguments, function);
+        return res;
     }
 
-    private String evaluateFunction(String function, String first, String second)
+    private static CondEvalResult evaluateFunction(
+            String func,
+            String first,
+            String second,
+            AlgorithmInstanceInterface algo,
+            String functionArguments,
+            Element function )
     {
-        int one;
-        int two;
-        String valOne = evaluateWord(first);
-        String valTwo = evaluateWord(second);
-        switch(function)
+        int one = 0;
+        int two = 0;
+        CondEvalResult res = evaluateWord(first, algo, functionArguments, function);
+        if(false == res.isValid())
+        {
+            return res;
+        }
+        String valOne = res.getResult();
+        res = evaluateWord(second, algo, functionArguments, function);
+        if(false == res.isValid())
+        {
+            return res;
+        }
+        String valTwo = res.getResult();
+        res = new CondEvalResult();
+        switch(func)
         {
         case KEY_AND:
-            if((KEY_TRUE.equals(valOne)) & (KEY_TRUE.equalsIgnoreCase(valTwo)))
+            if((KEY_TRUE.equals(valOne)) && (KEY_TRUE.equalsIgnoreCase(valTwo)))
             {
-                return KEY_TRUE;
+                res.setResultValid(KEY_TRUE);
             }
             else
             {
-                return KEY_FALSE;
+                res.setResultValid(KEY_FALSE);
             }
+            break;
 
         case KEY_OR:
-            if((KEY_TRUE.equals(valOne)) | (KEY_TRUE.equalsIgnoreCase(valTwo)))
+            if((KEY_TRUE.equals(valOne)) || (KEY_TRUE.equalsIgnoreCase(valTwo)))
             {
-                return KEY_TRUE;
+                res.setResultValid(KEY_TRUE);
             }
             else
             {
-                return KEY_FALSE;
+                res.setResultValid(KEY_FALSE);
             }
+            break;
 
         case KEY_IS_NOT_EQUAL_TO:
             if(valOne.equals(valTwo))
             {
-                return KEY_FALSE;
+                res.setResultValid(KEY_FALSE);
             }
             else
             {
-                return KEY_TRUE;
+                res.setResultValid(KEY_TRUE);
             }
+            break;
 
         case KEY_EQUALS:
             if(valOne.equals(valTwo))
             {
-                return KEY_TRUE;
+                res.setResultValid(KEY_TRUE);
             }
             else
             {
                 log.trace("equals failed: {} != {}", valOne, valTwo);
-                return KEY_FALSE;
+                res.setResultValid(KEY_FALSE);
             }
+            break;
 
         case KEY_SMALLER_THAN:
             try
@@ -604,13 +677,12 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "one invalid number : '" + valOne + "'");
-                ctx.addError(this, algo.toString());
-                ctx.addError(this, algo.dumpParameter());
-                ctx.addError(this, algo.dumpProperty());
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("one invalid number : '" + valOne + "'");
+                res.addErrorLine(algo.toString());
+                res.addErrorLine(algo.dumpParameter());
+                res.addErrorLine(algo.dumpProperty());
+                break;
             }
             try
             {
@@ -618,19 +690,18 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "invalid number : '" + valTwo + "'");
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("invalid number : '" + valTwo + "'");
             }
             if(one < two)
             {
-                return KEY_TRUE;
+                res.setResultValid(KEY_TRUE);
             }
             else
             {
-                return KEY_FALSE;
+                res.setResultValid(KEY_FALSE);
             }
+            break;
 
         case KEY_GREATER_THAN:
             try
@@ -639,10 +710,9 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "invalid number : '" + valOne + "'");
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("invalid number : '" + valOne + "'");
+                break;
             }
             try
             {
@@ -650,19 +720,19 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "invalid number : '" + valTwo + "'");
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("invalid number : '" + valTwo + "'");
+                break;
             }
             if(one > two)
             {
-                return KEY_TRUE;
+                res.setResultValid(KEY_TRUE);
             }
             else
             {
-                return KEY_FALSE;
+                res.setResultValid(KEY_FALSE);
             }
+            break;
 
 
         case KEY_MINUS:
@@ -672,13 +742,12 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "one invalid number : '" + valOne + "'");
-                ctx.addError(this, algo.toString());
-                ctx.addError(this, algo.dumpParameter());
-                ctx.addError(this, algo.dumpProperty());
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("one invalid number : '" + valOne + "'");
+                res.addErrorLine(algo.toString());
+                res.addErrorLine(algo.dumpParameter());
+                res.addErrorLine(algo.dumpProperty());
+                break;
             }
             try
             {
@@ -686,12 +755,12 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "invalid number : '" + valTwo + "'");
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("invalid number : '" + valTwo + "'");
+                break;
             }
-            return "" + (one - two);
+            res.setResultValid("" + (one - two));
+            break;
 
         case KEY_PLUS:
             try
@@ -700,13 +769,12 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "one invalid number : '" + valOne + "'");
-                ctx.addError(this, algo.toString());
-                ctx.addError(this, algo.dumpParameter());
-                ctx.addError(this, algo.dumpProperty());
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("one invalid number : '" + valOne + "'");
+                res.addErrorLine(algo.toString());
+                res.addErrorLine(algo.dumpParameter());
+                res.addErrorLine(algo.dumpProperty());
+                break;
             }
             try
             {
@@ -714,12 +782,12 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "invalid number : '" + valTwo + "'");
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("invalid number : '" + valTwo + "'");
+                break;
             }
-            return "" + (one + two);
+            res.setResultValid("" + (one + two));
+            break;
 
         case KEY_MULTIPLY:
             try
@@ -728,13 +796,12 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "one invalid number : '" + valOne + "'");
-                ctx.addError(this, algo.toString());
-                ctx.addError(this, algo.dumpParameter());
-                ctx.addError(this, algo.dumpProperty());
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("one invalid number : '" + valOne + "'");
+                res.addErrorLine(algo.toString());
+                res.addErrorLine(algo.dumpParameter());
+                res.addErrorLine(algo.dumpProperty());
+                break;
             }
             try
             {
@@ -742,12 +809,12 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "invalid number : '" + valTwo + "'");
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("invalid number : '" + valTwo + "'");
+                break;
             }
-            return "" + (one * two);
+            res.setResultValid("" + (one * two));
+            break;
 
         case KEY_DEVIDE:
             try
@@ -756,13 +823,12 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "one invalid number : '" + valOne + "'");
-                ctx.addError(this, algo.toString());
-                ctx.addError(this, algo.dumpParameter());
-                ctx.addError(this, algo.dumpProperty());
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("one invalid number : '" + valOne + "'");
+                res.addErrorLine(algo.toString());
+                res.addErrorLine(algo.dumpParameter());
+                res.addErrorLine(algo.dumpProperty());
+                break;
             }
             try
             {
@@ -770,19 +836,18 @@ public class ConditionEvaluator extends Base
             }
             catch(NumberFormatException e)
             {
-                valid = false;
-                ctx.addError(this,
-                        "invalid number : '" + valTwo + "'");
-                return KEY_FALSE;
+                res.setValid(false);
+                res.addErrorLine("invalid number : '" + valTwo + "'");
+                break;
             }
-            return "" + (one / two);
+            res.setResultValid("" + (one / two));
+            break;
 
         default:
-            valid = false;
-            ctx.addError(this,
-                    "invalid function : " + function);
-            return KEY_FALSE;
+            res.setValid(false);
+            res.addErrorLine("invalid function : " + func);
         }
+        return res;
     }
 
 }

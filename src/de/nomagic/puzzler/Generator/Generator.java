@@ -1,8 +1,6 @@
 
 package de.nomagic.puzzler.Generator;
 
-import java.util.HashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +11,6 @@ import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.FileGroup.SourceFile;
 import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 import de.nomagic.puzzler.solution.Api;
-import de.nomagic.puzzler.solution.ConditionEvaluator;
 import de.nomagic.puzzler.solution.Function;
 
 public abstract class Generator extends Base
@@ -31,13 +28,10 @@ public abstract class Generator extends Base
 
     // generated files are collected in this
     protected FileGroup codeGroup;
-    protected ConditionEvaluator condiEval;
-    protected HashMap<String, CInitCodeBlock> initcode = new HashMap<String, CInitCodeBlock>();
 
     protected Generator(Context ctx)
     {
         super(ctx);
-        condiEval = new ConditionEvaluator(ctx);
     }
 
     public abstract String getLanguageName();

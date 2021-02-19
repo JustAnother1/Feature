@@ -67,12 +67,6 @@ public class VerilogCodeGenerator extends Generator
         return "Verilog";
     }
 
-    protected String fillInFunctionCall(String functionName, AlgorithmInstanceInterface logic)
-    {
-        // this is an error
-        return null;
-    }
-
     @Override
     protected void addAllAdditionals(AlgorithmInstanceInterface algo)
     {
