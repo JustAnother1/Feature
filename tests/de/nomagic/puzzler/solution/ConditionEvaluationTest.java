@@ -36,8 +36,7 @@ public class ConditionEvaluationTest {
     public void testevaluateConditionParenthesisNull()
     {
         CondEvalResult result = ConditionEvaluator.evaluateConditionParenthesis("true", null, null, null);
-        assertEquals(true, result.isValid());
-        assertEquals("false", result.getResult());
+        assertEquals(false, result.isValid());
     }
 
     @Test
@@ -95,8 +94,7 @@ public class ConditionEvaluationTest {
         ConfiguredAlgorithmStub caStub = new ConfiguredAlgorithmStub();
         caStub.addParameter("on", "false");
         CondEvalResult result = ConditionEvaluator.evaluateConditionParenthesis("true equals param(on)", caStub, null, null);
-        assertEquals(true, result.isValid());
-        assertEquals("false", result.getResult());
+        assertEquals(false, result.isValid());
     }
 
     @Test
