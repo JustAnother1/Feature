@@ -124,7 +124,7 @@ With the APIs in place we now need some logic.
     <childElement type="run" />
   </required>
   <provides>
-    <singleTask value="numOfChilds equals 1"/>
+    <singleTask value="algorithm.numOfChilds equals 1"/>
   </provides>
   <c_code>
     <function name="main">

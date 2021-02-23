@@ -35,7 +35,7 @@ public abstract class Generator extends Base
     }
 
     public abstract String getLanguageName();
-    protected abstract void addAllAdditionals(AlgorithmInstanceInterface algo);
+    protected abstract void addAllAdditionals(Iterable<AlgorithmInstanceInterface> list);
     protected abstract SourceFile createFile(String fileName);
 
     public FileGroup generateFor(AlgorithmInstanceInterface logic)
@@ -97,7 +97,7 @@ public abstract class Generator extends Base
             sourceFile.addFunction(funcs[i]);
         }
 
-        addAllAdditionals(logic);
+        addAllAdditionals(logic.getAdditionals());
 
         codeGroup.add(sourceFile);
 

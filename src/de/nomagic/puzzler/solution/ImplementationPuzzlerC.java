@@ -1,5 +1,6 @@
 package de.nomagic.puzzler.solution;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.Generator.CCodeGenerator;
 import de.nomagic.puzzler.Generator.CFunctionCall;
 import de.nomagic.puzzler.Generator.Generator;
@@ -25,7 +25,6 @@ public class ImplementationPuzzlerC extends Base
     public static final String ALGORITHM_IF_CHILD_NAME = "if";
     public static final String ALGORITHM_FOR_CHILDS_CHILD_NAME = "forChilds";
     public static final String ALGORITHM_FOR_CHILDS_CHILD_API_ATTRIBUTE = "api";
-    public static final String ALGORITHM_FOR_CHILDS_CHILD_CALL_ATTRIBUTE = "call";
     public static final String IMPLEMENTATION_PLACEHOLDER_REGEX = "€";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
@@ -52,24 +51,36 @@ public class ImplementationPuzzlerC extends Base
         String searchedFunctionName = functionToCall.getName();
         if(null == searchedFunctionName)
         {
-            ctx.addError(this, "" + this + " : Function call to unknown function!");
+            ctx.addError(this, "" + algo + " : Function call to unknown function!");
             return null;
         }
         if(1 > searchedFunctionName.length())
         {
-            ctx.addError(this, "" + this + " : Function call to unnamed function!");
+            ctx.addError(this, "" + algo + " : Function call to unnamed function!");
             return null;
         }
 
         String api = functionToCall.getApi();
-        if( (null != api) && (false == algo.hasApi(api)) )
+        if(null != api)
         {
-            log.warn("{} : Function call to wrong API!(API: {})", this, api);
-            log.warn("valid APIs : {}",  algo.getApis());
-            log.warn("Function called: {}",  functionToCall.getName());
+            if(false == algo.hasApi(api))
+            {
+                log.warn("{} : Function call to wrong API!(API: {})", this, api);
+                log.warn("valid APIs : {}",  algo.getApis());
+                log.warn("Function called: {}",  functionToCall.getName());
+                return null;
+            }
+            else
+            {
+                // OK
+            }
+        }
+        else
+        {
+            // api == null
+            log.warn("{} : Function call to unknown API! called function was '{}'", algo, functionToCall.getName());
             return null;
         }
-        // else API unknown -> can not check
 
         if(false == ctx.wasSucessful())
         {
@@ -110,6 +121,24 @@ public class ImplementationPuzzlerC extends Base
         }
     }
 
+    private String beautifyImplementation(String impl)
+    {
+        impl = impl.trim();
+        if(0 < impl.length())
+        {
+            if(false == impl.endsWith(System.getProperty("line.separator")))
+            {
+                impl = impl + System.getProperty("line.separator");
+            }
+            return impl;
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    // this only gets the implementation parts that are active. (evaluates IF). It does not replace place holders!
     private String getImplementationFromFunctionElement(Element function, String FunctionArguments)
     {
         // some part of the Implementation might be conditional, So only select the valid parts
@@ -127,13 +156,9 @@ public class ImplementationPuzzlerC extends Base
                     Element active = ConditionEvaluator.getBest(curE, algo, FunctionArguments, function);
                     if(null != active)
                     {
-                        String impl = active.getText();
+                        String impl = beautifyImplementation(active.getText());
                         log.trace("adding the conditioned parts to the implementation : {}", impl);
                         sb.append(impl);
-                        if(false == impl.endsWith("\n"))
-                        {
-                            sb.append("\n");
-                        }
                     }
                     else
                     {
@@ -146,32 +171,16 @@ public class ImplementationPuzzlerC extends Base
                     String api = curE.getAttributeValue(ALGORITHM_FOR_CHILDS_CHILD_API_ATTRIBUTE);
                     if(null == api)
                     {
-                        ctx.addError(this, "" + this + " : for childs element with missing api attribute !)");
+                        ctx.addError(this, "" + algo + " : for childs element with missing api attribute !)");
                         return null;
                     }
                     Api theApi = Api.getFromFile(api, ctx);
                     if(null == theApi)
                     {
-                        ctx.addError(this, "" + this + " : for childs element with invalid api attribute ! (" + api + "))");
+                        ctx.addError(this, "" + algo + " : for childs element with invalid api attribute ! (" + api + "))");
                         return null;
                     }
-                    String FuncToCall = curE.getAttributeValue(ALGORITHM_FOR_CHILDS_CHILD_CALL_ATTRIBUTE);
-                    if(null == FuncToCall)
-                    {
-                        // if the API has only one function then we can call that
-                        if(1 == theApi.getNumberOfFunctions())
-                        {
-                            Function first = theApi.getFunctionIndex(0);
-                            FuncToCall = first.getName();
-                            log.trace("Element: {}",Tool.getXMLRepresentationFor(curE));
-                            log.trace("{} : No function to call specified, but API({}) has only one function, so taking that.", this, api);
-                        }
-                        else
-                        {
-                            ctx.addError(this, "" + this + " : the API (" + api + ") has more than one Function. You must specify the function to call!)");
-                            return null;
-                        }
-                    }
+                    String commonCode = curE.getText();
                     Iterator<String> it = algo.getAllChildren();
                     while(it.hasNext())
                     {
@@ -179,24 +188,19 @@ public class ImplementationPuzzlerC extends Base
                         AlgorithmInstanceInterface curChild = algo.getChild(childName);
                         if(true == curChild.hasApi(api))
                         {
-                            CFunctionCall fc = new CFunctionCall(FuncToCall);
-                            String implementation = curChild.getImplementationOf(fc);
+                            String implementation = replacePlaceHolders(commonCode, curChild);
                             if(null == implementation)
                             {
-                                String error = "Could not get an Implementation for " + FuncToCall;
+                                String error = "Could not get an Implementation for '" + commonCode + "' from " + curChild;
                                 log.error(error);
                                 ctx.addError(this, error);
                                 return null;
                             }
                             else
                             {
-                                implementation = implementation + "\n";
+                                implementation = beautifyImplementation(implementation);
                                 algo.addExtraAlgo(curChild);
                                 sb.append(implementation);
-                                if(false == implementation.endsWith("\n"))
-                                {
-                                    sb.append("\n");
-                                }
                             }
                         }
                         // else don't care for that child
@@ -204,12 +208,8 @@ public class ImplementationPuzzlerC extends Base
                 }
                 else
                 {
-                    String impl = curE.getText();
+                    String impl = beautifyImplementation(curE.getText());
                     sb.append(impl);
-                    if(false == impl.endsWith("\n"))
-                    {
-                        sb.append("\n");
-                    }
                     log.warn("Adding non conditional Element data to implementation ! text:  {} element: {}", impl, curE);
                 }
             }
@@ -217,18 +217,8 @@ public class ImplementationPuzzlerC extends Base
             {
                 // Not an element, therefore can not have if conditions,
                 // therefore we can just extract all the text.
-                String impl = curC.getValue();
-                String trimmed = impl.trim();
-                if(0 < trimmed.length())
-                {
-                    sb.append(impl);
-                    if(false == trimmed.endsWith("\n"))
-                    {
-                        sb.append("\n");
-                    }
-                    log.trace("adding non element code to implmentation: '{}' from '{}'", impl, curC);
-                }
-                // else whitespace in between tags
+                String impl = beautifyImplementation(curC.getValue());
+                sb.append(impl);
             }
         }
         return sb.toString();
@@ -288,9 +278,83 @@ public class ImplementationPuzzlerC extends Base
         }
 
         // function not found
-        ctx.addError(this, "Function call to missing function! (" + this
+        ctx.addError(this, "Function call to missing function! (" + algo
                         + ", function name : " + searchedFunctionName + " )");
         return null;
+    }
+
+    public String replacePlaceHolders(String line, AlgorithmInstanceInterface child)
+    {
+        if(null == line)
+        {
+            return "";
+        }
+        if(true == line.contains(ImplementationPuzzlerC.IMPLEMENTATION_PLACEHOLDER_REGEX))
+        {
+            StringBuilder res = new StringBuilder();
+            String[] parts = line.split(ImplementationPuzzlerC.IMPLEMENTATION_PLACEHOLDER_REGEX);
+            for(int i = 0; i < parts.length; i++)
+            {
+                if(0 == i%2)
+                {
+                    res.append(parts[i]);
+                }
+                else
+                {
+                    if(true == parts[i].endsWith(")"))
+                    {
+                        if(false == parts[i].contains("("))
+                        {
+                            ctx.addError(this,
+                                "Invalid Function Name (missing open brace?) " + parts[i] );
+                            return null;
+                        }
+                        else
+                        {
+                            // we found a reference to a function name
+                            String functionName = parts[i];
+                            String help = fillInFunctionCall(functionName, child);
+                            if(null == help)
+                            {
+                                return null;
+                            }
+                            else
+                            {
+                                res.append(help);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // might be something that puzzler itself can calculate from the Algorithm Instance.
+                        String paramValue = algo.getBuildIn(parts[i]);
+                        if(null != paramValue)
+                        {
+                            log.trace("Found {} as value for {} in build in configuration.", paramValue, parts[i]);
+                        }
+
+                        if(null == paramValue)
+                        {
+                            ctx.addError(this,
+                                "Invalid parameter requested : " + parts[i] );
+                            ctx.addError(this,"available parameters: " + algo.dumpParameter());
+                            ctx.addError(this,"available properties: " + algo.dumpProperty());
+                            return null;
+                        }
+                        else
+                        {
+                            res.append(paramValue);
+                        }
+                    }
+                }
+            }
+            return res.toString();
+        }
+        else
+        {
+            // nothing to replace
+            return line;
+        }
     }
 
     private String replacePlaceholders(String implementation,
@@ -337,6 +401,8 @@ public class ImplementationPuzzlerC extends Base
 
         if(0 == numEuros)
         {
+            // nothing to replace in the implementation
+            // -> another job well done !
             return implementation;
         }
 
@@ -358,15 +424,7 @@ public class ImplementationPuzzlerC extends Base
         }
         else
         {
-            if(true == implementation.contains(IMPLEMENTATION_PLACEHOLDER_REGEX))
-            {
-                return replacePlaceholdersInPart(implementation, FunctionParameters, functionElement);
-            }
-            else
-            {
-                // nothing to replace
-                return implementation;
-            }
+            return replacePlaceholdersInPart(implementation, FunctionParameters, functionElement);
         }
     }
 
@@ -452,7 +510,7 @@ public class ImplementationPuzzlerC extends Base
                     {
                         // we found a reference to a function name
                         String functionName = parts[i];
-                        String help = fillInFunctionCall(functionName);
+                        String help = fillInFunctionCall(functionName, null); //search for function in all children
                         if(null == help)
                         {
                             return null;
@@ -465,6 +523,7 @@ public class ImplementationPuzzlerC extends Base
                 }
                 else
                 {
+                    // check function parameters
                     String paramValue = getFunctionParameterValue(parts[i],
                                                                   functionElement,
                                                                   FunctionParameters);
@@ -476,6 +535,17 @@ public class ImplementationPuzzlerC extends Base
                         if(null != paramValue)
                         {
                             log.trace("Found {} as value for {} in algorithm configuration.", paramValue, parts[i]);
+                        }
+                    }
+
+                    // check build in
+                    if(null == paramValue)
+                    {
+                        // might be something that puzzler itself can calculate from the Algorithm Instance.
+                        paramValue = algo.getBuildIn(parts[i]);
+                        if(null != paramValue)
+                        {
+                            log.trace("Found {} as value for {} in build in configuration.", paramValue, parts[i]);
                         }
                     }
 
@@ -551,12 +621,24 @@ public class ImplementationPuzzlerC extends Base
         }
     }
 
-    private String fillInFunctionCall(String functionName)
+    // if child is not null them call the function in that child only.
+    private String fillInFunctionCall(String functionName, AlgorithmInstanceInterface child)
     {
-        log.trace("filling in the code for the function call to {} in {}", functionName, this);
-        // we now need to make sure that that function exists an can be called.
-        // we therefore need to extract the function out of the children of this algorithm
-        Iterator<String> it = algo.getAllChildren();
+        log.trace("filling in the code for the function call to {} in {}", functionName, algo);
+        Iterator<String> it;
+        if(null == child)
+        {
+            // we now need to make sure that that function exists an can be called.
+            // we therefore need to extract the function out of the children of this algorithm
+            it = algo.getAllChildren();
+        }
+        else
+        {
+            ArrayList<String> list = new ArrayList<String>();
+            list.add(child.getName());
+            it = list.iterator();
+        }
+
         StringBuilder res = new StringBuilder();
 
         CFunctionCall fc = new CFunctionCall(functionName);
@@ -595,28 +677,28 @@ public class ImplementationPuzzlerC extends Base
                 ConfiguredAlgorithm libAlgo = ConfiguredAlgorithm.getTreeFromEnvironment(libAlgoName, ctx, algo);
                 if(null == libAlgo)
                 {
-                    ctx.addError(this, "" + this + " : The Environment does not provide the needed library (" + libAlgoName + ") !");
-                    ctx.addError(this, "" + this + " : We needed to call the function " + functionName + " !");
+                    ctx.addError(this, "" + algo + " : The Environment does not provide the needed library (" + libAlgoName + ") !");
+                    ctx.addError(this, "" + algo + " : We needed to call the function " + functionName + " !");
                     return null;
                 }
+                log.trace("adding the library algorithm {}", libAlgo.getName());
+                algo.addExtraAlgo(libAlgo);
                 CFunctionCall libfc = new CFunctionCall(functionName);
                 String impl = libAlgo.getImplementationOf(libfc);
                 if(null == impl)
                 {
-                    ctx.addError(this, "" + this + " : Function call to missing (lib) function (" + functionName + ") !");
+                    ctx.addError(this, "" + algo + " : Function call to missing (lib) function (" + functionName + ") !");
                     return null;
                 }
-                algo.addExtraAlgo(libAlgo);
                 res.append(impl);
             }
             else
             {
-                ctx.addError(this, "" + this + " : Function call to missing function (" + functionName + ") !");
+                ctx.addError(this, "" + algo + " : Function call to missing function (" + functionName + ") !");
                 return null;
             }
         }
         return res.toString();
     }
-
 
 }

@@ -68,7 +68,7 @@ public class VerilogCodeGenerator extends Generator
     }
 
     @Override
-    protected void addAllAdditionals(AlgorithmInstanceInterface algo)
+    protected void addAllAdditionals(Iterable<AlgorithmInstanceInterface> list)
     {
         // nothing to do
     }

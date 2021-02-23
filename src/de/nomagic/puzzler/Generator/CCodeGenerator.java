@@ -36,10 +36,65 @@ public class CCodeGenerator extends Generator
         return "C";
     }
 
-    protected void addAllAdditionals(AlgorithmInstanceInterface algo)
+    private void addAllAdditionalsForAlgorithm(AlgorithmInstanceInterface logic, List<Element> addlist)
+    {
+        log.trace("adding addionals for algorithm {}", logic);
+        for(int i = 0; i < addlist.size(); i++)
+        {
+            Element curElement = addlist.get(i);
+            String type = curElement.getName();
+
+            switch(type)
+            {
+            case ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME:
+                String include = curElement.getText();
+                log.trace("adding include {}", include);
+                sourceFile.addLine(CFile.C_FILE_INCLUDE_SECTION_NAME, include);
+                break;
+
+            case ALGORITHM_FUNCTION_CHILD_NAME:
+                Function func = new Function(curElement);
+                log.trace("adding function {}", func.getName());
+                CFunctionCall fc = new CFunctionCall(func.getName());
+                fc.setApi(logic.getName());
+                String implementation = logic.getImplementationOf(fc);
+                if(null == implementation)
+                {
+                    String error = "Could not get an Implementation for " + func.getName();
+                    log.error(error);
+                    ctx.addError(this, error);
+                    continue;
+                }
+                else
+                {
+                    func.setImplementation(implementation);
+                }
+                sourceFile.addFunction(func);
+                break;
+
+            case ALGORITHM_ADDITIONAL_FILE_CHILD_NAME:
+                AbstractFile aFile = FileFactory.getFileFromXml(curElement);
+                codeGroup.add(aFile);
+                log.trace("adding file {}", aFile.getFileName());
+                break;
+
+            case ALGORITHM_ADDITIONAL_VARIABLE_CHILD_NAME:
+                String line = curElement.getText();
+                line = logic.replacePlaceHolders(line);
+                sourceFile.addLine(CFile.C_FILE_GLOBAL_VAR_SECTION_NAME, line);
+                log.trace("adding variable ({})", line);
+                break;
+
+            default: // ignore
+                log.warn("invalid type '{}' for algorithm '{}' !", type, logic);
+                break;
+            }
+        }
+    }
+
+    protected void addAllAdditionals(Iterable<AlgorithmInstanceInterface> list)
     {
         log.trace("starting to add addionals:");
-        Iterable<AlgorithmInstanceInterface> list = algo.getAdditionals();
         Iterator<AlgorithmInstanceInterface> it = list.iterator();
         while(it.hasNext())
         {
@@ -50,70 +105,26 @@ public class CCodeGenerator extends Generator
             {
                 ctx.addError(this,
                     "Could not read implementation from " + logic.toString());
-                continue;
             }
-            Element additional = cCode.getChild(Generator.ALGORITHM_ADDITIONAL_CHILD_NAME);
-            if(null == additional)
+            else
             {
-                log.trace("no addionals for algorithm {}", logic);
-                continue;
-            }
-            List<Element> addlist = additional.getChildren();
-            if(null == addlist)
-            {
-                log.trace("empty addionals tag for algorithm {}", logic);
-                continue;
-            }
-
-            log.trace("adding addionals for algorithm {}", logic);
-            for(int i = 0; i < addlist.size(); i++)
-            {
-                Element curElement = addlist.get(i);
-                String type = curElement.getName();
-
-                switch(type)
+                Element additional = cCode.getChild(Generator.ALGORITHM_ADDITIONAL_CHILD_NAME);
+                if(null == additional)
                 {
-                case ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME:
-                    String include = curElement.getText();
-                    log.trace("adding include {}", include);
-                    sourceFile.addLine(CFile.C_FILE_INCLUDE_SECTION_NAME, include);
-                    break;
-
-                case ALGORITHM_FUNCTION_CHILD_NAME:
-                    Function func = new Function(curElement);
-
-                    CFunctionCall fc = new CFunctionCall(func.getName());
-                    String implementation = logic.getImplementationOf(fc);
-                    if(null == implementation)
+                    log.trace("no addionals for algorithm {}", logic);
+                }
+                else
+                {
+                    List<Element> addlist = additional.getChildren();
+                    if(null == addlist)
                     {
-                        String error = "Could not get an Implementation for " + func.getName();
-                        log.error(error);
-                        ctx.addError(this, error);
-                        continue;
+                        log.trace("empty addionals tag for algorithm {}", logic);
                     }
                     else
                     {
-                        func.setImplementation(implementation);
+                        // this Algorithm has something -> add it
+                        addAllAdditionalsForAlgorithm(logic, addlist);
                     }
-
-                    sourceFile.addFunction(func);
-                    break;
-
-                case ALGORITHM_ADDITIONAL_FILE_CHILD_NAME:
-                    AbstractFile aFile = FileFactory.getFileFromXml(curElement);
-                    codeGroup.add(aFile);
-                    log.trace("adding file {}", aFile.getFileName());
-                    break;
-
-                case ALGORITHM_ADDITIONAL_VARIABLE_CHILD_NAME:
-                    String line = curElement.getText();
-                    sourceFile.addLine(CFile.C_FILE_GLOBAL_VAR_SECTION_NAME, line);
-                    log.trace("adding variable ({})", line);
-                    break;
-
-                default: // ignore
-                    log.warn("invalid type '{}' for algorithm '{}' !", type, logic);
-                    break;
                 }
             }
         }
@@ -135,4 +146,3 @@ public class CCodeGenerator extends Generator
     }
 
 }
-;

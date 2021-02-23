@@ -127,4 +127,10 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
         return null;
     }
 
+    @Override
+    public String replacePlaceHolders(String line)
+    {
+        return null;
+    }
+
 }

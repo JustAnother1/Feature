@@ -1,5 +1,6 @@
 package de.nomagic.puzzler.solution;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.jdom2.Element;
@@ -22,6 +23,7 @@ public interface AlgorithmInstanceInterface
     AlgorithmInstanceInterface getChild(String name);
     String getImplementationOf(FunctionCall fc);
     void addExtraAlgo(AlgorithmInstanceInterface algo);
-    Iterable<AlgorithmInstanceInterface> getAdditionals();
+    Collection<AlgorithmInstanceInterface> getAdditionals();
     ConfigurationHandler getCfgHandler();
+    String replacePlaceHolders(String line);
 }

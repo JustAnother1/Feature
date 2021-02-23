@@ -3,6 +3,7 @@ package de.nomagic.puzzler.FileGroup;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -59,6 +60,10 @@ public class TextFile extends AbstractFile
 
     public void writeToStream(OutputStream out) throws IOException
     {
+        if(out == null)
+        {
+            return;
+        }
         for(int sec = 0; sec < sections.size(); sec++)
         {
             String curSection = sections.get(sec);
@@ -70,34 +75,42 @@ public class TextFile extends AbstractFile
                 {
                     // last line
                     String line = curData.get(i);
-                    String lines[] = line.split("\\r?\\n");
-                    for(int j = 0; j < lines.length; j++)
+                    if(null != line)
                     {
-                        if(j == lines.length -1)
+                        String[] lines = line.split("\\r?\\n");
+                        for(int j = 0; j < lines.length; j++)
                         {
-                            if(0 < lines[j].length())
+                            if(j == lines.length -1)
                             {
-                                out.write((lines[j] + getLineSperator()).getBytes());
+                                if(0 < lines[j].length())
+                                {
+                                    out.write((lines[j] + getLineSperator()).getBytes(StandardCharsets.UTF_8));
+                                }
+                                else
+                                {
+                                    // skip empty line
+                                }
                             }
                             else
                             {
-                                // skip empty line
+                                out.write((lines[j] + getLineSperator()).getBytes(StandardCharsets.UTF_8));
                             }
                         }
-                        else
-                        {
-                            out.write((lines[j] + getLineSperator()).getBytes());
-                        }
                     }
+                    // else line is Null -> do nothing with that.
                 }
                 else
                 {
-                    out.write((curData.get(i) + getLineSperator()).getBytes());
+                    String line = curData.get(i);
+                    if(null != line)
+                    {
+                        out.write((line + getLineSperator()).getBytes(StandardCharsets.UTF_8));
+                    }
                 }
             }
             if((true == addSeperation) && (false == curData.isEmpty()))
             {
-                out.write(getLineSperator().getBytes());
+                out.write(getLineSperator().getBytes(StandardCharsets.UTF_8));
             }
         }
     }

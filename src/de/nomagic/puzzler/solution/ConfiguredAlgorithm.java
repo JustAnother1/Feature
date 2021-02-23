@@ -1,5 +1,6 @@
 package de.nomagic.puzzler.solution;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,13 +27,16 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     public static final String ALGORITHM_PROVIDES_CHILD_NAME = "provides";
     public static final String ALGORITHM_PROVIDES_PROPERTY_VALUE = "value";
 
-    public static final String BUILD_IN_NUM_OF_CHILDS = "numOfChilds";
+    public static final String BUILD_IN_NUM_OF_CHILDS = "algorithm.numOfChilds";
+    public static final String BUILD_IN_NAME = "algorithm.InstanceName";
 
     private static final Logger LOG = LoggerFactory.getLogger("ConfiguredAlgorithm");
 
     private final String name;
     private final Algorithm algorithmDefinition;
     private final ConfigurationHandler cfgHandler;
+
+    ImplementationPuzzlerC puzzler;
 
     // collects all ConfiguredAlgorithm classes used. The collected classes will
     // be asked for additional elements and those will be added to the generated code.
@@ -53,6 +57,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             cfgHandler.setParentHandler(parent.getCfgHandler());
         }
         extraAlgoList.add(this);
+        puzzler = new ImplementationPuzzlerC(ctx, this);
     }
 
     public String getName()
@@ -144,10 +149,13 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
 
     public String getBuildIn(String word)
     {
-        // numOfChilds
         if(true == BUILD_IN_NUM_OF_CHILDS.equals(word))
         {
             return "" + cfgHandler.getNumberOfAlgorithms();
+        }
+        else if(true == BUILD_IN_NAME.equals(word))
+        {
+            return "" + this.name;
         }
         return null;
     }
@@ -187,9 +195,17 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     {
         extraAlgoList.add(algo);
     }
+
     @Override
-    public Iterable<AlgorithmInstanceInterface> getAdditionals()
+    public Collection<AlgorithmInstanceInterface> getAdditionals()
     {
+        // collect Algorithms from children
+        Iterator<String> ChildNameIterator = this.getAllChildren();
+        while(ChildNameIterator.hasNext())
+        {
+            AlgorithmInstanceInterface algo = this.getChild(ChildNameIterator.next());
+            extraAlgoList.addAll(algo.getAdditionals()); // recursion!!
+        }
         return extraAlgoList;
     }
 
@@ -498,8 +514,6 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             LOG.trace("getting the C implemention of the function {} from {}",
                     functionToCall, this);
 
-            ImplementationPuzzlerC puzzler = new ImplementationPuzzlerC(ctx, this);
-
             return puzzler.getImplementationOf(functionToCall);
         }
         // new languages go here
@@ -508,6 +522,12 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
             LOG.error("unknown Function Call Class -> unsupported language!");
             return null;
         }
+    }
+
+    @Override
+    public String replacePlaceHolders(String line)
+    {
+        return puzzler.replacePlaceHolders(line, null);
     }
 
 }
