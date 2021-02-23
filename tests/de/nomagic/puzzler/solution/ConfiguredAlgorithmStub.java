@@ -1,5 +1,6 @@
 package de.nomagic.puzzler.solution;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -111,7 +112,7 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     }
 
     @Override
-    public Iterable<AlgorithmInstanceInterface> getAdditionals()
+    public Collection<AlgorithmInstanceInterface> getAdditionals()
     {
         return null;
     }
