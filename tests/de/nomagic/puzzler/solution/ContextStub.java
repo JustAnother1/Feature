@@ -13,9 +13,11 @@ public class ContextStub implements Context
 {
     private Vector<String> errors = null;
     private Solution s = null;
+    private Configuration cfg;
 
-    public ContextStub()
+    public ContextStub(Configuration cfg)
     {
+        this.cfg = cfg;
     }
 
     @Override
@@ -60,7 +62,7 @@ public class ContextStub implements Context
     @Override
     public Configuration cfg()
     {
-        return null;
+        return cfg;
     }
 
     @Override

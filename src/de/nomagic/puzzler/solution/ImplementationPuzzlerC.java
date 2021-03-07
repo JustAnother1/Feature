@@ -59,6 +59,11 @@ public class ImplementationPuzzlerC extends Base
 
     public String getImplementationOf(CFunctionCall functionToCall)
     {
+        if(null == functionToCall)
+        {
+            ctx.addError(this, "" + algo + " : Function call to null function!");
+            return null;
+        }
         String searchedFunctionName = functionToCall.getName();
         if(null == searchedFunctionName)
         {
