@@ -15,6 +15,11 @@ public class ContextStub implements Context
     private Solution s = null;
     private Configuration cfg;
 
+    public ContextStub()
+    {
+        this.cfg = null;
+    }
+
     public ContextStub(Configuration cfg)
     {
         this.cfg = cfg;

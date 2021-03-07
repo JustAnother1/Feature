@@ -29,14 +29,14 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetTreeFromNoSolution()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
     }
 
     @Test
     public void testGetTreeFromNoRoot()
     {
-        ContextStub ctx = new ContextStub();
+        ContextStub ctx = new ContextStub(null);
         Solution s = new SolutionStub();
         ctx.addSolution(s);
         assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
@@ -48,7 +48,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetTreeFromBadRoot()
     {
-        ContextStub ctx = new ContextStub();
+        ContextStub ctx = new ContextStub(null);
         SolutionStub s = new SolutionStub();
         ctx.addSolution(s);
         Element badRoot = new Element("bad");
@@ -62,7 +62,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetTreeFromNoChildren()
     {
-        ContextStub ctx = new ContextStub();
+        ContextStub ctx = new ContextStub(null);
         SolutionStub s = new SolutionStub();
         ctx.addSolution(s);
         Element badRoot = new Element(Project.SOLUTION_ELEMENT_NAME);
@@ -76,7 +76,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetTreeFromBadChildren()
     {
-        ContextStub ctx = new ContextStub();
+        ContextStub ctx = new ContextStub(null);
         SolutionStub s = new SolutionStub();
         ctx.addSolution(s);
         Element badRoot = new Element(Project.SOLUTION_ELEMENT_NAME);
@@ -92,7 +92,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetTreeFromBadAlgo()
     {
-        ContextStub ctx = new ContextStub();
+        ContextStub ctx = new ContextStub(null);
         SolutionStub s = new SolutionStub();
         ctx.addSolution(s);
         Element root = new Element(Project.SOLUTION_ELEMENT_NAME);
@@ -109,7 +109,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetTreeFromAlgo()
     {
-        ContextStub ctx = new ContextStub();
+        ContextStub ctx = new ContextStub(null);
         SolutionStub s = new SolutionStub();
         ctx.addSolution(s);
         Element root = new Element(Project.SOLUTION_ELEMENT_NAME);
@@ -137,7 +137,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testHasApiNoApi()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         Algorithm algo = new Algorithm(root, ctx);
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
@@ -148,7 +148,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testHasApiWrongApi()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         root.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "foo");
         Algorithm algo = new Algorithm(root, ctx);
@@ -160,7 +160,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testHasApiApi()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         root.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "bla");
         Algorithm algo = new Algorithm(root, ctx);
@@ -319,7 +319,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElementNoChild()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         Algorithm algo = new Algorithm(root, ctx);
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
@@ -329,7 +329,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElementNotThatChild()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -341,7 +341,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElementOneChild()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -353,7 +353,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElementTwoChildren()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         Element sibling = new Element("foo");
@@ -374,7 +374,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElementsNoChild()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         Algorithm algo = new Algorithm(root, ctx);
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
@@ -386,7 +386,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElementsNotThatChild()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -400,7 +400,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElementsOneChild()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         root.addContent(child);
@@ -414,7 +414,7 @@ public class ConfiguredAlgorithmTest
     @Test
     public void testGetAlgorithmElementsTwoChildren()
     {
-        Context ctx = new ContextStub();
+        Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         Element child = new Element("foo");
         Element sibling = new Element("foo");
