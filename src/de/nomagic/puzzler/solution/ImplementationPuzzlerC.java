@@ -213,6 +213,10 @@ public class ImplementationPuzzlerC extends Base
                     log.warn("Adding non conditional Element data to implementation ! text:  {} element: {}", impl, curE);
                 }
             }
+            else if(CType.Comment == curC.getCType())
+            {
+                // ignore comments
+            }
             else
             {
                 // Not an element, therefore can not have if conditions,
