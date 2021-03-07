@@ -39,7 +39,18 @@ public class ImplementationPuzzlerC extends Base
     {
         super(ctx);
         this.algo = algo;
-        if("true".equals(ctx.cfg().getString(Configuration.CFG_DOC_CODE_SRC)))
+        if(null == ctx)
+        {
+            log.error("Context is missing!");
+            return;
+        }
+        Configuration cfg = ctx.cfg();
+        if(null == cfg)
+        {
+            log.error("Configuration is missing!");
+            return;
+        }
+        if("true".equals(cfg.getString(Configuration.CFG_DOC_CODE_SRC)))
         {
             log.trace("Switching on documentation of source code");
             documentCodeSource = true;
