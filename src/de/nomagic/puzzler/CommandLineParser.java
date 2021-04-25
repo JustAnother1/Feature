@@ -1,9 +1,12 @@
 package de.nomagic.puzzler;
 
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.configuration.Configuration;
+import de.nomagic.puzzler.xmlrpc.DokuwikiParser;
 import de.nomagic.puzzler.xmlrpc.XmlRpcGetter;
 
 public class CommandLineParser
@@ -14,7 +17,7 @@ public class CommandLineParser
     private boolean foundLibDirectory = false;
     private String[] args = null;
     int idx = 0;
-    int num_args = 0;
+    int numArgs = 0;
 
     public CommandLineParser()
     {
@@ -29,7 +32,7 @@ public class CommandLineParser
 
     private void printHelp()
     {
-        System.out.println("Feature Puzzler [Parameters] [Project File]");
+        System.out.println("Feature Puzzler [Parameters] <Project File>");
         System.out.println("Parameters:");
         System.out.println("-D<SettingName>=<Value>    : Set a value to a configuration variable.");
         System.out.println("--list_conf_variables      : list all currently supported configuration variables.");
@@ -49,6 +52,8 @@ public class CommandLineParser
         System.out.println("-x <URL>                   : read from XML-RPC source at URL.");
         System.out.println("--dump_remote_ressource <path>");
         System.out.println("                           : print the content of the linked ressource.");
+        System.out.println("--covert_xml_to_wiki <filename>");
+        System.out.println("                           : prints the content of the xml file in Wiki syntax.");
         System.out.println("-z <filename> / --zip <filename>");
         System.out.println("                           : zip created data (ignores output folder setting).");
         System.out.println("--zip_to_stdout            : zip created data and write zip file to stdout.");
@@ -88,21 +93,43 @@ public class CommandLineParser
         {
         case "--dump_remote_ressource":
             idx++;
-            if(idx == num_args)
+            if(idx == numArgs)
             {
                 System.err.println("ERROR: missing parameter for " + args[idx-1]);
                 return false;
             }
             String ressource = args[idx];
             XmlRpcGetter xrg = new XmlRpcGetter(cfg.getString(Configuration.XML_RPC_URL));
+            xrg.setLogXmlFile(true);
             xrg.getAsDocument(ressource);
+            return false;
+
+        case "--covert_xml_to_wiki":
+            idx++;
+            if(idx == numArgs)
+            {
+                System.err.println("ERROR: missing parameter for " + args[idx-1]);
+                return false;
+            }
+            Context ctx = new ContextImpl(cfg);
+            FileGetter fg = new FileGetter(ctx);
+            Document doc = fg.getXmlFile(null, args[idx]);
+            if(null == doc)
+            {
+                System.err.println("ERROR: parsing XML file(" + args[idx] + ") failed !");
+            }
+            else
+            {
+                DokuwikiParser p = new DokuwikiParser();
+                System.out.println(p.convertXmlToWiki(doc));
+            }
             return false;
 
         case "-e":
         case "--environment_dirctory":
             // environment directory
             idx++;
-            if(idx == num_args)
+            if(idx == numArgs)
             {
                 System.err.println("ERROR: missing parameter for " + args[idx-1]);
                 return false;
@@ -123,7 +150,7 @@ public class CommandLineParser
         case "--library_directory":
             // Library directory
             idx++;
-            if(idx == num_args)
+            if(idx == numArgs)
             {
                 System.err.println("ERROR: missing parameter for " + args[idx-1]);
                 return false;
@@ -144,7 +171,7 @@ public class CommandLineParser
         case "--output_directory":
             // output directory
             idx++;
-            if(idx == num_args)
+            if(idx == numArgs)
             {
                 System.err.println("ERROR: missing parameter for " + args[idx-1]);
                 return false;
@@ -158,7 +185,7 @@ public class CommandLineParser
         case "--prj_name":
             // project name
             idx++;
-            if(idx == num_args)
+            if(idx == numArgs)
             {
                 System.err.println("ERROR: missing parameter for " + args[idx-1]);
                 return false;
@@ -170,7 +197,7 @@ public class CommandLineParser
         case "--project_directory":
             // project directory
             idx++;
-            if(idx == num_args)
+            if(idx == numArgs)
             {
                 System.err.println("ERROR: missing parameter for " + args[idx-1]);
                 return false;
@@ -185,7 +212,7 @@ public class CommandLineParser
         case "--solution_directory":
             // solution directory
             idx++;
-            if(idx == num_args)
+            if(idx == numArgs)
             {
                 System.err.println("ERROR: missing parameter for " + args[idx-1]);
                 return false;
@@ -204,7 +231,7 @@ public class CommandLineParser
         case "-x":
             cfg.setBool(Configuration.USE_XML_RPC, true);
             idx++;
-            if(idx == num_args)
+            if(idx == numArgs)
             {
                 System.err.println("ERROR: missing parameter for " + args[idx-1]);
                 return false;
@@ -219,7 +246,7 @@ public class CommandLineParser
         case "--zip":
             // zip output
             idx++;
-            if(idx == num_args)
+            if(idx == numArgs)
             {
                 System.err.println("ERROR: missing parameter for " + args[idx-1]);
                 return false;
@@ -268,9 +295,9 @@ public class CommandLineParser
     public boolean parse(String[] args)
     {
         idx = 0;
-        num_args = args.length;
+        numArgs = args.length;
         this.args = args;
-        while(idx < num_args)
+        while(idx < numArgs)
         {
             if(true == args[idx].startsWith("-"))
             {

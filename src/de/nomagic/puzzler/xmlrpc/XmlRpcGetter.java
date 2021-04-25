@@ -34,9 +34,17 @@ public class XmlRpcGetter
         }
         catch (MalformedURLException e)
         {
+            log.error("Malformed URL when trying : " + url + " !");
+            log.error("Details:");
             e.printStackTrace();
             client = null;
         }
+        logXmlFile = log.isTraceEnabled();
+    }
+
+    public void setLogXmlFile(boolean setting)
+    {
+        logXmlFile = setting;
     }
 
     public Document getAsDocument(String Source)
