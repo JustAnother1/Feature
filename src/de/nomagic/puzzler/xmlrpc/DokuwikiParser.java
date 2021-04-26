@@ -205,7 +205,7 @@ public class DokuwikiParser
                 {
                     sb.append("''end''" + System.getProperty("line.separator"));
                 }
-                sb.append("<code>" + ((CDATA)p).getText() + ">/code>" + System.getProperty("line.separator"));
+                sb.append("<code>" + ((CDATA)p).getText() + "</code>" + System.getProperty("line.separator"));
                 lastPartWasChild = false;
                 break;
 
