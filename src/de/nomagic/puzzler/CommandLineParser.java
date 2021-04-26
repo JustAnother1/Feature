@@ -1,7 +1,6 @@
 package de.nomagic.puzzler;
 
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +53,8 @@ public class CommandLineParser
         System.out.println("                           : print the content of the linked ressource.");
         System.out.println("--covert_xml_to_wiki <filename>");
         System.out.println("                           : prints the content of the xml file in Wiki syntax.");
+        System.out.println("--save_remote_ressource");
+        System.out.println("                           : stores all remote ressources needed locally.");
         System.out.println("-z <filename> / --zip <filename>");
         System.out.println("                           : zip created data (ignores output folder setting).");
         System.out.println("--zip_to_stdout            : zip created data and write zip file to stdout.");
@@ -124,6 +125,10 @@ public class CommandLineParser
                 System.out.println(p.convertXmlToWiki(doc));
             }
             return false;
+
+        case "--save_remote_ressource":
+            cfg.setBool(Configuration.CFG_LOCAL_COPY_OF_REMOTE, true);
+            break;
 
         case "-e":
         case "--environment_dirctory":

@@ -3,6 +3,7 @@ package de.nomagic.puzzler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -11,6 +12,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,6 +176,25 @@ public final class FileGetter
             {
                 // we could try to read it from the wiki
                 jdomDocument = xrg.getAsDocument(xmlSource);
+                if((null != jdomDocument) && (true == (ctx.cfg()).getBool(Configuration.CFG_LOCAL_COPY_OF_REMOTE)))
+                {
+                    // store the retrieved Resource into a local file, so that next time we do not need to fetch the file.
+
+                    String onlyPath = xmlSource.substring(0, xmlSource.lastIndexOf(File.separator));
+                    File pathFile = new File(onlyPath);
+                    pathFile.mkdirs();
+
+                    try(FileWriter fw = new FileWriter(xf))
+                    {
+                        XMLOutputter outputter = new XMLOutputter();
+                        outputter.setFormat(Format.getPrettyFormat());
+                        outputter.output(jdomDocument, fw);
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
         return jdomDocument;
