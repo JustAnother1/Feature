@@ -357,6 +357,7 @@ public class ImplementationPuzzlerC extends Base
                         {
                             ctx.addError(this,
                                 "Invalid parameter requested : " + parts[i] );
+                            ctx.addError(this,"request was: " + line);
                             ctx.addError(this,"available parameters: " + algo.dumpParameter());
                             ctx.addError(this,"available properties: " + algo.dumpProperty());
                             return null;
@@ -573,6 +574,7 @@ public class ImplementationPuzzlerC extends Base
                     {
                         ctx.addError(this,
                             "Invalid parameter requested : " + parts[i] );
+                        ctx.addError(this,"request was: " + implementation);
                         ctx.addError(this,"available parameters: " + algo.dumpParameter());
                         ctx.addError(this,"available properties: " + algo.dumpProperty());
                         return null;
@@ -613,7 +615,7 @@ public class ImplementationPuzzlerC extends Base
             Attribute attr = functionElement.getAttribute("param" + paramIndex + "_name");
             if(null == attr)
             {
-                log.trace("Function parameter {} not found !(Algorithm configuration?)", ParameterName);
+                log.trace("Function parameter '{}' not found !(Algorithm configuration?)", ParameterName);
                 return null;
             }
             if(true == ParameterName.equals(attr.getValue()))
