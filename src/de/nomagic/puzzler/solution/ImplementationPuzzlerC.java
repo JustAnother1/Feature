@@ -81,7 +81,7 @@ public class ImplementationPuzzlerC extends Base
         {
             if(false == algo.hasApi(api))
             {
-                log.warn("{} : Function call to wrong API!(API: {})", this, api);
+                log.warn("Function call to wrong API!(API: {})", api);
                 log.warn("valid APIs : {}",  algo.getApis());
                 log.warn("Function called: {}",  functionToCall.getName());
                 return null;
@@ -346,11 +346,23 @@ public class ImplementationPuzzlerC extends Base
                     }
                     else
                     {
-                        // might be something that puzzler itself can calculate from the Algorithm Instance.
-                        String paramValue = algo.getBuildIn(parts[i]);
+
+                        // Not a parameter passed in the function call,
+                        // but a parameter in the algorithm configuration?
+                        String paramValue = algo.getParameter(parts[i]);
                         if(null != paramValue)
                         {
-                            log.trace("Found {} as value for {} in build in configuration.", paramValue, parts[i]);
+                            log.trace("Found {} as value for {} in algorithm configuration.", paramValue, parts[i]);
+                        }
+
+                        // might be something that puzzler itself can calculate from the Algorithm Instance.
+                        if(null == paramValue)
+                        {
+                            paramValue = algo.getBuildIn(parts[i]);
+                            if(null != paramValue)
+                            {
+                                log.trace("Found {} as value for {} in build in configuration.", paramValue, parts[i]);
+                            }
                         }
 
                         if(null == paramValue)
