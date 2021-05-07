@@ -26,3 +26,5 @@ hs_err_pid*
 /deploy.sh
 /wiki/
 /todo.txt
+/target/
+/wiki
