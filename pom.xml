@@ -117,7 +117,7 @@
           </execution>
         </executions>
         </plugin>
-
+<!--
         <plugin>
           <groupId>pl.project13.maven</groupId>
           <artifactId>git-commit-id-plugin</artifactId>
@@ -132,11 +132,10 @@
             </execution>
           </executions>
           <configuration>
-            <!-- everything else is default -->
             <generateGitPropertiesFile>false</generateGitPropertiesFile>
           </configuration>
         </plugin>
-
+-->
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.1.0</version>
@@ -219,7 +218,7 @@
             <executions>
               <execution>
                 <id>make-assembly</id>
-                <phase>package</phase> 
+                <phase>package</phase>
                 <goals>
                     <goal>single</goal>
                 </goals>
