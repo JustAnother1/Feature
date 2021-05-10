@@ -55,7 +55,10 @@ public class ProgressReport
                 report = "ERROR(" + ref.getClass().getName() + ") : " + msg;
             }
             reports.add(report);
-            System.err.println(report);
+            if(null != System.err)
+            {
+                System.err.println(report);
+            }
         }
     }
 
