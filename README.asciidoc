@@ -13,11 +13,7 @@ Feature tries to split the different parts of a software solution up into very s
 To explain the process further an link:res/doc/example.asciidoc[example] is provided.
 
 
-image::https://github.com/JustAnother1/Feature/workflows/Java build/badge.svg[build state]
-
 image::https://github.com/JustAnother1/Feature/workflows/Java unit test/badge.svg[unit test state]
-
-image::https://github.com/JustAnother1/Feature/workflows/run%20%22runTests.sh%22/badge.svg[run tests state]
 
 
 == Libre projects
