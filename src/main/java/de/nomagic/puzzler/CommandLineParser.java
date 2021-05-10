@@ -185,6 +185,7 @@ public class CommandLineParser
             {
                 return false;
             }
+            foundOutputDirectory = true;
             break;
 
         case "--prj_name":
