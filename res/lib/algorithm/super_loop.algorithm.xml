@@ -6,7 +6,7 @@
   <childElement type="initialize" />
   <c_code>
     <function name="main">
-     <forChilds api="initialize"> <![CDATA[  €initialize:initlize()€]]> </forChilds>
+     <forChilds api="initialize"> <![CDATA[  €initialize:initialize()€]]> </forChilds>
          <![CDATA[  for(;;) {]]>
      <forChilds api="run">
          <![CDATA[    €run:execute()€]]>
