@@ -27,3 +27,6 @@ hs_err_pid*
 /wiki/
 /todo.txt
 /wiki
+/target/
+/wiki
+/dependency-reduced-pom.xml

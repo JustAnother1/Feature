@@ -56,7 +56,7 @@ public class CCodeGenerator extends Generator
                 Function func = new Function(curElement);
                 log.trace("adding function {}", func.getName());
                 CFunctionCall fc = new CFunctionCall(func.getName());
-                fc.setApi(logic.getName());
+                fc.setApi(logic.getName()); // TODO
                 String implementation = logic.getImplementationOf(fc);
                 if(null == implementation)
                 {

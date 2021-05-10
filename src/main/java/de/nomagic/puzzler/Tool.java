@@ -225,6 +225,31 @@ public final class Tool
     {
         try
         {
+            final InputStream s = Tool.class.getResourceAsStream("/git.properties");
+            final BufferedReader in = new BufferedReader(new InputStreamReader(s));
+
+            String id = "";
+
+            String line = in.readLine();
+            while(null != line)
+            {
+                if(line.startsWith("git.commit.id.full"))
+                {
+                    id = line.substring(line.indexOf('=') + 1);
+                }
+                line = in.readLine();
+            }
+            in.close();
+            s.close();
+            return id;
+        }
+        catch( Exception e )
+        {
+            return e.toString();
+        }
+        /*
+        try
+        {
             final InputStream s = Tool.class.getResourceAsStream("/commit-id");
             final BufferedReader in = new BufferedReader(new InputStreamReader(s));
             final String commitId = in.readLine();
@@ -251,5 +276,6 @@ public final class Tool
         {
             return e.toString();
         }
+        */
     }
 }
