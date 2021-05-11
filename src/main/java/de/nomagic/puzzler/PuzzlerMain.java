@@ -297,8 +297,10 @@ public class PuzzlerMain
         }
         else if(true == ctx.cfg().getBool(Configuration.ZIP_OUTPUT))
         {
-            if(false ==allFiles.saveToZip(ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG),
-                                          ctx.cfg().getString(Configuration.PROJECT_FILE_CFG)))
+            String file = ctx.cfg().getString(Configuration.OUTPUT_PATH_CFG);
+            String folder = ctx.cfg().getString(Configuration.PROJECT_FILE_CFG);
+            log.trace("creating zip file: {}/{}", folder, file);
+            if(false ==allFiles.saveToZip(file, folder))
             {
                 log.error("Failed to create the zip file!");
                 return false;

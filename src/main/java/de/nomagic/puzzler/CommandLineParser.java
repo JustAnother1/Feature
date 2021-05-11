@@ -257,10 +257,12 @@ public class CommandLineParser
                 System.err.println("ERROR: missing parameter for " + args[idx-1]);
                 return false;
             }
-            if(false == cmdln_handleDirectory(args[idx], Configuration.ZIP_OUTPUT))
+            if(false == cmdln_handleDirectory(args[idx], Configuration.OUTPUT_PATH_CFG))
             {
                 return false;
             }
+            cfg.setBool(Configuration.ZIP_OUTPUT, true);
+            foundOutputDirectory = true;
             break;
 
         case "--zip_to_stdout":
