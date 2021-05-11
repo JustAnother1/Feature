@@ -45,4 +45,20 @@ public class ProgressReportTest
         dut.addError(dut, "Boom!");
     }
 
+    @Test
+    public void test_getAllReports_empty()
+    {
+        ProgressReport dut = new ProgressReport();
+        String res = dut.getAllReports();
+        assertEquals("", res);
+    }
+
+    @Test
+    public void test_getAllReports()
+    {
+        ProgressReport dut = new ProgressReport();
+        dut.addError("bomb", "Boom!");
+        String res = dut.getAllReports();
+        assertEquals("ERROR(bomb) : Boom!\n", res);
+    }
 }

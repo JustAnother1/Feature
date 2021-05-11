@@ -56,4 +56,32 @@ public class ConfigurationTest
         assertEquals("456", arr[1]);
     }
 
+    @Test
+    public void testGetBool()
+    {
+        Configuration cfg = new Configuration();
+        assertNotNull(cfg);
+        cfg.setBool("bla", true);
+        boolean res = cfg.getBool("bla");
+        assertTrue(res);
+    }
+
+    @Test
+    public void testGetMissingBool()
+    {
+        Configuration cfg = new Configuration();
+        assertNotNull(cfg);
+        cfg.setBool("bla", true);
+        boolean res = cfg.getBool("blubb");
+        assertFalse(res);
+    }
+
+    @Test
+    public void testListAllConfigurationVariables()
+    {
+        String res = Configuration.listAllConfigurationVariables();
+        assertEquals("document_code_source=true      : define in comments which algorithm cretaed the source code lines\n"
+                   + "embeetle_project=true          : create a Embetle IDE(https://embeetle.com/) project\n"
+                   , res);
+    }
 }

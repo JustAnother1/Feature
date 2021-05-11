@@ -85,4 +85,14 @@ public class TargetTest
         dut.setPhony(true);
         assertTrue(dut.isPhony());
     }
+
+    @Test
+    public void testSetDefault()
+    {
+        Element xml = new Element("bla");
+        Target dut = new Target(xml);
+        assertFalse(dut.isDefault());
+        dut.setDefault();
+        assertTrue(dut.isDefault());
+    }
 }

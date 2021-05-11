@@ -4,10 +4,10 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.nomagic.puzzler.ContextStub;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithmStub;
-import de.nomagic.puzzler.solution.ContextStub;
 
 public class CCodeGeneratorTest
 {

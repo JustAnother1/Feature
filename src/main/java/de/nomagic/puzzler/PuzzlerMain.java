@@ -35,6 +35,7 @@ import org.jdom2.Element;
 import de.nomagic.puzzler.BuildSystem.BuildSystemApi;
 import de.nomagic.puzzler.BuildSystem.BuildSystemFactory;
 import de.nomagic.puzzler.Environment.Environment;
+import de.nomagic.puzzler.Environment.EnvironmentImpl;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.Generator.CodeGeneratorFactory;
 import de.nomagic.puzzler.Generator.Generator;
@@ -193,7 +194,7 @@ public class PuzzlerMain
 
     private Environment openEnvironment(Context ctx, Element envElement)
     {
-        Environment e = new Environment(ctx);
+        Environment e = new EnvironmentImpl(ctx);
         Element envEleemnt = ctx.loadElementFrom(envElement,
                 ctx.cfg().getString(Configuration.ENVIRONMENT_PATH_CFG),
                 Environment.ROOT_ELEMENT_NAME);

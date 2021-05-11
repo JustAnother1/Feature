@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import de.nomagic.puzzler.ContextImpl;
 import de.nomagic.puzzler.Environment.Environment;
+import de.nomagic.puzzler.Environment.EnvironmentStub;
 import de.nomagic.puzzler.FileGroup.CFile;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
@@ -47,7 +48,7 @@ public class MakeBuildSystemTest
         FileGroup files = new FileGroup();
         assertNull("Created Solution without Files", dut.createBuildFor(files));
     }
-    
+
     @Test
     public void testCreateBuildForMain()
     {
@@ -56,7 +57,7 @@ public class MakeBuildSystemTest
         files.add(main);
         assertNull(dut.createBuildFor(files));
     }
-    
+
     @Test
     public void testCreateBuildForProjectName()
     {
@@ -74,12 +75,12 @@ public class MakeBuildSystemTest
         CFile main = new CFile("main.c");
         files.add(main);
         cfg.setString("projectName", "bla");
-        Environment e = new Environment(ctx);
+        Environment e = new EnvironmentStub();
         ctx.addEnvironment(e);
         assertNull(dut.createBuildFor(files));
     }
-    
-    
+
+
     @Test
     public void testHasTargetForEmptySystem()
     {

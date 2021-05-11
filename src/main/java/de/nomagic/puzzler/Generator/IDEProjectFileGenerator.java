@@ -482,7 +482,7 @@ public class IDEProjectFileGenerator
 
     public static FileGroup generateFileInto(Context ctx, FileGroup files)
     {
-        if(null == files)
+        if((null == files) || (null == ctx))
         {
             return null;
         }

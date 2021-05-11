@@ -61,11 +61,11 @@ public class DokuwikiParser
         {
             return "No Document!";
         }
-        Element e = xml.getRootElement();
-        if(null == e)
+        if(false == xml.hasRootElement())
         {
             return "No root element!";
         }
+        Element e = xml.getRootElement();
         return getWikiSyntaxFor(e, 0);
     }
 

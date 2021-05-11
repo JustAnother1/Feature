@@ -1,19 +1,19 @@
-package de.nomagic.puzzler.solution;
+package de.nomagic.puzzler;
 
 import java.util.Vector;
 
 import org.jdom2.Element;
 
-import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.FileGetter;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.configuration.Configuration;
+import de.nomagic.puzzler.solution.Solution;
 
 public class ContextStub implements Context
 {
     private Vector<String> errors = null;
     private Solution s = null;
     private Configuration cfg;
+    private Environment e = null;
 
     public ContextStub()
     {
@@ -73,12 +73,13 @@ public class ContextStub implements Context
     @Override
     public Environment getEnvironment()
     {
-        return null;
+        return e;
     }
 
     @Override
     public void addEnvironment(Environment e)
     {
+        this.e = e;
     }
 
     @Override

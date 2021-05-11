@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.nomagic.puzzler.ContextStub;
 import de.nomagic.puzzler.configuration.Configuration;
 
 public class ImplementationPuzzlerCTest {

@@ -11,16 +11,16 @@ import org.jdom2.Element;
 import de.nomagic.puzzler.ContextImpl;
 import de.nomagic.puzzler.configuration.Configuration;
 
-public class EnvironmentTest
+public class EnvironmentImplTest
 {
     Configuration cfg = new Configuration();
     ContextImpl ctx = new ContextImpl(cfg);
     Environment dut;
-    
+
     @Before
     public void setUp()
     {
-        dut = new Environment(ctx);
+        dut = new EnvironmentImpl(ctx);
     }
 
     @After
@@ -33,13 +33,13 @@ public class EnvironmentTest
     {
         assertNotNull(dut);
     }
-    
+
     @Test
     public void testloadFromNull()
     {
         assertFalse(dut.loadFromElement(null));
     }
-    
+
     @Test
     public void testloadFromEmptyElement()
     {

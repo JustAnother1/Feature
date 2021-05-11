@@ -24,6 +24,10 @@ public class BuildSystemFactory
         }
 
         Environment e = ctx.getEnvironment();
+        if(null == e)
+        {
+            return null;
+        }
         String BuldSystemType = e.getBuldSystemType();
         log.trace("Build System from environment : {}", BuldSystemType);
 

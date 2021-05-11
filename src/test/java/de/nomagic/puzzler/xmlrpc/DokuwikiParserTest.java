@@ -3,6 +3,7 @@ package de.nomagic.puzzler.xmlrpc;
 import static org.junit.Assert.*;
 
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.junit.Before;
@@ -183,6 +184,31 @@ public class DokuwikiParserTest {
                 + "    <user_led algorithm=\"gpio\" port=\"D\" pin=\"12\" />\r\n"
                 + "  </resources>\r\n"
                 + "</environment>\r\n", getXml(res));
+    }
+
+    @Test
+    public void test_convertXmlToWiki_null()
+    {
+        String res = dut.convertXmlToWiki(null);
+        assertEquals("No Document!", res);
+    }
+
+    @Test
+    public void test_convertXmlToWiki_no_rootl()
+    {
+        Document doc = new Document();
+        String res = dut.convertXmlToWiki(doc);
+        assertEquals("No root element!", res);
+    }
+
+    @Test
+    public void test_convertXmlToWikil()
+    {
+        Document doc = new Document();
+        Element root = new Element("environment");
+        doc.setRootElement(root);
+        String res = dut.convertXmlToWiki(doc);
+        assertEquals("====== environment ======" +  System.getProperty("line.separator"), res);
     }
 
 }

@@ -9,6 +9,7 @@ import org.jdom2.Element;
 import org.junit.Test;
 
 import de.nomagic.puzzler.Context;
+import de.nomagic.puzzler.ContextStub;
 import de.nomagic.puzzler.Project;
 
 public class ConfiguredAlgorithmTest
