@@ -16,6 +16,7 @@ import de.nomagic.puzzler.FileGroup.FileFactory;
 import de.nomagic.puzzler.FileGroup.SourceFile;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
+import de.nomagic.puzzler.solution.Api;
 import de.nomagic.puzzler.solution.Function;
 
 public class CCodeGenerator extends Generator
@@ -23,6 +24,8 @@ public class CCodeGenerator extends Generator
     public static final String ALGORITHM_C_CODE_CHILD_NAME = "c_code";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
+
+    private SourceFile sourceFile;
 
     public CCodeGenerator(Context ctx)
     {
@@ -92,7 +95,7 @@ public class CCodeGenerator extends Generator
         }
     }
 
-    protected void addAllAdditionals(Iterable<AlgorithmInstanceInterface> list)
+    private void addAllAdditionals(Iterable<AlgorithmInstanceInterface> list)
     {
         log.trace("starting to add addionals:");
         Iterator<AlgorithmInstanceInterface> it = list.iterator();
@@ -143,6 +146,42 @@ public class CCodeGenerator extends Generator
                                      "  created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
                                      "*/"});
         return aFile;
+    }
+
+    @Override
+    protected boolean generateSourceCodeFor(Api api, AlgorithmInstanceInterface logic)
+    {
+        sourceFile = createFile(ROOT_FILE_NAME);
+
+        // ... now we can add the code to sourceFile
+
+        log.trace("getting implementation of the {} from {}", api, logic);
+        Function[] funcs = api.getRequiredFunctions();
+        for(int i = 0; i < funcs.length; i++)
+        {
+            CFunctionCall fc = new CFunctionCall(funcs[i].getName());
+            fc.setApi(api.toString());
+            String implementation = logic.getImplementationOf(fc);
+            if(null == implementation)
+            {
+                String error = "Could not get an Implementation for " + funcs[i].getName();
+                log.error(error);
+                ctx.addError(this, error);
+                return false;
+            }
+            else
+            {
+                funcs[i].setImplementation(implementation);
+            }
+
+            sourceFile.addFunction(funcs[i]);
+        }
+
+        addAllAdditionals(logic.getAdditionals());
+
+        codeGroup.add(sourceFile);
+
+        return true;
     }
 
 }

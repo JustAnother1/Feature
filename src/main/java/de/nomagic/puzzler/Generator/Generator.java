@@ -8,10 +8,8 @@ import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Environment.Environment;
 import de.nomagic.puzzler.FileGroup.FileGroup;
-import de.nomagic.puzzler.FileGroup.SourceFile;
 import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 import de.nomagic.puzzler.solution.Api;
-import de.nomagic.puzzler.solution.Function;
 
 public abstract class Generator extends Base
 {
@@ -23,8 +21,7 @@ public abstract class Generator extends Base
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
-    protected String ROOT_FILE_NAME = "not_set.txt";
-    protected SourceFile sourceFile;
+    protected String ROOT_FILE_NAME = "not_set.txt";  // should be initialized by implementing classes to something that makes sense.
 
     // generated files are collected in this
     protected FileGroup codeGroup;
@@ -35,18 +32,9 @@ public abstract class Generator extends Base
     }
 
     public abstract String getLanguageName();
-    protected abstract void addAllAdditionals(Iterable<AlgorithmInstanceInterface> list);
-    protected abstract SourceFile createFile(String fileName);
 
-    public FileGroup generateFor(AlgorithmInstanceInterface logic)
+    private Api checkRootApi(AlgorithmInstanceInterface logic)
     {
-        if(null == logic)
-        {
-            ctx.addError(this, "root algorithm instance is null! -> Failed to build the algorithm tree !");
-            return null;
-        }
-
-        codeGroup = new FileGroup();
         Environment e = ctx.getEnvironment();
         if(null == e)
         {
@@ -68,38 +56,34 @@ public abstract class Generator extends Base
             ctx.addError(this, "" + logic + " : Root element of the solution is not an " + rootApi + " !");
             return null;
         }
+        return api;
+    }
 
-        log.trace("starting to generate the C implementation for {}", logic);
+    protected abstract boolean generateSourceCodeFor(Api api, AlgorithmInstanceInterface logic);
 
-        sourceFile = createFile(ROOT_FILE_NAME);
-
-        // ... now we can add the code to sourceFile
-
-        log.trace("getting implementation of the {} from {}", api, logic);
-        Function[] funcs = api.getRequiredFunctions();
-        for(int i = 0; i < funcs.length; i++)
+    public FileGroup generateFor(AlgorithmInstanceInterface logic)
+    {
+        if(null == logic)
         {
-            CFunctionCall fc = new CFunctionCall(funcs[i].getName());
-            fc.setApi(api.toString());
-            String implementation = logic.getImplementationOf(fc);
-            if(null == implementation)
-            {
-                String error = "Could not get an Implementation for " + funcs[i].getName();
-                log.error(error);
-                ctx.addError(this, error);
-                return null;
-            }
-            else
-            {
-                funcs[i].setImplementation(implementation);
-            }
-
-            sourceFile.addFunction(funcs[i]);
+            ctx.addError(this, "root algorithm instance is null! -> Failed to build the algorithm tree !");
+            return null;
         }
 
-        addAllAdditionals(logic.getAdditionals());
+        codeGroup = new FileGroup();
 
-        codeGroup.add(sourceFile);
+        Api api = checkRootApi(logic);
+        if(null == api)
+        {
+            return null;
+        }
+        // else OK
+
+        log.trace("starting to generate the {} implementation for {}", getLanguageName(), logic);
+
+        if(false == generateSourceCodeFor(api, logic))
+        {
+            return null;
+        }
 
         if(false == ctx.wasSucessful())
         {

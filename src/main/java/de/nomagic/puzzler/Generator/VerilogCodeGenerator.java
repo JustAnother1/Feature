@@ -14,14 +14,17 @@ import de.nomagic.puzzler.FileGroup.SourceFile;
 import de.nomagic.puzzler.FileGroup.VerilogFile;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
+import de.nomagic.puzzler.solution.Api;
+import de.nomagic.puzzler.solution.Function;
 
 public class VerilogCodeGenerator extends Generator
 {
-    public final static String ALGORITHM_VERILOG_CODE_CHILD_NAME = "verilog_code";
-
-    public final static String CFG_DOC_CODE_SRC = "document_code_source";
+    public static final String ALGORITHM_VERILOG_CODE_CHILD_NAME = "verilog_code";
+    public static final String CFG_DOC_CODE_SRC = "document_code_source";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
+
+    private SourceFile sourceFile;
 
     public VerilogCodeGenerator(Context ctx)
     {
@@ -41,7 +44,7 @@ public class VerilogCodeGenerator extends Generator
         }
 
         log.trace("starting to generate the verilog implementation for {}", logic);
-        // we will need at least one *.c file. So create that now.
+        // we will need at least one *.v file. So create that now.
         SourceFile sourceFile = createFile("top.v");
 
         Element res = logic.getAlgorithmElement(VerilogCodeGenerator.ALGORITHM_VERILOG_CODE_CHILD_NAME);
@@ -67,14 +70,7 @@ public class VerilogCodeGenerator extends Generator
         return "Verilog";
     }
 
-    @Override
-    protected void addAllAdditionals(Iterable<AlgorithmInstanceInterface> list)
-    {
-        // nothing to do
-    }
-
-    @Override
-    protected SourceFile createFile(String fileName)
+    private SourceFile createFile(String fileName)
     {
         VerilogFile aFile = new VerilogFile(fileName);
 
@@ -85,6 +81,39 @@ public class VerilogCodeGenerator extends Generator
                                      "//created from " + ctx.cfg().getString(Configuration.SOLUTION_FILE_CFG),
                                      });
         return aFile;
+    }
+
+    @Override
+    protected boolean generateSourceCodeFor(Api api, AlgorithmInstanceInterface logic)
+    {
+        sourceFile = createFile(ROOT_FILE_NAME);
+
+        // ... now we can add the code to sourceFile
+
+        log.trace("getting implementation of the {} from {}", api, logic);
+        Function[] funcs = api.getRequiredFunctions();
+        for(int i = 0; i < funcs.length; i++)
+        {
+            CFunctionCall fc = new CFunctionCall(funcs[i].getName());  // TODO
+            fc.setApi(api.toString());
+            String implementation = logic.getImplementationOf(fc);
+            if(null == implementation)
+            {
+                String error = "Could not get an Implementation for " + funcs[i].getName();
+                log.error(error);
+                ctx.addError(this, error);
+                return false;
+            }
+            else
+            {
+                funcs[i].setImplementation(implementation);
+            }
+
+            sourceFile.addFunction(funcs[i]);
+        }
+        codeGroup.add(sourceFile);
+
+        return true;
     }
 
 }
