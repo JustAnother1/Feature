@@ -7,11 +7,11 @@ import de.nomagic.puzzler.FileGroup.CppFile;
 import de.nomagic.puzzler.FileGroup.SourceFile;
 import de.nomagic.puzzler.configuration.Configuration;
 
-public class CppCodeGenerator extends CCodeGenerator
+public class Cpp_CodeGenerator extends C_CodeGenerator
 {
     public static final String ALGORITHM_CPP_CODE_CHILD_NAME = "cpp_code";
 
-    public CppCodeGenerator(Context ctx)
+    public Cpp_CodeGenerator(Context ctx)
     {
         super(ctx);
     }

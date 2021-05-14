@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Project;
-import de.nomagic.puzzler.Generator.CFunctionCall;
+import de.nomagic.puzzler.Generator.C_FunctionCall;
 import de.nomagic.puzzler.Generator.FunctionCall;
 
 public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface
@@ -508,9 +508,10 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     @Override
     public String getImplementationOf(FunctionCall fc)
     {
-        if(fc instanceof CFunctionCall)
+        // TODO
+        if(fc instanceof C_FunctionCall)
         {
-            CFunctionCall functionToCall = (CFunctionCall)fc;
+            C_FunctionCall functionToCall = (C_FunctionCall)fc;
             LOG.trace("getting the C implemention of the function {} from {}",
                     functionToCall, this);
 

@@ -19,7 +19,7 @@ import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 import de.nomagic.puzzler.solution.Api;
 import de.nomagic.puzzler.solution.Function;
 
-public class CCodeGenerator extends Generator
+public class C_CodeGenerator extends Generator
 {
     public static final String ALGORITHM_C_CODE_CHILD_NAME = "c_code";
 
@@ -27,7 +27,7 @@ public class CCodeGenerator extends Generator
 
     private SourceFile sourceFile;
 
-    public CCodeGenerator(Context ctx)
+    public C_CodeGenerator(Context ctx)
     {
         super(ctx);
         ROOT_FILE_NAME = "main.c";
@@ -58,7 +58,7 @@ public class CCodeGenerator extends Generator
             case ALGORITHM_FUNCTION_CHILD_NAME:
                 Function func = new Function(curElement);
                 log.trace("adding function {}", func.getName());
-                CFunctionCall fc = new CFunctionCall(func.getName());
+                C_FunctionCall fc = new C_FunctionCall(func.getName());
                 fc.setApi(logic.getName()); // TODO
                 String implementation = logic.getImplementationOf(fc);
                 if(null == implementation)
@@ -159,7 +159,7 @@ public class CCodeGenerator extends Generator
         Function[] funcs = api.getRequiredFunctions();
         for(int i = 0; i < funcs.length; i++)
         {
-            CFunctionCall fc = new CFunctionCall(funcs[i].getName());
+            C_FunctionCall fc = new C_FunctionCall(funcs[i].getName());
             fc.setApi(api.toString());
             String implementation = logic.getImplementationOf(fc);
             if(null == implementation)

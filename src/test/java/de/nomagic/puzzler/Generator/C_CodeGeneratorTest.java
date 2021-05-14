@@ -9,20 +9,20 @@ import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithmStub;
 
-public class CCodeGeneratorTest
+public class C_CodeGeneratorTest
 {
 
     @Test
     public void testCCodeGenerator()
     {
-        CCodeGenerator gen = new CCodeGenerator(null);
+        C_CodeGenerator gen = new C_CodeGenerator(null);
         assertNotNull(gen);
     }
 
     @Test
     public void testLanguageName()
     {
-        CCodeGenerator gen = new CCodeGenerator(null);
+        C_CodeGenerator gen = new C_CodeGenerator(null);
         assertEquals("C", gen.getLanguageName());
     }
 
@@ -30,7 +30,7 @@ public class CCodeGeneratorTest
     public void testGenerateForNull()
     {
         ContextStub ctx = new ContextStub(null);
-        CCodeGenerator gen = new CCodeGenerator(ctx);
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(null);
         assertNull(fg);
@@ -41,7 +41,7 @@ public class CCodeGeneratorTest
     {
         ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
         ContextStub ctx = new ContextStub(null);
-        CCodeGenerator gen = new CCodeGenerator(ctx);
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(cas);
         assertNull(fg);

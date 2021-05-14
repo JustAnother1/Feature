@@ -32,7 +32,7 @@ public class CodeGeneratorFactory
 
         Element res = null;
         // check for C Code
-        res = algoTree.getAlgorithmElement(CCodeGenerator.ALGORITHM_C_CODE_CHILD_NAME);
+        res = algoTree.getAlgorithmElement(C_CodeGenerator.ALGORITHM_C_CODE_CHILD_NAME);
         if(null == res)
         {
             log.trace("Is not a valid C-Code tree");
@@ -40,11 +40,11 @@ public class CodeGeneratorFactory
         else
         {
             log.trace("tree has C-Code");
-            resVec.add(new CCodeGenerator(ctx));
+            resVec.add(new C_CodeGenerator(ctx));
         }
 
         // check for C++ Code
-        res = algoTree.getAlgorithmElement(CppCodeGenerator.ALGORITHM_CPP_CODE_CHILD_NAME);
+        res = algoTree.getAlgorithmElement(Cpp_CodeGenerator.ALGORITHM_CPP_CODE_CHILD_NAME);
         if(null == res)
         {
             log.trace("Is not a valid C++-Code tree");
@@ -52,11 +52,11 @@ public class CodeGeneratorFactory
         else
         {
             log.trace("tree has C++-Code");
-            resVec.add(new CppCodeGenerator(ctx));
+            resVec.add(new Cpp_CodeGenerator(ctx));
         }
 
         // check for Verilog code
-        res = algoTree.getAlgorithmElement(VerilogCodeGenerator.ALGORITHM_VERILOG_CODE_CHILD_NAME);
+        res = algoTree.getAlgorithmElement(Verilog_CodeGenerator.ALGORITHM_VERILOG_CODE_CHILD_NAME);
         if(null == res)
         {
             log.trace("Is not a valid Verilog-Code tree");
@@ -64,7 +64,7 @@ public class CodeGeneratorFactory
         else
         {
             log.trace("tree has Verilog-Code");
-            resVec.add(new VerilogCodeGenerator(ctx));
+            resVec.add(new Verilog_CodeGenerator(ctx));
         }
 
         return resVec.toArray(new Generator[0]);

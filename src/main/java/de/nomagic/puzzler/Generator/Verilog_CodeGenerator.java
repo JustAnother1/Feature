@@ -17,7 +17,7 @@ import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 import de.nomagic.puzzler.solution.Api;
 import de.nomagic.puzzler.solution.Function;
 
-public class VerilogCodeGenerator extends Generator
+public class Verilog_CodeGenerator extends Generator
 {
     public static final String ALGORITHM_VERILOG_CODE_CHILD_NAME = "verilog_code";
     public static final String CFG_DOC_CODE_SRC = "document_code_source";
@@ -26,7 +26,7 @@ public class VerilogCodeGenerator extends Generator
 
     private SourceFile sourceFile;
 
-    public VerilogCodeGenerator(Context ctx)
+    public Verilog_CodeGenerator(Context ctx)
     {
         super(ctx);
         ROOT_FILE_NAME = "top.v";
@@ -47,7 +47,7 @@ public class VerilogCodeGenerator extends Generator
         // we will need at least one *.v file. So create that now.
         SourceFile sourceFile = createFile("top.v");
 
-        Element res = logic.getAlgorithmElement(VerilogCodeGenerator.ALGORITHM_VERILOG_CODE_CHILD_NAME);
+        Element res = logic.getAlgorithmElement(Verilog_CodeGenerator.ALGORITHM_VERILOG_CODE_CHILD_NAME);
         if(null != res)
         {
             List<Element> l = res.getChildren("module");
@@ -94,7 +94,7 @@ public class VerilogCodeGenerator extends Generator
         Function[] funcs = api.getRequiredFunctions();
         for(int i = 0; i < funcs.length; i++)
         {
-            CFunctionCall fc = new CFunctionCall(funcs[i].getName());  // TODO
+            C_FunctionCall fc = new C_FunctionCall(funcs[i].getName());  // TODO
             fc.setApi(api.toString());
             String implementation = logic.getImplementationOf(fc);
             if(null == implementation)

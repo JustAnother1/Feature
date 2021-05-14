@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.Generator.CCodeGenerator;
-import de.nomagic.puzzler.Generator.CFunctionCall;
+import de.nomagic.puzzler.Generator.C_CodeGenerator;
+import de.nomagic.puzzler.Generator.C_FunctionCall;
 import de.nomagic.puzzler.Generator.Generator;
 import de.nomagic.puzzler.configuration.Configuration;
 
@@ -57,7 +57,7 @@ public class ImplementationPuzzlerC extends Base
         }
     }
 
-    public String getImplementationOf(CFunctionCall functionToCall)
+    public String getImplementationOf(C_FunctionCall functionToCall)
     {
         if(null == functionToCall)
         {
@@ -247,7 +247,7 @@ public class ImplementationPuzzlerC extends Base
 
     private Element getFunctionElement(String searchedFunctionName, String FunctionArguments)
     {
-        Element cCode = algo.getAlgorithmElement(CCodeGenerator.ALGORITHM_C_CODE_CHILD_NAME);
+        Element cCode = algo.getAlgorithmElement(C_CodeGenerator.ALGORITHM_C_CODE_CHILD_NAME);
         if(null == cCode)
         {
             ctx.addError(this,
@@ -663,7 +663,7 @@ public class ImplementationPuzzlerC extends Base
 
         StringBuilder res = new StringBuilder();
 
-        CFunctionCall fc = new CFunctionCall(functionName);
+        C_FunctionCall fc = new C_FunctionCall(functionName);
         String params = fc.getArguments();
         fc.setFunctionArguments(params);
 
@@ -705,7 +705,7 @@ public class ImplementationPuzzlerC extends Base
                 }
                 log.trace("adding the library algorithm {}", libAlgo.getName());
                 algo.addExtraAlgo(libAlgo);
-                CFunctionCall libfc = new CFunctionCall(functionName);
+                C_FunctionCall libfc = new C_FunctionCall(functionName);
                 String impl = libAlgo.getImplementationOf(libfc);
                 if(null == impl)
                 {
