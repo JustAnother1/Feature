@@ -80,11 +80,16 @@ public class MakeBuildSystemTest
         assertNull(dut.createBuildFor(files));
     }
 
-
     @Test
     public void testHasTargetForEmptySystem()
     {
         assertFalse("Found Target in Empty Build System", dut.hasTargetFor("%c"));
+    }
+
+    @Test
+    public void testHasTargetForEmptySystem_null()
+    {
+        assertFalse("Found Target in Empty Build System", dut.hasTargetFor(null));
     }
 
     @Test
@@ -103,4 +108,38 @@ public class MakeBuildSystemTest
         assertTrue("Did not find available Target", dut.hasTargetFor("%c"));
     }
 
+    @Test
+    public void testaddDefaultTarget()
+    {
+        Target trg = new Target("%c");
+        trg.setDefault();
+        dut.addTarget(trg);
+        assertTrue("Did not find available Target", dut.hasTargetFor("%c"));
+    }
+
+    @Test
+    public void testextendListVariable_null()
+    {
+        dut.extendListVariable(null, "blubb   ");
+    }
+
+    @Test
+    public void testextendListVariable_noOld()
+    {
+        dut.extendListVariable("bla", "blubb");
+    }
+
+    @Test
+    public void testextendListVariable_several()
+    {
+        dut.extendListVariable("bla", "eins");
+        dut.extendListVariable("bla", "zwei");
+        dut.extendListVariable("bla", "drei");
+    }
+
+    @Test
+    public void testaddRequiredVariable_null()
+    {
+        dut.addRequiredVariable(null);
+    }
 }
