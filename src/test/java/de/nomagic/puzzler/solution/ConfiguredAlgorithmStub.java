@@ -1,12 +1,10 @@
 package de.nomagic.puzzler.solution;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.jdom2.Element;
 
-import de.nomagic.puzzler.Generator.FunctionCall;
 
 public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
 {
@@ -106,30 +104,13 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     }
 
     @Override
-    public String getImplementationOf(FunctionCall fc)
-    {
-        return null;
-    }
-
-    @Override
-    public Collection<AlgorithmInstanceInterface> getAdditionals()
-    {
-        return null;
-    }
-
-    @Override
-    public void addExtraAlgo(AlgorithmInstanceInterface algo)
-    {
-    }
-
-    @Override
     public ConfigurationHandler getCfgHandler()
     {
         return null;
     }
 
     @Override
-    public String replacePlaceHolders(String line)
+    public Algo_c_code get_c_code()
     {
         return null;
     }

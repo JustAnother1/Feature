@@ -1,7 +1,5 @@
 package de.nomagic.puzzler.solution;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.Project;
-import de.nomagic.puzzler.Generator.C_FunctionCall;
-import de.nomagic.puzzler.Generator.FunctionCall;
 
 public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterface
 {
@@ -36,12 +32,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     private final Algorithm algorithmDefinition;
     private final ConfigurationHandler cfgHandler;
 
-    ImplementationPuzzlerC puzzler;
 
-    // collects all ConfiguredAlgorithm classes used. The collected classes will
-    // be asked for additional elements and those will be added to the generated code.
-    // includes at least the own instance.
-    private HashSet<AlgorithmInstanceInterface> extraAlgoList = new HashSet<AlgorithmInstanceInterface>();
 
     public ConfiguredAlgorithm(String name,
                                Algorithm algorithmDefinition,
@@ -56,8 +47,6 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         {
             cfgHandler.setParentHandler(parent.getCfgHandler());
         }
-        extraAlgoList.add(this);
-        puzzler = new ImplementationPuzzlerC(ctx, this);
     }
 
     public String getName()
@@ -188,25 +177,6 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     public ConfigurationHandler getCfgHandler()
     {
         return cfgHandler;
-    }
-
-    @Override
-    public void addExtraAlgo(AlgorithmInstanceInterface algo)
-    {
-        extraAlgoList.add(algo);
-    }
-
-    @Override
-    public Collection<AlgorithmInstanceInterface> getAdditionals()
-    {
-        // collect Algorithms from children
-        Iterator<String> ChildNameIterator = this.getAllChildren();
-        while(ChildNameIterator.hasNext())
-        {
-            AlgorithmInstanceInterface algo = this.getChild(ChildNameIterator.next());
-            extraAlgoList.addAll(algo.getAdditionals()); // recursion!!
-        }
-        return extraAlgoList;
     }
 
     public static ConfiguredAlgorithm getTreeFrom(Context ctx, ConfiguredAlgorithm parent)
@@ -506,29 +476,10 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     }
 
     @Override
-    public String getImplementationOf(FunctionCall fc)
+    public Algo_c_code get_c_code()
     {
-        // TODO
-        if(fc instanceof C_FunctionCall)
-        {
-            C_FunctionCall functionToCall = (C_FunctionCall)fc;
-            LOG.trace("getting the C implemention of the function {} from {}",
-                    functionToCall, this);
-
-            return puzzler.getImplementationOf(functionToCall);
-        }
-        // new languages go here
-        else
-        {
-            LOG.error("unknown Function Call Class -> unsupported language!");
-            return null;
-        }
-    }
-
-    @Override
-    public String replacePlaceHolders(String line)
-    {
-        return puzzler.replacePlaceHolders(line, null);
+        Algo_c_code res = new Algo_c_code(ctx, this);
+        return res;
     }
 
 }

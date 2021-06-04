@@ -14,7 +14,6 @@ import de.nomagic.puzzler.solution.Api;
 public abstract class Generator extends Base
 {
     public static final String ALGORITHM_FUNCTION_CHILD_NAME = "function";
-    public static final String ALGORITHM_ADDITIONAL_CHILD_NAME = "additional";
     public static final String ALGORITHM_ADDITIONAL_INCLUDE_CHILD_NAME = "include";
     public static final String ALGORITHM_ADDITIONAL_FILE_CHILD_NAME = "file";
     public static final String ALGORITHM_ADDITIONAL_VARIABLE_CHILD_NAME = "variable";
@@ -59,8 +58,22 @@ public abstract class Generator extends Base
         return api;
     }
 
+    /**
+     *
+     * @param api Functions that the source code will be generated for.
+     * @param logic the Algorithm that is converted to source code.
+     * @return true == OK, false == something went wrong, no source code generated.
+     */
     protected abstract boolean generateSourceCodeFor(Api api, AlgorithmInstanceInterface logic);
 
+    /** generate source code from algorithm.
+     *
+     * checks the API of the algorithm and creates a new FileGroup for the result.
+     * Then calls generateSourceCodeFor() to create the actual source code files.
+     *
+     * @param logic the root algorithm of the solution.
+     * @return the source code files
+     */
     public FileGroup generateFor(AlgorithmInstanceInterface logic)
     {
         if(null == logic)

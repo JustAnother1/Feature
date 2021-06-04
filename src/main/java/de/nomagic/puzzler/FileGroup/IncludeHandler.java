@@ -14,16 +14,16 @@ public class IncludeHandler extends ElementHandler
     }
 
     @Override
-    protected List<CElement> makeUnique()
+    protected List<C_Element> makeUnique()
     {
-        LinkedList<CElement> unique = new LinkedList<CElement>();
+        LinkedList<C_Element> unique = new LinkedList<C_Element>();
         // remove duplicates
         Collections.sort(elements);
-        Iterator<CElement> it = elements.iterator();
-        CInclude first = (CInclude)it.next(); // we just checked that it is not empty, so this should work.
+        Iterator<C_Element> it = elements.iterator();
+        C_Include first = (C_Include)it.next(); // we just checked that it is not empty, so this should work.
         while(it.hasNext())
         {
-            CInclude next = (CInclude)it.next();
+            C_Include next = (C_Include)it.next();
             if(true == first.getName().equals(next.getName()))
             {
                 first.addComment(next.getComment());

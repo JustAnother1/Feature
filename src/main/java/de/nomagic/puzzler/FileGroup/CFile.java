@@ -1,6 +1,7 @@
 package de.nomagic.puzzler.FileGroup;
 
 import java.util.List;
+
 import de.nomagic.puzzler.solution.Function;
 
 public class CFile extends SourceFile
@@ -46,7 +47,7 @@ public class CFile extends SourceFile
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
         {
-            CInclude inc = new CInclude(line, comment);
+            C_Include inc = new C_Include(line, comment);
             includes.add(inc);
         }
         else
@@ -60,7 +61,7 @@ public class CFile extends SourceFile
     {
         if(true == C_FILE_INCLUDE_SECTION_NAME.equals(sectionName))
         {
-            CInclude inc = new CInclude(line, null);
+            C_Include inc = new C_Include(line, null);
             includes.add(inc);
         }
         else

@@ -9,13 +9,13 @@ import org.slf4j.LoggerFactory;
 public abstract class ElementHandler
 {
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-    protected List<CElement> elements = new LinkedList<CElement>();
+    protected List<C_Element> elements = new LinkedList<C_Element>();
 
     public ElementHandler()
     {
     }
 
-    public void add(CElement inc)
+    public void add(C_Element inc)
     {
         elements.add(inc);
     }
@@ -32,7 +32,7 @@ public abstract class ElementHandler
         }
     }
 
-    protected abstract List<CElement> makeUnique();
+    protected abstract List<C_Element> makeUnique();
 
     public List<String> getCode(int type, String lineSperator)
     {
@@ -40,14 +40,14 @@ public abstract class ElementHandler
         {
             return new LinkedList<String>();
         }
-        List<CElement> unique = makeUnique();
+        List<C_Element> unique = makeUnique();
 
         log.trace("{} unique entries!", unique.size());
         // expand to valid statements
         LinkedList<String> res = new LinkedList<String>();
         for(int i = 0; i < unique.size(); i++)
         {
-            CElement ele = unique.get(i);
+            C_Element ele = unique.get(i);
             String line = ele.getCode(type, lineSperator);
             res.add(line);
         }

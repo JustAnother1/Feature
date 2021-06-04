@@ -29,7 +29,7 @@ public class C_CodeGeneratorTest
     @Test
     public void testGenerateForNull()
     {
-        ContextStub ctx = new ContextStub(null);
+        ContextStub ctx = new ContextStub(new Configuration());
         C_CodeGenerator gen = new C_CodeGenerator(ctx);
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(null);
@@ -40,7 +40,7 @@ public class C_CodeGeneratorTest
     public void testGenerateForNotRoot()
     {
         ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
-        ContextStub ctx = new ContextStub(null);
+        ContextStub ctx = new ContextStub(new Configuration());
         C_CodeGenerator gen = new C_CodeGenerator(ctx);
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(cas);

@@ -9,7 +9,7 @@ import de.nomagic.puzzler.configuration.Configuration;
 
 public class Cpp_CodeGenerator extends C_CodeGenerator
 {
-    public static final String ALGORITHM_CPP_CODE_CHILD_NAME = "cpp_code";
+    public static final String ALGORITHM_CODE_CHILD_NAME = "cpp_code";
 
     public Cpp_CodeGenerator(Context ctx)
     {

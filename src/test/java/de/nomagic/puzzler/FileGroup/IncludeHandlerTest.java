@@ -20,7 +20,7 @@ public class IncludeHandlerTest
     public void testAdd()
     {
         IncludeHandler dut = new IncludeHandler();
-        CInclude inc = new CInclude("bla.h", null);
+        C_Include inc = new C_Include("bla.h", null);
         assertTrue(dut.isEmpty());
         dut.add(inc);
         assertFalse(dut.isEmpty());
@@ -41,7 +41,7 @@ public class IncludeHandlerTest
     {
         IncludeHandler dut = new IncludeHandler();
         IncludeHandler dut2 = new IncludeHandler();
-        CInclude inc = new CInclude("bla.h", null);
+        C_Include inc = new C_Include("bla.h", null);
         assertTrue(dut.isEmpty());
         dut.add(inc);
         assertFalse(dut.isEmpty());
@@ -61,7 +61,7 @@ public class IncludeHandlerTest
     public void testgetCodeInc()
     {
         IncludeHandler dut = new IncludeHandler();
-        CInclude inc = new CInclude("bla.h", null);
+        C_Include inc = new C_Include("bla.h", null);
         dut.add(inc);
         Vector<String> res = new Vector<String>();
         res.add("#include <bla.h>");
@@ -72,7 +72,7 @@ public class IncludeHandlerTest
     public void testgetCodeUnique()
     {
         IncludeHandler dut = new IncludeHandler();
-        CInclude inc = new CInclude("bla.h", null);
+        C_Include inc = new C_Include("bla.h", null);
         dut.add(inc);
         dut.add(inc);
         Vector<String> res = new Vector<String>();
@@ -84,8 +84,8 @@ public class IncludeHandlerTest
     public void testgetCodeSorted()
     {
         IncludeHandler dut = new IncludeHandler();
-        CInclude incb = new CInclude("bla.h", null);
-        CInclude incn = new CInclude("no.h", null);
+        C_Include incb = new C_Include("bla.h", null);
+        C_Include incn = new C_Include("no.h", null);
         dut.add(incn);
         dut.add(incb);
         Vector<String> res = new Vector<String>();

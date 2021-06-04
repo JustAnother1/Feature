@@ -19,7 +19,7 @@ import de.nomagic.puzzler.solution.Function;
 
 public class Verilog_CodeGenerator extends Generator
 {
-    public static final String ALGORITHM_VERILOG_CODE_CHILD_NAME = "verilog_code";
+    public static final String ALGORITHM_CODE_CHILD_NAME = "verilog_code";
     public static final String CFG_DOC_CODE_SRC = "document_code_source";
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
@@ -47,7 +47,7 @@ public class Verilog_CodeGenerator extends Generator
         // we will need at least one *.v file. So create that now.
         SourceFile sourceFile = createFile("top.v");
 
-        Element res = logic.getAlgorithmElement(Verilog_CodeGenerator.ALGORITHM_VERILOG_CODE_CHILD_NAME);
+        Element res = logic.getAlgorithmElement(Verilog_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         if(null != res)
         {
             List<Element> l = res.getChildren("module");
@@ -94,6 +94,7 @@ public class Verilog_CodeGenerator extends Generator
         Function[] funcs = api.getRequiredFunctions();
         for(int i = 0; i < funcs.length; i++)
         {
+            /*
             C_FunctionCall fc = new C_FunctionCall(funcs[i].getName());  // TODO
             fc.setApi(api.toString());
             String implementation = logic.getImplementationOf(fc);
@@ -110,6 +111,7 @@ public class Verilog_CodeGenerator extends Generator
             }
 
             sourceFile.addFunction(funcs[i]);
+            */
         }
         codeGroup.add(sourceFile);
 

@@ -23,12 +23,12 @@ public class FunctionHandler extends ElementHandler
     }
 
     @Override
-    protected List<CElement> makeUnique()
+    protected List<C_Element> makeUnique()
     {
-        LinkedList<CElement> unique = new LinkedList<CElement>();
+        LinkedList<C_Element> unique = new LinkedList<C_Element>();
         // remove duplicates
         Collections.sort(elements);
-        Iterator<CElement> it = elements.iterator();
+        Iterator<C_Element> it = elements.iterator();
         Function first = (Function)it.next(); // we just checked that it is not empty, so this should work.
         while(it.hasNext())
         {

@@ -7,10 +7,10 @@ import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.nomagic.puzzler.FileGroup.CElement;
+import de.nomagic.puzzler.FileGroup.C_Element;
 import de.nomagic.puzzler.FileGroup.FunctionHandler;
 
-public class Function extends CElement
+public class Function extends C_Element
 {
     public static final String FUNCTION_NAME_ATTRIBUTE_NAME = "name";
     public static final String FUNCTION_TYPE_ATTRIBUTE_NAME = "type";
