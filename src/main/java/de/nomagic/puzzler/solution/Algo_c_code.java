@@ -34,9 +34,9 @@ public class Algo_c_code extends Base
     public static final char   IMPLEMENTATION_PLACEHOLDER_CHAR = '€';
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-    private final ConfiguredAlgorithm algo;
+    private final AlgorithmInstanceInterface algo;
 
-    public Algo_c_code(Context ctx, ConfiguredAlgorithm configuredAlgorithm)
+    public Algo_c_code(Context ctx, AlgorithmInstanceInterface configuredAlgorithm)
     {
         super(ctx);
         this.algo = configuredAlgorithm;

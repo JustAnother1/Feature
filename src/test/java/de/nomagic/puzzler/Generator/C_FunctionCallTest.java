@@ -29,6 +29,14 @@ public class C_FunctionCallTest
     }
 
     @Test
+    public void testSetApi()
+    {
+        C_FunctionCall dut = new C_FunctionCall("bla:blubb(blabla)");
+        dut.setApi("somethingElse");
+        assertEquals("somethingElse", dut.getApi());
+    }
+
+    @Test
     public void testGetArgumentsNull()
     {
         C_FunctionCall dut = new C_FunctionCall("bla");

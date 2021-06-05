@@ -498,7 +498,7 @@ public class C_CodeGenerator extends Generator
     private String fillInFunctionCallFromLibrary(C_FunctionCall libfc, AlgorithmInstanceInterface algo)
     {
         // include the library
-        ConfiguredAlgorithm libAlgo = ConfiguredAlgorithm.getTreeFromEnvironment(libfc.getApi(), ctx, algo);
+        AlgorithmInstanceInterface libAlgo = ConfiguredAlgorithm.getTreeFromEnvironment(libfc.getApi(), ctx, algo);
         if(null == libAlgo)
         {
             ctx.addError(this, "" + algo +
