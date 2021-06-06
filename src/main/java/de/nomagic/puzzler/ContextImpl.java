@@ -104,7 +104,16 @@ public class ContextImpl implements Context
             addError(this, "Must provide a stream!");
             return null;
         }
-        Document doc = fg.getXmlFromString(in);
+
+        Document doc;
+        try
+        {
+            doc = fg.getXmlFromString(in);
+        }
+        catch(NullPointerException e)
+        {
+            return null;
+        }
         if(null == doc)
         {
             addError(this, "Could not read Project File ");
@@ -131,7 +140,15 @@ public class ContextImpl implements Context
             addError(this, "Invalid request! tag name missing!");
             return null;
         }
-        Document doc = fg.getXmlFile(path, fileName);
+        Document doc;
+        try
+        {
+            doc = fg.getXmlFile(path, fileName);
+        }
+        catch(NullPointerException e)
+        {
+            return null;
+        }
         if(null == doc)
         {
             addError(this, "Could not read xml file " + path +  fileName);
