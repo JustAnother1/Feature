@@ -13,9 +13,6 @@ Feature tries to split the different parts of a software solution up into very s
 To explain the process further an link:res/doc/example.asciidoc[example] is provided.
 
 
-image::https://github.com/JustAnother1/Feature/workflows/Java unit test/badge.svg[unit test state]
-
-
 == Libre projects
 
 Libre projects is a web site that creates simple embedded projects. It uses Feature to do that. You can test it https://ing-poetter.de/libreprojects.php[here]
