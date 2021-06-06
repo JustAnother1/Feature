@@ -37,11 +37,11 @@ public final class FileGetter
 
     public Document getXmlFromString(String in)
     {
-        StringReader sr = new StringReader(in);
         SAXBuilder jdomBuilder = new SAXBuilder();
         Document jdomDocument = null;
         try
         {
+            StringReader sr = new StringReader(in);
             jdomDocument = jdomBuilder.build(sr);
         }
         catch(JDOMException e)
@@ -50,14 +50,20 @@ public final class FileGetter
             log.trace(Tool.fromExceptionToString(e));
             jdomDocument = null;
         }
-        catch (IOException e)
+        catch (IOException e1)
         {
-            ctx.addError(CLASS_NAME, "IOException from stream");
-            ctx.addError(CLASS_NAME, e.getMessage());
-            log.trace(Tool.fromExceptionToString(e));
+            ctx.addError(CLASS_NAME, "IOException from String");
+            ctx.addError(CLASS_NAME, e1.getMessage());
+            log.trace(Tool.fromExceptionToString(e1));
             jdomDocument = null;
         }
-
+        catch(NullPointerException e2)
+        {
+            ctx.addError(CLASS_NAME, "NullPointerException from String");
+            ctx.addError(CLASS_NAME, e2.getMessage());
+            log.trace(Tool.fromExceptionToString(e2));
+            jdomDocument = null;
+        }
         return jdomDocument;
     }
 

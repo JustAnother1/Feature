@@ -15,6 +15,7 @@ public class ContextImplTest
         ContextImpl dut = new ContextImpl(null);
         assertNotNull(dut);
         assertTrue(dut.wasSucessful()); // no failure registered yet.
+        assertEquals("Context has no Errors!", dut.getErrors());
     }
 
     @Test
@@ -42,6 +43,38 @@ public class ContextImplTest
         SolutionStub sol = new SolutionStub();
         dut.addSolution(sol);
         assertEquals(sol, dut.getSolution());
+    }
+
+    @Test
+    public void testFileGetter()
+    {
+        ContextImpl dut = new ContextImpl(null);
+        assertNotNull(dut);
+        assertNull(dut.getFileGetter());
+        FileGetter fg = new FileGetter(null);
+        dut.addFileGetter(fg);
+        assertEquals(fg, dut.getFileGetter());
+    }
+
+    @Test
+    public void testGetElementFrom()
+    {
+        ContextImpl dut = new ContextImpl(null);
+        assertNotNull(dut);
+        assertNull(dut.getElementfrom(null, null));
+        assertNull(dut.getElementfrom(null, ""));
+        assertNull(dut.getElementfrom("", ""));
+    }
+
+    @Test
+    public void testGetElementFromFile()
+    {
+        ContextImpl dut = new ContextImpl(null);
+        assertNotNull(dut);
+        assertNull(dut.getElementfrom(null, null, null));
+        assertNull(dut.getElementfrom(null, null, ""));
+        assertNull(dut.getElementfrom(null, "", ""));
+        assertNull(dut.getElementfrom("", "", ""));
     }
 
 }

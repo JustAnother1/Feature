@@ -42,6 +42,10 @@ public final class Tool
 
     public static String getXMLRepresentationFor(Element tag)
     {
+        if(null == tag)
+        {
+            return "";
+        }
         XMLOutputter xmlOutput = new XMLOutputter();
         xmlOutput.setFormat(Format.getPrettyFormat());
         String res = xmlOutput.outputString(tag);

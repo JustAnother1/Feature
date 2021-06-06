@@ -84,6 +84,25 @@ public class AlgorithmTest {
     }
 
     @Test
+    public void testgetApiNull()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        Algorithm cut = new Algorithm(null, ctx);
+        assertNull(cut.getApis());
+    }
+
+    @Test
+    public void testgetApi_no()
+    {
+        Configuration cfg = new Configuration();
+        ContextImpl ctx = new ContextImpl(cfg);
+        Element ele = new Element("bad");
+        Algorithm cut = new Algorithm(ele, ctx);
+        assertNull(cut.getApis());
+    }
+
+    @Test
     public void testHasApiNull()
     {
         Configuration cfg = new Configuration();

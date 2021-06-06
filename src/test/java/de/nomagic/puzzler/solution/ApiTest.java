@@ -40,4 +40,12 @@ public class ApiTest
         assertEquals(0, res.length);
     }
 
+    @Test
+    public void testGetNumberOfFunctions()
+    {
+        Element root = new Element("bla");
+        Api dut = new Api(root, null);
+        assertEquals(0, dut.getNumberOfFunctions());
+    }
+
 }

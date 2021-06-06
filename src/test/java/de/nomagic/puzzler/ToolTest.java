@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 
+import org.jdom2.Element;
 import org.junit.Test;
 
 public class ToolTest {
@@ -277,5 +278,20 @@ public class ToolTest {
     public void testValidatePathOk()
     {
         assertEquals("bla" + File.separator, Tool.validatePath("bla" + File.separator));
+    }
+
+    @Test
+    public void testGetXMLRepresentationFor_null()
+    {
+        String xml = Tool.getXMLRepresentationFor(null);
+        assertEquals("", xml);
+    }
+
+    @Test
+    public void testGetXMLRepresentationFor()
+    {
+        Element e = new Element("bla");
+        String xml = Tool.getXMLRepresentationFor(e);
+        assertEquals("<bla />", xml);
     }
 }

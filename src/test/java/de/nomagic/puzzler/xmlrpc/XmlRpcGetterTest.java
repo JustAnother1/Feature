@@ -24,4 +24,12 @@ public class XmlRpcGetterTest
         Document res = dut.getAsDocument("");
         assertNull(res);
     }
+
+    @Test
+    public void testGetAsDocument_url_emptyString()
+    {
+        dut = new XmlRpcGetter("http://127.0.0.1:8080/");
+        Document res = dut.getAsDocument("");
+        assertNull(res);
+    }
 }

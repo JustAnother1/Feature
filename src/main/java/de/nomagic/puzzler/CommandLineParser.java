@@ -302,6 +302,10 @@ public class CommandLineParser
 
     public boolean parse(String[] args)
     {
+        if(null == args)
+        {
+            return false;
+        }
         idx = 0;
         numArgs = args.length;
         this.args = args;

@@ -9,7 +9,8 @@ public class FileGetterTest {
     @Test
     public void testGetXmlFileNull()
     {
-        FileGetter fg = new FileGetter(null);
+        Context ctx = new ContextStub();
+        FileGetter fg = new FileGetter(ctx);
         String noString = null;
         assertNull(fg.getXmlFile(noString, null));
     }
@@ -17,7 +18,8 @@ public class FileGetterTest {
     @Test
     public void tesTtryToGetXmlFileNull()
     {
-        FileGetter fg = new FileGetter(null);
+        Context ctx = new ContextStub();
+        FileGetter fg = new FileGetter(ctx);
         String noString = null;
         assertNull(fg.tryToGetXmlFile(noString, null, false));
     }
@@ -25,7 +27,8 @@ public class FileGetterTest {
     @Test
     public void tesTtryToGetXmlFileNoPathButName()
     {
-        FileGetter fg = new FileGetter(null);
+        Context ctx = new ContextStub();
+        FileGetter fg = new FileGetter(ctx);
         String noString = null;
         assertNull(fg.tryToGetXmlFile(noString, "", false));
     }
@@ -33,8 +36,33 @@ public class FileGetterTest {
     @Test
     public void tesTtryToGetXmlFileEmptyPathBut()
     {
-        FileGetter fg = new FileGetter(null);
+        Context ctx = new ContextStub();
+        FileGetter fg = new FileGetter(ctx);
         assertNull(fg.tryToGetXmlFile("", "", false));
+    }
+
+    @Test
+    public void testGetXmlFromString_null()
+    {
+        Context ctx = new ContextStub();
+        FileGetter fg = new FileGetter(ctx);
+        assertNull(fg.getXmlFromString(null));
+    }
+
+    @Test
+    public void testGetXmlFromString_empty()
+    {
+        Context ctx = new ContextStub();
+        FileGetter fg = new FileGetter(ctx);
+        assertNull(fg.getXmlFromString(""));
+    }
+
+    @Test
+    public void testGetXmlFromString_invalid()
+    {
+        Context ctx = new ContextStub();
+        FileGetter fg = new FileGetter(ctx);
+        assertNull(fg.getXmlFromString("This is no XML!"));
     }
 
 }
