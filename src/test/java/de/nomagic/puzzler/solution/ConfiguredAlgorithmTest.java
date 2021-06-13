@@ -311,6 +311,44 @@ public class ConfiguredAlgorithmTest
     }
 
     @Test
+    public void testGetDescription_Null()
+    {
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
+        assertEquals("dut(no algorithm attached)", dut.getDescription());
+    }
+
+    @Test
+    public void testGetDescription()
+    {
+        Context ctx = new ContextStub(null);
+        Element root = new Element("testElement");
+        root.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "someApi");
+        root.setAttribute(Algorithm.ALGORITHM_NAME_ATTRIBUTE_NAME, "someAlgorithm");
+        Algorithm algo = new Algorithm(root, ctx);
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, null, null);
+        assertEquals("dut (Algorithm someAlgorithm implementing someApi)", dut.getDescription());
+    }
+
+    @Test
+    public void testGetApis_Null()
+    {
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
+        assertNull(dut.getApis());
+    }
+
+    @Test
+    public void testGetApis()
+    {
+        Context ctx = new ContextStub(null);
+        Element root = new Element("testElement");
+        root.setAttribute(Algorithm.ALGORITHM_API_ATTRIBUTE_NAME, "someApi");
+        root.setAttribute(Algorithm.ALGORITHM_NAME_ATTRIBUTE_NAME, "someAlgorithm");
+        Algorithm algo = new Algorithm(root, ctx);
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, null, null);
+        assertEquals("someApi", dut.getApis());
+    }
+
+    @Test
     public void testGetAlgorithmElementNull()
     {
         ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);

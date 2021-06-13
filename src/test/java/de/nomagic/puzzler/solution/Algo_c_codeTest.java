@@ -124,4 +124,32 @@ public class Algo_c_codeTest {
         assertEquals("i=i++;" + System.getProperty("line.separator"), res);
     }
 
+    @Test
+    public void getImplementationForFunction_alternativeFunction()
+    {
+        Context ctx = new ContextStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        Element code = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        Element funcBla = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
+        funcBla = funcBla.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
+        code = code.addContent(funcBla);
+        Element funcNoName = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
+        code = code.addContent(funcNoName);
+        Element additional = new Element(Algo_c_code.ALGORITHM_ADDITIONAL_CHILD_NAME);
+        Element funcMain = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
+        funcMain = funcMain.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
+        Comment remove = new Comment("increment i by one");
+        funcMain = funcMain.addContent(remove);
+        CDATA impl = new CDATA("i=i++;");
+        funcMain = funcMain.addContent(impl);
+        additional = additional.addContent(funcMain);
+        code = code.addContent(additional);
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, code);
+        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        C_FunctionCall fc = new C_FunctionCall("main()");
+        String res = cut.getFunctionImplementation(fc);
+        assertNotNull(res);
+        assertEquals("i=i++;" + System.getProperty("line.separator"), res);
+    }
+
 }
