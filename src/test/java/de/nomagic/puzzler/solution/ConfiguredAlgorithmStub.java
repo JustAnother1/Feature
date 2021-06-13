@@ -10,6 +10,7 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
 {
     private HashMap<String, String> properties = new HashMap<String, String>();
     private HashMap<String, String> parameters = new HashMap<String, String>();
+    private HashMap<String, Element> elements = new HashMap<String, Element>();
     private String api = "";
 
     public ConfiguredAlgorithmStub()
@@ -67,10 +68,15 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
         api = api + enabledApi;
     }
 
+    public void addAlgorithmElement(String Name, Element data)
+    {
+        elements.put(Name, data);
+    }
+
     @Override
     public Element getAlgorithmElement(String elementName)
     {
-        return null;
+        return elements.get(elementName);
     }
 
     @Override

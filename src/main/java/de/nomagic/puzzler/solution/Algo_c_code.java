@@ -157,7 +157,11 @@ public class Algo_c_code extends Base
         {
             // check additional functions
             Element additional = cCode.getChild(ALGORITHM_ADDITIONAL_CHILD_NAME);
-            res = getFunctionElementFromElement(additional, searchedFunctionName);
+            if(null != additional)
+            {
+                res = getFunctionElementFromElement(additional, searchedFunctionName);
+            }
+            // else no additional functions in this algorithm.
         }
         if(null == res)
         {
