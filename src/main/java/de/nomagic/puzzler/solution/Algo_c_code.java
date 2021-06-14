@@ -229,8 +229,9 @@ public class Algo_c_code extends Base
         else
         {
             impl = beautifyImplementation(curE.getText());
-            log.warn("Adding non conditional Element data to implementation ! text:  {} element: {}",
+            log.warn("Ignoring not recognised Element in implementation ! text:  {} element: {}",
                     impl, curE);
+            return null;
         }
         return impl;
     }
