@@ -5,6 +5,7 @@ import org.jdom2.Element;
 public class EnvironmentStub implements Environment
 {
     private String[] PlatformParts;
+    private String BuildSystemType = null;
 
     public EnvironmentStub()
     {
@@ -22,10 +23,15 @@ public class EnvironmentStub implements Environment
         return PlatformParts;
     }
 
+    public void setBuildSystemType(String val)
+    {
+        BuildSystemType = val;
+    }
+
     @Override
     public String getBuldSystemType()
     {
-        return null;
+        return BuildSystemType;
     }
 
     @Override

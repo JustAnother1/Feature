@@ -32,9 +32,56 @@ public class BuildSystemFactoryTest
         ContextStub ctx = new ContextStub(cfg);
         Environment e = new EnvironmentStub();
         ctx.addEnvironment(e);
+
         BuildSystemApi res = BuildSystemFactory.getBuildSystemFor(ctx);
+
         assertNotNull(res);
         assertTrue(res instanceof MakeBuildSystem);
+    }
+
+    @Test
+    public void testGetBuildSystemFor_Embeetle()
+    {
+        Configuration cfg = new Configuration();
+        cfg.setString(Configuration.CFG_EMBEETLE_PROJECT, "true");
+        ContextStub ctx = new ContextStub(cfg);
+        Environment e = new EnvironmentStub();
+        ctx.addEnvironment(e);
+
+        BuildSystemApi res = BuildSystemFactory.getBuildSystemFor(ctx);
+
+        assertNotNull(res);
+        assertTrue(res instanceof EmbeetleMakeBuildSystem);
+    }
+
+    @Test
+    public void testGetBuildSystemFor_none()
+    {
+        Configuration cfg = new Configuration();
+        ContextStub ctx = new ContextStub(cfg);
+        EnvironmentStub e = new EnvironmentStub();
+        e.setBuildSystemType("none");
+        ctx.addEnvironment(e);
+
+        BuildSystemApi res = BuildSystemFactory.getBuildSystemFor(ctx);
+
+        assertNotNull(res);
+        assertTrue(res instanceof NoBuildSystem);
+    }
+
+    @Test
+    public void testGetBuildSystemFor_qmake()
+    {
+        Configuration cfg = new Configuration();
+        ContextStub ctx = new ContextStub(cfg);
+        EnvironmentStub e = new EnvironmentStub();
+        e.setBuildSystemType("qmake");
+        ctx.addEnvironment(e);
+
+        BuildSystemApi res = BuildSystemFactory.getBuildSystemFor(ctx);
+
+        assertNotNull(res);
+        assertTrue(res instanceof QmakeBuildSystem);
     }
 
 }
