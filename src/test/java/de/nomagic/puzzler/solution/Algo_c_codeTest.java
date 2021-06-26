@@ -7,6 +7,7 @@ import java.util.List;
 import org.jdom2.CDATA;
 import org.jdom2.Element;
 import org.jdom2.Comment;
+import org.jdom2.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,7 @@ import ch.qos.logback.core.read.ListAppender;
 
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.ContextStub;
+import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.Generator.C_CodeGenerator;
 import de.nomagic.puzzler.Generator.C_FunctionCall;
 import de.nomagic.puzzler.Generator.Generator;
@@ -49,6 +51,8 @@ public class Algo_c_codeTest {
         String res = cut.getFunctionImplementation(null);
 
         assertNull(res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
     @Test
@@ -62,6 +66,8 @@ public class Algo_c_codeTest {
         String res = cut.getFunctionImplementation(fc);
 
         assertNull(res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
     @Test
@@ -75,6 +81,8 @@ public class Algo_c_codeTest {
         String res = cut.getFunctionImplementation(fc);
 
         assertNull(res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
     @Test
@@ -90,6 +98,8 @@ public class Algo_c_codeTest {
         String res = cut.getFunctionImplementation(fc);
 
         assertNull(res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
     @Test
@@ -110,6 +120,8 @@ public class Algo_c_codeTest {
         String res = cut.getFunctionImplementation(fc);
 
         assertNull(res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
     @Test
@@ -134,6 +146,8 @@ public class Algo_c_codeTest {
 
         assertNotNull(res);
         assertEquals("", res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
     @Test
@@ -162,6 +176,8 @@ public class Algo_c_codeTest {
 
         assertNotNull(res);
         assertEquals("", res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
     @Test
@@ -190,6 +206,8 @@ public class Algo_c_codeTest {
 
         assertNotNull(res);
         assertEquals("i=i++;" + System.getProperty("line.separator"), res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
     @Test
@@ -220,6 +238,8 @@ public class Algo_c_codeTest {
 
         assertNotNull(res);
         assertEquals("i=i++;" + System.getProperty("line.separator"), res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
     @Test
@@ -250,9 +270,68 @@ public class Algo_c_codeTest {
         assertNotNull(res);
         assertEquals("", res);
         List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(1, logsList.size());
         assertEquals("Ignoring not recognised Element in implementation ! text:  {} element: {}",
                 logsList.get(0).getMessage());
         assertEquals(Level.WARN, logsList.get(0).getLevel());
+    }
+
+    @Test
+    public void getImplementationForFunction_inv_if()
+    {
+        Context ctx = new ContextStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        Element code = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        Element funcBla = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
+        funcBla = funcBla.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
+        code = code.addContent(funcBla);
+        Element funcNoName = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
+        code = code.addContent(funcNoName);
+        Element funcMain = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
+        funcMain = funcMain.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
+        Comment remove = new Comment("increment i by one");
+        funcMain = funcMain.addContent(remove);
+        Element invalid = new Element(Algo_c_code.ALGORITHM_IF_CHILD_NAME);
+        invalid.setText("this is no implementation");
+        funcMain = funcMain.addContent(invalid);
+        code = code.addContent(funcMain);
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, code);
+
+        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        C_FunctionCall fc = new C_FunctionCall("main()");
+        String res = cut.getFunctionImplementation(fc);
+
+        assertNotNull(res);
+        assertEquals("", res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+    }
+
+
+    @Test
+    public void getImplementationForFunction_function_call_xml()
+    {
+        Context ctx = new ContextStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        Document doc = Tool.getXmlDocumentFrom(
+                "<c_code>"
+                + "<additional>"
+                + "<function name=\"main\">"
+                + "<![CDATA[€initialize:initialize()€]]>"
+                + "</function>"
+                + "</additional>"
+                + "</c_code>");
+
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, doc.getRootElement());
+
+        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        C_FunctionCall fc = new C_FunctionCall("main()");
+        String res = cut.getFunctionImplementation(fc);
+
+        assertNotNull(res);
+        assertEquals("€initialize:initialize()€" + System.getProperty("line.separator"), res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
 }

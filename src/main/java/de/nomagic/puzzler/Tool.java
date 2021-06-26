@@ -16,15 +16,20 @@ package de.nomagic.puzzler;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
@@ -50,6 +55,20 @@ public final class Tool
         xmlOutput.setFormat(Format.getPrettyFormat());
         String res = xmlOutput.outputString(tag);
         return res;
+    }
+
+    public static Document getXmlDocumentFrom(String xmlData)
+    {
+        StringReader stringReader = new StringReader(xmlData);
+        SAXBuilder builder = new SAXBuilder();
+        Document doc;
+        try {
+            doc = builder.build(stringReader);
+            return doc;
+        } catch (JDOMException | IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static String curentDateTime()
