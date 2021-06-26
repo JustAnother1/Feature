@@ -18,6 +18,14 @@ public class C_CodeGeneratorTest
         C_CodeGenerator gen = new C_CodeGenerator(null);
         assertNotNull(gen);
     }
+    
+    @Test
+    public void testCCodeGenerator_noCfg()
+    {
+        ContextStub ctx = new ContextStub(null);
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+    }
 
     @Test
     public void testLanguageName()
