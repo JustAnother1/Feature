@@ -325,7 +325,7 @@ public class PuzzlerMain
             return;
         }
         Context ctx = new ContextImpl(cfg);
-        FileGetter fg = new FileGetter(ctx);
+        FileGetter fg = new FileGetterImpl(ctx);
         if(true == cfg.getBool(Configuration.USE_XML_RPC))
         {
             String url = cfg.getString(Configuration.XML_RPC_URL);

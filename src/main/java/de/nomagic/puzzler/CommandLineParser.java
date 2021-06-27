@@ -113,7 +113,7 @@ public class CommandLineParser
                 return false;
             }
             Context ctx = new ContextImpl(cfg);
-            FileGetter fg = new FileGetter(ctx);
+            FileGetter fg = new FileGetterImpl(ctx);
             Document doc = fg.getXmlFile(null, args[idx]);
             if(null == doc)
             {

@@ -14,6 +14,7 @@ public class ContextStub implements Context
     private Solution s = null;
     private Configuration cfg;
     private Environment e = null;
+    private FileGetter fg = null;
 
     public ContextStub()
     {
@@ -117,12 +118,13 @@ public class ContextStub implements Context
     @Override
     public void addFileGetter(FileGetter fg)
     {
+    	this.fg = fg;
     }
 
     @Override
     public FileGetter getFileGetter()
     {
-        return null;
+        return fg;
     }
 
 }

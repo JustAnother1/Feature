@@ -6,6 +6,7 @@ public class EnvironmentStub implements Environment
 {
     private String[] PlatformParts;
     private String BuildSystemType = null;
+    private String rootApi = null;
 
     public EnvironmentStub()
     {
@@ -34,10 +35,15 @@ public class EnvironmentStub implements Environment
         return BuildSystemType;
     }
 
+    public void setRootApi(String nameApi)
+    {
+    	rootApi = nameApi;
+    }
+    
     @Override
     public String getRootApi()
     {
-        return null;
+        return rootApi;
     }
 
     @Override

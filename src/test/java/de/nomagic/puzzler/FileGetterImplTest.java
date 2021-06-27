@@ -4,13 +4,13 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class FileGetterTest {
+public class FileGetterImplTest {
 
     @Test
     public void testGetXmlFileNull()
     {
         Context ctx = new ContextStub();
-        FileGetter fg = new FileGetter(ctx);
+        FileGetter fg = new FileGetterImpl(ctx);
         String noString = null;
         assertNull(fg.getXmlFile(noString, null));
     }
@@ -19,7 +19,7 @@ public class FileGetterTest {
     public void tesTtryToGetXmlFileNull()
     {
         Context ctx = new ContextStub();
-        FileGetter fg = new FileGetter(ctx);
+        FileGetter fg = new FileGetterImpl(ctx);
         String noString = null;
         assertNull(fg.tryToGetXmlFile(noString, null, false));
     }
@@ -28,7 +28,7 @@ public class FileGetterTest {
     public void tesTtryToGetXmlFileNoPathButName()
     {
         Context ctx = new ContextStub();
-        FileGetter fg = new FileGetter(ctx);
+        FileGetter fg = new FileGetterImpl(ctx);
         String noString = null;
         assertNull(fg.tryToGetXmlFile(noString, "", false));
     }
@@ -37,7 +37,7 @@ public class FileGetterTest {
     public void tesTtryToGetXmlFileEmptyPathBut()
     {
         Context ctx = new ContextStub();
-        FileGetter fg = new FileGetter(ctx);
+        FileGetter fg = new FileGetterImpl(ctx);
         assertNull(fg.tryToGetXmlFile("", "", false));
     }
 
@@ -45,7 +45,7 @@ public class FileGetterTest {
     public void testGetXmlFromString_null()
     {
         Context ctx = new ContextStub();
-        FileGetter fg = new FileGetter(ctx);
+        FileGetter fg = new FileGetterImpl(ctx);
         assertNull(fg.getXmlFromString(null));
     }
 
@@ -53,7 +53,7 @@ public class FileGetterTest {
     public void testGetXmlFromString_empty()
     {
         Context ctx = new ContextStub();
-        FileGetter fg = new FileGetter(ctx);
+        FileGetter fg = new FileGetterImpl(ctx);
         assertNull(fg.getXmlFromString(""));
     }
 
@@ -61,7 +61,7 @@ public class FileGetterTest {
     public void testGetXmlFromString_invalid()
     {
         Context ctx = new ContextStub();
-        FileGetter fg = new FileGetter(ctx);
+        FileGetter fg = new FileGetterImpl(ctx);
         assertNull(fg.getXmlFromString("This is no XML!"));
     }
 

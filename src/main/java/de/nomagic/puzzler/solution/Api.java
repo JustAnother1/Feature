@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.FileGetter;
+import de.nomagic.puzzler.FileGetterImpl;
 
 public class Api extends Base
 {
@@ -56,7 +57,7 @@ public class Api extends Base
         {
             return null;
         }
-        Element root = fg.getFromFile(name, "api", FileGetter.API_ROOT_ELEMENT_NAME);
+        Element root = fg.getFromFile(name, "api", FileGetterImpl.API_ROOT_ELEMENT_NAME);
         if(null != root)
         {
             return new Api(root, ctx);

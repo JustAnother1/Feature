@@ -51,7 +51,7 @@ public class ContextImplTest
         ContextImpl dut = new ContextImpl(null);
         assertNotNull(dut);
         assertNull(dut.getFileGetter());
-        FileGetter fg = new FileGetter(null);
+        FileGetterStub fg = new FileGetterStub();
         dut.addFileGetter(fg);
         assertEquals(fg, dut.getFileGetter());
     }

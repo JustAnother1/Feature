@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Base;
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.FileGetter;
+import de.nomagic.puzzler.FileGetterImpl;
 
 public class Algorithm extends Base
 {
@@ -74,7 +74,7 @@ public class Algorithm extends Base
         }
         Element root = ctx.getFileGetter().getFromFile(Name,
                 "algorithm",
-                FileGetter.ALGORITHM_ROOT_ELEMENT_NAME);
+                FileGetterImpl.ALGORITHM_ROOT_ELEMENT_NAME);
         if(null == root)
         {
             return null;
