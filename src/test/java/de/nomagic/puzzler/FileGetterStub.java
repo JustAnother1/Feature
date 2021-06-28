@@ -9,6 +9,8 @@ import de.nomagic.puzzler.xmlrpc.XmlRpcGetter;
 
 public class FileGetterStub implements FileGetter 
 {
+	private Element getFromFileResult = null;
+	
 	public FileGetterStub()
 	{
 		
@@ -42,11 +44,15 @@ public class FileGetterStub implements FileGetter
 		return null;
 	}
 
+	public void setGetFtromFileResult(Element val)
+	{
+		getFromFileResult = val;
+	}
+	
 	@Override
 	public Element getFromFile(String Name, String type, String rootElementName) 
-	{
-		// TODO Auto-generated method stub
-		return null;
+	{		
+		return getFromFileResult;
 	}
 
 	@Override
