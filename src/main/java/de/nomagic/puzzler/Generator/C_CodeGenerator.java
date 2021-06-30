@@ -75,6 +75,12 @@ public class C_CodeGenerator extends Generator
     {
         return "C";
     }
+    
+    @Override
+    public String toString()
+    {
+    	return "C_CodeGenerator";
+    }
 
     protected SourceFile createFile(String fileName)
     {

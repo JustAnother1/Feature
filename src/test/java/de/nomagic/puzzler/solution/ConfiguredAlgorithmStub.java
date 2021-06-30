@@ -16,6 +16,13 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     public ConfiguredAlgorithmStub()
     {
     }
+    
+    @Override
+    public String toString()
+    {
+    	return "ConfiguredAlgorithmStub";
+        // return name + "(" + algorithmDefinition + ")";
+    }
 
     @Override
     public String getProperty(String name)

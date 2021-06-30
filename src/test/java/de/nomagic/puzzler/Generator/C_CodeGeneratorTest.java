@@ -2,9 +2,18 @@ package de.nomagic.puzzler.Generator;
 
 import static org.junit.Assert.*;
 
-import org.jdom2.Element;
-import org.junit.Test;
+import java.util.List;
 
+import org.jdom2.Element;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import de.nomagic.puzzler.ContextStub;
 import de.nomagic.puzzler.FileGetterStub;
 import de.nomagic.puzzler.Environment.EnvironmentStub;
@@ -14,6 +23,24 @@ import de.nomagic.puzzler.solution.ConfiguredAlgorithmStub;
 
 public class C_CodeGeneratorTest
 {
+    // private final Logger testedLog = (Logger)LoggerFactory.getLogger(C_CodeGenerator.class);
+    private final Logger testedLog = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    private ListAppender<ILoggingEvent> listAppender;
+
+    @Before
+    public void setupTestedLogger()
+    {
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        testedLog.setLevel(Level.WARN);
+        testedLog.addAppender(listAppender);
+    }
+
+    @After
+    public void teardownTestedLogger()
+    {
+    	testedLog.detachAppender(listAppender);
+    }
 
     @Test
     public void testCCodeGenerator()
@@ -67,6 +94,9 @@ public class C_CodeGeneratorTest
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(cas);
         assertNull(fg);
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
     
     @Test
@@ -79,6 +109,9 @@ public class C_CodeGeneratorTest
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(cas);
         assertNull(fg);
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
 
     @Test
@@ -93,6 +126,9 @@ public class C_CodeGeneratorTest
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(cas);
         assertNull(fg);
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
     
     @Test
@@ -109,6 +145,9 @@ public class C_CodeGeneratorTest
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(cas);
         assertNull(fg);
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
     
     @Test
@@ -127,6 +166,9 @@ public class C_CodeGeneratorTest
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(cas);
         assertNull(fg);
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
     }
     
     @Test
@@ -142,9 +184,22 @@ public class C_CodeGeneratorTest
         fgs.setGetFtromFileResult(res);
         ctx.addFileGetter(fgs);  
         cas.setApi("run");
+        
         C_CodeGenerator gen = new C_CodeGenerator(ctx);
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(cas);
+        
         assertNull(fg);
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+        assertEquals("C_CodeGenerator : Could not read implementation from ConfiguredAlgorithmStub", ctx.getErrors());
+        /*
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(1, logsList.size());
+        assertEquals("",
+                logsList.get(0).getMessage());
+        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+        */
     }
 }

@@ -28,7 +28,8 @@ import de.nomagic.puzzler.Generator.Generator;
 
 public class Algo_c_codeTest {
 
-    private final Logger testedLog = (Logger)LoggerFactory.getLogger(Algo_c_code.class);
+    // private final Logger testedLog = (Logger)LoggerFactory.getLogger(Algo_c_code.class);
+    private final Logger testedLog = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     private ListAppender<ILoggingEvent> listAppender;
 
     @Before
@@ -42,6 +43,7 @@ public class Algo_c_codeTest {
     @After
     public void teardownTestedLogger()
     {
+    	testedLog.detachAppender(listAppender);
     }
 
     @Test
