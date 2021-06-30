@@ -6,6 +6,8 @@ import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.nomagic.puzzler.Tool;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -35,8 +37,7 @@ public class XmlRpcGetter
         catch (MalformedURLException e)
         {
             log.error("Malformed URL when trying : " + url + " !");
-            log.error("Details:");
-            e.printStackTrace();
+            log.error("Details:" + Tool.fromExceptionToString(e));
             client = null;
         }
         logXmlFile = log.isTraceEnabled();
@@ -77,7 +78,7 @@ public class XmlRpcGetter
         }
         catch (XmlRpcException | IOException e)
         {
-            e.printStackTrace();
+        	log.error(Tool.fromExceptionToString(e));
         }
         return null;
     }

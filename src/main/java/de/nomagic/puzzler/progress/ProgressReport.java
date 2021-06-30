@@ -41,7 +41,10 @@ public class ProgressReport
             String name = (String)ref;
             String report = "ERROR(" + name + ") : " + msg;
             reports.add(report);
-            System.err.println(report);
+            if(null != System.err)
+            {
+            	System.err.println(report);
+            }
         }
         else
         {
