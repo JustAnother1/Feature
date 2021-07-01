@@ -202,4 +202,43 @@ public class C_CodeGeneratorTest
         assertEquals(Level.ERROR, logsList.get(0).getLevel());
         */
     }
+    
+    @Test
+    public void testGenerateForNotRoot_api_func()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);  
+        cas.setApi("run");
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+        
+        assertNull(fg);
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(1, logsList.size());
+        assertEquals("Could not get an Implementation for execute", logsList.get(0).getMessage());
+        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+        assertEquals("C_CodeGenerator : Could not get an Implementation for execute", ctx.getErrors());
+        /*
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(1, logsList.size());
+        assertEquals("Could not get an Implementation for execute",
+                logsList.get(0).getMessage());
+        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+        */
+    }
 }
