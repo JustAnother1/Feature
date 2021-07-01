@@ -72,7 +72,7 @@ public class XmlRpcGetterTest
         assertNull(res);
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(1, logsList.size());
-        assertTrue((logsList.get(0).getMessage()).startsWith("Exception [Failed to read server's response:"));
+        assertTrue((logsList.get(0).getMessage()).startsWith("Exception"));
         assertEquals(Level.ERROR, logsList.get(0).getLevel());        
     }
 }
