@@ -66,7 +66,7 @@ public class ContextStub implements Context
             StringBuilder sb = new StringBuilder();
             for(int i = 0; i < errors.size(); i++)
             {
-                sb.append(errors.get(i));
+                sb.append(errors.get(i) + System.getProperty("line.separator"));
             }
             return sb.toString();
         }

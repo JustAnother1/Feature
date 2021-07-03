@@ -1,10 +1,12 @@
 package de.nomagic.puzzler.solution;
 
+import java.util.Vector;
+
 import de.nomagic.puzzler.Generator.C_FunctionCall;
 
 public class Ago_c_code_stub implements Algo_c_code 
 {
-	private String funcImpl = null;
+	private Vector<String> funcImpl = new Vector<String>();
 	private String paramVal = null;
 
 	public Ago_c_code_stub()
@@ -14,13 +16,21 @@ public class Ago_c_code_stub implements Algo_c_code
 	
 	public void setFunctionImplementation(String val)
 	{
-		funcImpl = val;
+		funcImpl.add(val);
 	}
 	
 	@Override
     public String getFunctionImplementation(C_FunctionCall functionToCall)
     {
-    	return funcImpl;
+		if(0 < funcImpl.size())
+		{
+			return funcImpl.remove(0);
+		}
+		else
+		{
+			// no more implementations available.
+			return null;
+		}
     }
 	
 	public void setFunctionParameter(String val)
