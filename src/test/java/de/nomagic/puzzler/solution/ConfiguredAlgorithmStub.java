@@ -11,6 +11,7 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     private HashMap<String, String> properties = new HashMap<String, String>();
     private HashMap<String, String> parameters = new HashMap<String, String>();
     private HashMap<String, Element> elements = new HashMap<String, Element>();
+    private HashMap<String, String> buildIn = new HashMap<String, String>();
     private String api = "";
     private Algo_c_code code = null;
 
@@ -58,11 +59,16 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     {
         parameters.put(name, value);
     }
+    
+    public void addBuildIn(String name, String val)
+    {
+    	buildIn.put(name, val);
+    }
 
     @Override
     public String getBuildIn(String word)
     {
-        return null;
+        return buildIn.get(word);
     }
 
     @Override
