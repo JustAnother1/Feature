@@ -478,7 +478,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
     @Override
     public Algo_c_code get_c_code()
     {
-        Algo_c_code res = new Algo_c_code(ctx, this);
+        Algo_c_code res = new Algo_c_code_impl(ctx, this);
         return res;
     }
 

@@ -12,6 +12,7 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     private HashMap<String, String> parameters = new HashMap<String, String>();
     private HashMap<String, Element> elements = new HashMap<String, Element>();
     private String api = "";
+    private Algo_c_code code = null;
 
     public ConfiguredAlgorithmStub()
     {
@@ -122,10 +123,15 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
         return null;
     }
 
+    public void setAlgo_c_code(Algo_c_code val)
+    {
+    	code = val;
+    }
+    
     @Override
     public Algo_c_code get_c_code()
     {
-        return null;
+        return code;
     }
 
 }

@@ -19,6 +19,7 @@ import de.nomagic.puzzler.FileGetterStub;
 import de.nomagic.puzzler.Environment.EnvironmentStub;
 import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
+import de.nomagic.puzzler.solution.Ago_c_code_stub;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithmStub;
 
 public class C_CodeGeneratorTest
@@ -240,7 +241,7 @@ public class C_CodeGeneratorTest
     }
     
     @Test
-    public void testGenerateFor_hasApi()
+    public void testGenerateFor_hasAlgoCodeClass()
     {
         ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
         ContextStub ctx = new ContextStub(new Configuration());
@@ -257,7 +258,8 @@ public class C_CodeGeneratorTest
         fgs.setGetFtromFileResult(res);
         ctx.addFileGetter(fgs);  
         cas.setApi("run");
-        // cas.
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        cas.setAlgo_c_code(code);
         
         C_CodeGenerator gen = new C_CodeGenerator(ctx);
         assertNotNull(gen);
@@ -270,5 +272,39 @@ public class C_CodeGeneratorTest
         assertEquals("Could not get an Implementation for execute", logsList.get(0).getMessage());
         assertEquals(Level.ERROR, logsList.get(0).getLevel());
         assertEquals("C_CodeGenerator : Could not get an Implementation for execute", ctx.getErrors());
+    }
+    
+    @Test
+    public void testGenerateFor_hasImplementation()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);  
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        // code.setFunctionImplementation("€initialize:initialize()€" + System.getProperty("line.separator"));
+        code.setFunctionImplementation("printf(\"Hello World!\");" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+        
+        assertNull(fg);
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+        assertEquals("C_CodeGenerator : Could not read implementation from ConfiguredAlgorithmStub", ctx.getErrors());
     }
 }

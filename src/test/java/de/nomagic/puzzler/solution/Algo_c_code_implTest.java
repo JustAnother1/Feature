@@ -26,7 +26,7 @@ import de.nomagic.puzzler.Generator.C_CodeGenerator;
 import de.nomagic.puzzler.Generator.C_FunctionCall;
 import de.nomagic.puzzler.Generator.Generator;
 
-public class Algo_c_codeTest {
+public class Algo_c_code_implTest {
 
     // private final Logger testedLog = (Logger)LoggerFactory.getLogger(Algo_c_code.class);
     private final Logger testedLog = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
@@ -49,7 +49,7 @@ public class Algo_c_codeTest {
     @Test
     public void getImplementationForNull()
     {
-        Algo_c_code cut = new Algo_c_code(null, null);
+        Algo_c_code cut = new Algo_c_code_impl(null, null);
         String res = cut.getFunctionImplementation(null);
 
         assertNull(res);
@@ -63,7 +63,7 @@ public class Algo_c_codeTest {
         Context ctx = new ContextStub();
         AlgorithmInstanceInterface algo = new ConfiguredAlgorithmStub();
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("");
         String res = cut.getFunctionImplementation(fc);
 
@@ -78,7 +78,7 @@ public class Algo_c_codeTest {
         Context ctx = new ContextStub();
         AlgorithmInstanceInterface algo = new ConfiguredAlgorithmStub();
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
@@ -95,7 +95,7 @@ public class Algo_c_codeTest {
         Element code = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, code);
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
@@ -111,13 +111,13 @@ public class Algo_c_codeTest {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
         Element code = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         Element funcBla = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcBla = funcBla.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
+        funcBla = funcBla.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
         code = code.addContent(funcBla);
         Element funcNoName = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
         code = code.addContent(funcNoName);
         algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, code);
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
@@ -133,16 +133,16 @@ public class Algo_c_codeTest {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
         Element code = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         Element funcBla = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcBla = funcBla.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
+        funcBla = funcBla.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
         code = code.addContent(funcBla);
         Element funcNoName = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
         code = code.addContent(funcNoName);
         Element funcMain = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcMain = funcMain.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
+        funcMain = funcMain.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
         code = code.addContent(funcMain);
         algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, code);
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
@@ -159,12 +159,12 @@ public class Algo_c_codeTest {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
         Element code = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         Element funcBla = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcBla = funcBla.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
+        funcBla = funcBla.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
         code = code.addContent(funcBla);
         Element funcNoName = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
         code = code.addContent(funcNoName);
         Element funcMain = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcMain = funcMain.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
+        funcMain = funcMain.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
         Comment remove = new Comment("increment i by one");
         funcMain = funcMain.addContent(remove);
         CDATA impl = new CDATA("  ");
@@ -172,7 +172,7 @@ public class Algo_c_codeTest {
         code = code.addContent(funcMain);
         algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, code);
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
@@ -189,12 +189,12 @@ public class Algo_c_codeTest {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
         Element code = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         Element funcBla = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcBla = funcBla.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
+        funcBla = funcBla.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
         code = code.addContent(funcBla);
         Element funcNoName = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
         code = code.addContent(funcNoName);
         Element funcMain = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcMain = funcMain.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
+        funcMain = funcMain.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
         Comment remove = new Comment("increment i by one");
         funcMain = funcMain.addContent(remove);
         CDATA impl = new CDATA("i=i++;");
@@ -202,7 +202,7 @@ public class Algo_c_codeTest {
         code = code.addContent(funcMain);
         algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, code);
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
@@ -219,13 +219,13 @@ public class Algo_c_codeTest {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
         Element code = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         Element funcBla = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcBla = funcBla.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
+        funcBla = funcBla.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
         code = code.addContent(funcBla);
         Element funcNoName = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
         code = code.addContent(funcNoName);
-        Element additional = new Element(Algo_c_code.ALGORITHM_ADDITIONAL_CHILD_NAME);
+        Element additional = new Element(Algo_c_code_impl.ALGORITHM_ADDITIONAL_CHILD_NAME);
         Element funcMain = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcMain = funcMain.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
+        funcMain = funcMain.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
         Comment remove = new Comment("increment i by one");
         funcMain = funcMain.addContent(remove);
         CDATA impl = new CDATA("i=i++;");
@@ -234,7 +234,7 @@ public class Algo_c_codeTest {
         code = code.addContent(additional);
         algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, code);
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
@@ -251,12 +251,12 @@ public class Algo_c_codeTest {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
         Element code = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         Element funcBla = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcBla = funcBla.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
+        funcBla = funcBla.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
         code = code.addContent(funcBla);
         Element funcNoName = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
         code = code.addContent(funcNoName);
         Element funcMain = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcMain = funcMain.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
+        funcMain = funcMain.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
         Comment remove = new Comment("increment i by one");
         funcMain = funcMain.addContent(remove);
         Element invalid = new Element("somethingCrazy");
@@ -265,7 +265,7 @@ public class Algo_c_codeTest {
         code = code.addContent(funcMain);
         algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, code);
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
@@ -285,21 +285,21 @@ public class Algo_c_codeTest {
         ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
         Element code = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         Element funcBla = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcBla = funcBla.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
+        funcBla = funcBla.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "bla");
         code = code.addContent(funcBla);
         Element funcNoName = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
         code = code.addContent(funcNoName);
         Element funcMain = new Element(Generator.ALGORITHM_FUNCTION_CHILD_NAME);
-        funcMain = funcMain.setAttribute(Algo_c_code.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
+        funcMain = funcMain.setAttribute(Algo_c_code_impl.ALGORITHM_FUNCTION_NAME_ATTRIBUTE_NAME, "main");
         Comment remove = new Comment("increment i by one");
         funcMain = funcMain.addContent(remove);
-        Element invalid = new Element(Algo_c_code.ALGORITHM_IF_CHILD_NAME);
+        Element invalid = new Element(Algo_c_code_impl.ALGORITHM_IF_CHILD_NAME);
         invalid.setText("this is no implementation");
         funcMain = funcMain.addContent(invalid);
         code = code.addContent(funcMain);
         algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, code);
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
@@ -326,7 +326,7 @@ public class Algo_c_codeTest {
 
         algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, doc.getRootElement());
 
-        Algo_c_code cut = new Algo_c_code(ctx, algo);
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 

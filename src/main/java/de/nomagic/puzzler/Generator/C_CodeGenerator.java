@@ -17,6 +17,7 @@ import de.nomagic.puzzler.FileGroup.FileFactory;
 import de.nomagic.puzzler.FileGroup.SourceFile;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.Algo_c_code;
+import de.nomagic.puzzler.solution.Algo_c_code_impl;
 import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 import de.nomagic.puzzler.solution.Api;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
@@ -279,7 +280,7 @@ public class C_CodeGenerator extends Generator
         {
             switch(implementation.charAt(i))
             {
-            case Algo_c_code.IMPLEMENTATION_PLACEHOLDER_CHAR : numEuros++; break;
+            case Algo_c_code_impl.IMPLEMENTATION_PLACEHOLDER_CHAR : numEuros++; break;
             case '(': numOpenBraces++; break;
             case ')': numClosingBaces++; break;
             default: break;
@@ -295,7 +296,7 @@ public class C_CodeGenerator extends Generator
 
         if(0 != numEuros%2)
         {
-            ctx.addError(this,"Invalid Syntax: odd number of " + Algo_c_code.IMPLEMENTATION_PLACEHOLDER_CHAR + " ! ");
+            ctx.addError(this,"Invalid Syntax: odd number of " + Algo_c_code_impl.IMPLEMENTATION_PLACEHOLDER_CHAR + " ! ");
             return null;
         }
         if(numOpenBraces != numClosingBaces)
@@ -548,7 +549,7 @@ public class C_CodeGenerator extends Generator
             }
             else
             {
-                Element additional = cCode.getChild(Algo_c_code.ALGORITHM_ADDITIONAL_CHILD_NAME);
+                Element additional = cCode.getChild(Algo_c_code_impl.ALGORITHM_ADDITIONAL_CHILD_NAME);
                 if(null == additional)
                 {
                     log.trace("no addionals for algorithm {}", logic);
