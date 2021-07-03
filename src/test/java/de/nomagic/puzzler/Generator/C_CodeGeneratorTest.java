@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import org.jdom2.Element;
@@ -341,7 +340,7 @@ public class C_CodeGeneratorTest
         C_CodeGenerator gen = new C_CodeGenerator(ctx);
         assertNotNull(gen);
         FileGroup fg = gen.generateFor(cas);
-        
+
         assertTrue(ctx.wasSucessful());
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(0, logsList.size());
@@ -356,7 +355,7 @@ public class C_CodeGeneratorTest
         try 
         {
 			main.writeToStream(codeFile);
-			String sourceCode =  codeFile.toString(Charset.forName("UTF8"));
+			String sourceCode =  codeFile.toString("UTF8");
 			assertTrue(sourceCode.contains("printf(\"Hello World!\");"));
 		}
         catch (IOException e1) 
