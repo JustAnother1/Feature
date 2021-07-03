@@ -112,6 +112,13 @@ public class C_CodeGenerator extends Generator
 
         log.trace("getting implementation of the {} from {}", api, logic);
         Function[] funcs = api.getRequiredFunctions();
+        if(0 == funcs.length)
+        {
+            String error = "Could not get required function for the API " + api;
+            log.error(error);
+            ctx.addError(this, error);
+        	return false;
+        }
         for(int i = 0; i < funcs.length; i++)
         {
             C_FunctionCall fc = new C_FunctionCall(funcs[i].getName());
@@ -198,7 +205,7 @@ public class C_CodeGenerator extends Generator
         Algo_c_code cCode = algo.get_c_code();
         if(null == cCode)
         {
-            log.error("The algorithm{} does not have C-code!", algo);
+            log.error("The algorithm {} does not have C-code!", algo);
             return null;
         }
         String implementation = cCode.getFunctionImplementation(functionToCall);

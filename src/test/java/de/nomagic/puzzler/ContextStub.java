@@ -29,7 +29,14 @@ public class ContextStub implements Context
     @Override
     public boolean wasSucessful()
     {
-        return false;
+    	if(null == errors)
+    	{
+    		return true;
+    	}
+    	else
+    	{
+    		return false;
+    	}
     }
 
     @Override

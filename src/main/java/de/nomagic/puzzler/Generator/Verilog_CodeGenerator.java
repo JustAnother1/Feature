@@ -58,10 +58,16 @@ public class Verilog_CodeGenerator extends Generator
                 sourceFile.addLine(VerilogFile.VERILOG_FILE_MODULE_SECTION_NAME,
                         curE.getText());
             }
+            codeGroup.add(sourceFile);
+            return codeGroup;
         }
-
-        codeGroup.add(sourceFile);
-        return codeGroup;
+        else
+        {
+            String error = "No Code in Algoritrhm " + logic;
+            log.error(error);
+            ctx.addError(this, error);
+        	return null;
+        }
     }
 
     @Override
@@ -92,6 +98,10 @@ public class Verilog_CodeGenerator extends Generator
 
         log.trace("getting implementation of the {} from {}", api, logic);
         Function[] funcs = api.getRequiredFunctions();
+        if(0 == funcs.length)
+        {
+        	return false;
+        }
         for(int i = 0; i < funcs.length; i++)
         {
             /*
