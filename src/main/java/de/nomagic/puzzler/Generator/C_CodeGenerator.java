@@ -552,6 +552,7 @@ public class C_CodeGenerator extends Generator
                 Element additional = cCode.getChild(Algo_c_code_impl.ALGORITHM_ADDITIONAL_CHILD_NAME);
                 if(null == additional)
                 {
+                	// it is OK to have no entries in the additional element
                     log.trace("no addionals for algorithm {}", logic);
                 }
                 else
