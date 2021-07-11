@@ -93,17 +93,13 @@ public class EnvironmentImpl extends Base implements Environment
         // the environment provides resources,...
         if(null != xmlTreeRoot)
         {
-            Element cpu = xmlTreeRoot.getChild(TOOL_ELEMENT_NAME);
-            if(null != cpu)
+            Element resMap = xmlTreeRoot.getChild(PIN_MAPPING_ELEMENT_NAME);
+            if(null != resMap)
             {
-                Element resMap = xmlTreeRoot.getChild(PIN_MAPPING_ELEMENT_NAME);
-                if(null != resMap)
+                Element pin = resMap.getChild(name);
+                if(null != pin)
                 {
-                    Element pin = resMap.getChild(name);
-                    if(null != pin)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }

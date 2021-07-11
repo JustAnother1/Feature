@@ -614,4 +614,98 @@ public class C_CodeGeneratorTest
 		}
     }
     
+    @Test
+    public void testGenerateFor_func()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);  
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€initialize:initialize()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);
+        Element add = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, add);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(2, logsList.size());
+        assertEquals("No solution available in this context !", logsList.get(0).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+        assertEquals("Could not get an Implementation for execute", logsList.get(1).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(1).getLevel());
+        assertEquals("C_CodeGenerator : Could not get an Implementation for execute\n", ctx.getErrors());
+        assertNull(fg);
+    }
+    
+    /*
+    @Test
+    public void testGenerateFor_func()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);  
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€initialize:initialize()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);
+        Element add = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, add);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertTrue(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+        assertEquals("", ctx.getErrors());
+        assertNotNull(fg);
+        assertEquals(1, fg.numEntries());
+        AbstractFile main = fg.getFileWithName("main.c");
+        assertNotNull(main);
+        assertTrue(main instanceof CFile);
+        // CFile c_main = (CFile)main;
+        ByteArrayOutputStream codeFile = new ByteArrayOutputStream();
+        try 
+        {
+			main.writeToStream(codeFile);
+			String sourceCode =  codeFile.toString("UTF8");
+			assertTrue(sourceCode.contains("printf(\"Hello World!\");"));
+			assertTrue(sourceCode.contains("execute"));
+		}
+        catch (IOException e1) 
+        {
+			e1.printStackTrace();
+			fail("Could not read generated main.c");
+		}
+    }
+    */
+    
 }

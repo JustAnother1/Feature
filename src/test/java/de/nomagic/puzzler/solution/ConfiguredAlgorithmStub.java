@@ -112,12 +112,6 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     }
 
     @Override
-    public String getDescription()
-    {
-        return null;
-    }
-
-    @Override
     public String getApis()
     {
         return null;
@@ -139,5 +133,26 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     {
         return code;
     }
+
+	@Override
+	public AlgorithmInstanceInterface[] getChildsWithAPI(String apiStr) 
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean containsElement(String tagName) 
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean allRequiredDataAvailable()
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

@@ -2,12 +2,11 @@ package de.nomagic.puzzler.Generator;
 
 import java.util.ArrayList;
 
-import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.nomagic.puzzler.Context;
-import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
+import de.nomagic.puzzler.solution.Solution;
 
 public class CodeGeneratorFactory
 {
@@ -19,21 +18,26 @@ public class CodeGeneratorFactory
         // not used
     }
 
-    public static Generator[] getGeneratorFor(AlgorithmInstanceInterface algoTree,
-            Context ctx)
+    public static Generator[] getGeneratorFor(Context ctx)
     {
-        if(null == algoTree)
+        if(null == ctx)
         {
-            ctx.addError("CodeGeneratorFactory", "algorithm tree is null !");
-            return null;
-        }
-
+        	log.error("No context!");
+            return new Generator[0];
+        }    	
+        
+        Solution s = ctx.getSolution();
+        if(null == s)
+        {
+        	log.error("No solution!");
+            return new Generator[0];
+        }  
+        
         ArrayList<Generator> resVec = new ArrayList<Generator>();
-
-        Element res = null;
+        
+        
         // check for C Code
-        res = algoTree.getAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
-        if(null == res)
+        if(false == s.treeContainsElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME))
         {
             log.trace("Is not a valid C-Code tree");
         }
@@ -44,8 +48,7 @@ public class CodeGeneratorFactory
         }
 
         // check for C++ Code
-        res = algoTree.getAlgorithmElement(Cpp_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
-        if(null == res)
+        if(false == s.treeContainsElement(Cpp_CodeGenerator.ALGORITHM_CODE_CHILD_NAME))
         {
             log.trace("Is not a valid C++-Code tree");
         }
@@ -56,8 +59,7 @@ public class CodeGeneratorFactory
         }
 
         // check for Verilog code
-        res = algoTree.getAlgorithmElement(Verilog_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
-        if(null == res)
+        if(false == s.treeContainsElement(Verilog_CodeGenerator.ALGORITHM_CODE_CHILD_NAME))
         {
             log.trace("Is not a valid Verilog-Code tree");
         }

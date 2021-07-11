@@ -7,7 +7,6 @@ import org.jdom2.Element;
 public interface AlgorithmInstanceInterface
 {
     String getName();
-    String getDescription();
     String getProperty(String name);
     String dumpProperty();
     String getParameter(String name);
@@ -20,4 +19,7 @@ public interface AlgorithmInstanceInterface
     AlgorithmInstanceInterface getChild(String name);
     ConfigurationHandler getCfgHandler();
     Algo_c_code get_c_code();
+	AlgorithmInstanceInterface[] getChildsWithAPI(String apiStr);
+	boolean containsElement(String tagName);
+	boolean allRequiredDataAvailable();
 }

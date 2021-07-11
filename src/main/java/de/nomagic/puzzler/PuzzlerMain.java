@@ -41,7 +41,6 @@ import de.nomagic.puzzler.Generator.CodeGeneratorFactory;
 import de.nomagic.puzzler.Generator.Generator;
 import de.nomagic.puzzler.Generator.IDEProjectFileGenerator;
 import de.nomagic.puzzler.configuration.Configuration;
-import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
 import de.nomagic.puzzler.solution.Solution;
 import de.nomagic.puzzler.solution.SolutionImpl;
 import de.nomagic.puzzler.xmlrpc.XmlRpcGetter;
@@ -213,6 +212,7 @@ public class PuzzlerMain
         Solution s = new SolutionImpl(ctx);
         if(false == s.getFromProject(pro))
         {
+        	log.error("Could not read Solution from Project!");
             return null;
         }
 
@@ -226,11 +226,9 @@ public class PuzzlerMain
         return s;
     }
 
-    private FileGroup createRessourcesFromSolution(Context ctx)
+    private FileGroup createRessourcesFromSolution(Context ctx, Solution s)
     {
-        // create "code creator" back end (creates the Source Code in C or other languages)
-        ConfiguredAlgorithm algoTree = ConfiguredAlgorithm.getTreeFrom(ctx, null);
-        Generator[] gen = CodeGeneratorFactory.getGeneratorFor(algoTree, ctx);
+        Generator[] gen = CodeGeneratorFactory.getGeneratorFor(ctx);
         if(null == gen)
         {
             log.error("Could not create code generators !");
@@ -248,7 +246,7 @@ public class PuzzlerMain
         {
             Generator curGen = gen[i];
             // give solution to code creator to create code project
-            FileGroup files = curGen.generateFor(algoTree);
+            FileGroup files = curGen.generateFor(s.getRootAlgorithm());
             if(null == files)
             {
                 log.error("Failed to generate {} source code!", curGen.getLanguageName());
@@ -364,7 +362,7 @@ public class PuzzlerMain
         ctx.addSolution(s);
 
         // create all needed files in memory
-        FileGroup allFiles = createRessourcesFromSolution(ctx);
+        FileGroup allFiles = createRessourcesFromSolution(ctx, s);
         if(null == allFiles)
         {
             log.error("Could not create ressources !");

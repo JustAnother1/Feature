@@ -20,8 +20,8 @@ import de.nomagic.puzzler.solution.Algo_c_code;
 import de.nomagic.puzzler.solution.Algo_c_code_impl;
 import de.nomagic.puzzler.solution.AlgorithmInstanceInterface;
 import de.nomagic.puzzler.solution.Api;
-import de.nomagic.puzzler.solution.ConfiguredAlgorithm;
 import de.nomagic.puzzler.solution.Function;
+import de.nomagic.puzzler.solution.Solution;
 
 /** generate C source code.
  *
@@ -265,11 +265,6 @@ public class C_CodeGenerator extends Generator
             ctx.addError(this,"Implementation is null ! ");
             return null;
         }
-        if(null == Function.getArguments())
-        {
-            log.trace("Function Parameters are null, changing to empty String !");
-            log.trace("Implementation is : {} !", implementation);
-        }
         if(null == logic)
         {
             ctx.addError(this,"logic is null ! ");
@@ -371,7 +366,7 @@ public class C_CodeGenerator extends Generator
         return part;
     }
 
-    private String replacePlaceholdersInPart(String implementation,
+	private String replacePlaceholdersInPart(String implementation,
             C_FunctionCall Function,
             AlgorithmInstanceInterface algo)
     {
@@ -495,42 +490,59 @@ public class C_CodeGenerator extends Generator
             else
             {
                 // call to child apiStr or library function
-                String libImpl = fillInFunctionCallFromLibrary(fc, algo);
-                if(null != libImpl)
+            	AlgorithmInstanceInterface[] matchingChilds = algo.getChildsWithAPI(apiStr);
+            	if(null != matchingChilds)
+            	{
+	            	if(0 < matchingChilds.length)
+	            	{
+	                	// child
+	            		if(1 < matchingChilds.length)
+	            		{
+	            			// Wait what? Which shall we call ? Something is wrong here!
+	                        log.error("call to API {} that is available in more than one child of {} !", apiStr, algo);
+	                        return null;
+	            		}
+	            		else
+	            		{
+	    	                String implementation = getImplementationOf(fc, matchingChilds[0]);
+	    	                if(null == implementation)
+	    	                {
+	    	                    String error = "Could not get an Implementation for " + fc.toString() + " from " + matchingChilds[0];
+	    	                    log.error(error);
+	    	                    ctx.addError(this, error);
+	    	                    return null;
+	    	                }
+	    	                else
+	    	                {
+	    	                	return implementation;
+	    	                }
+	            		}
+	            	}
+	            	// else Library
+            	}
+            	// else Library
+            	Solution s = ctx.getSolution();
+            	if(null == s)
+            	{
+                    log.error("No solution available in this context !");
+                    return null;
+            	}
+            	AlgorithmInstanceInterface otherAlgo = s.getAlgorithm(apiStr);
+
+                String implementation = getImplementationOf(fc, otherAlgo);
+                if(null == implementation)
                 {
-                    return libImpl;
+                    String error = "Could not get an Implementation for " + fc.toString();
+                    log.error(error);
+                    ctx.addError(this, error);
+                    return null;
                 }
                 else
                 {
-                    ctx.addError(this, "" + algo + " : Function call to missing function (" + functionName + ") !");
-                    return null;
+                	return implementation;
                 }
             }
         }
-    }
-
-    private String fillInFunctionCallFromLibrary(C_FunctionCall libfc, AlgorithmInstanceInterface algo)
-    {
-        // include the library
-        AlgorithmInstanceInterface libAlgo = ConfiguredAlgorithm.getTreeFromEnvironment(libfc.getApi(), ctx, algo);
-        if(null == libAlgo)
-        {
-            ctx.addError(this, "" + algo +
-                    " : The Environment does not provide the needed library (" + libfc.getApi() + ") !");
-            ctx.addError(this, "" + algo +
-                    " : We needed to call the function " + libfc.getName() + " !");
-            return null;
-        }
-        log.trace("adding the library algorithm {}", libAlgo.getName());
-        extraAlgoList.add(libAlgo);
-        String impl = getImplementationOf(libfc, libAlgo);
-        if(null == impl)
-        {
-            ctx.addError(this, "" + algo +
-                    " : Function call to missing (lib) function (" + libfc.getName() + ") !");
-            return null;
-        }
-        return impl;
     }
 
     private void addAllAdditionals(AlgorithmInstanceInterface algo)

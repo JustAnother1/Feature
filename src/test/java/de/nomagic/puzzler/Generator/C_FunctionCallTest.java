@@ -17,7 +17,7 @@ public class C_FunctionCallTest
     @Test
     public void testGetApiNull()
     {
-        C_FunctionCall dut = new C_FunctionCall("bla");
+        C_FunctionCall dut = new C_FunctionCall("bla()");
         assertEquals(null, dut.getApi());
     }
 
@@ -39,7 +39,7 @@ public class C_FunctionCallTest
     @Test
     public void testGetArgumentsNull()
     {
-        C_FunctionCall dut = new C_FunctionCall("bla");
+        C_FunctionCall dut = new C_FunctionCall("bla()");
         assertEquals(null, dut.getApi());
     }
 
@@ -60,10 +60,10 @@ public class C_FunctionCallTest
     @Test
     public void testSetFunctionalArguments()
     {
-        C_FunctionCall dut = new C_FunctionCall("bla:bla");
-        assertEquals(null, dut.getArguments());
+        C_FunctionCall dut = new C_FunctionCall("bla:bla()");
+        assertEquals("", dut.getArguments());
         dut.setFunctionArguments("aloha");
         assertEquals("aloha", dut.getArguments());
     }
-
+    
 }

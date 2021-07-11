@@ -10,138 +10,31 @@ import org.junit.Test;
 
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.ContextStub;
-import de.nomagic.puzzler.Project;
 
 public class ConfiguredAlgorithmTest
 {
     @Test
     public void testConfiguredAlgorithm()
     {
-        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null, null);
         assertEquals("dut", dut.getName());
-    }
-
-    @Test
-    public void testGetTreeFromNullNull()
-    {
-        assertNull(ConfiguredAlgorithm.getTreeFrom(null, null));
-    }
-
-    @Test
-    public void testGetTreeFromNoSolution()
-    {
-        Context ctx = new ContextStub(null);
-        assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
-    }
-
-    @Test
-    public void testGetTreeFromNoRoot()
-    {
-        ContextStub ctx = new ContextStub(null);
-        Solution s = new SolutionStub();
-        ctx.addSolution(s);
-        assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
-        String err = ctx.getErrors();
-        assertEquals("ConfiguredAlgorithm.getTreeFrom : No root element in the provided solution !\n", err);
-        assertEquals(77, err.length());
-    }
-
-    @Test
-    public void testGetTreeFromBadRoot()
-    {
-        ContextStub ctx = new ContextStub(null);
-        SolutionStub s = new SolutionStub();
-        ctx.addSolution(s);
-        Element badRoot = new Element("bad");
-        s.setRootElement(badRoot);
-        assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
-        String err = ctx.getErrors();
-        assertEquals("ConfiguredAlgorithm.getTreeFrom.1 : invalid root tag (bad) !\n", err);
-        assertEquals(61, err.length());
-    }
-
-    @Test
-    public void testGetTreeFromNoChildren()
-    {
-        ContextStub ctx = new ContextStub(null);
-        SolutionStub s = new SolutionStub();
-        ctx.addSolution(s);
-        Element badRoot = new Element(Project.SOLUTION_ELEMENT_NAME);
-        s.setRootElement(badRoot);
-        assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
-        String err = ctx.getErrors();
-        assertEquals("ConfiguredAlgorithm.getTreeFrom.2 : No algorithm elements in the provided solution !\n", err);
-        assertEquals(85, err.length());
-    }
-
-    @Test
-    public void testGetTreeFromBadChildren()
-    {
-        ContextStub ctx = new ContextStub(null);
-        SolutionStub s = new SolutionStub();
-        ctx.addSolution(s);
-        Element badRoot = new Element(Project.SOLUTION_ELEMENT_NAME);
-        Element badChild = new Element("bad");
-        badRoot.addContent(badChild);
-        s.setRootElement(badRoot);
-        assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
-        String err = ctx.getErrors();
-        assertEquals("ConfiguredAlgorithm.getTreeFrom.3 : Failed to get Algorithm for null !\n", err);
-        assertEquals(71, err.length());
-    }
-
-    @Test
-    public void testGetTreeFromBadAlgo()
-    {
-        ContextStub ctx = new ContextStub(null);
-        SolutionStub s = new SolutionStub();
-        ctx.addSolution(s);
-        Element root = new Element(Project.SOLUTION_ELEMENT_NAME);
-        Element child = new Element("bad");
-        child.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, "algo");
-        root.addContent(child);
-        s.setRootElement(root);
-        assertNull(ConfiguredAlgorithm.getTreeFrom(ctx, null));
-        String err = ctx.getErrors();
-        assertEquals("ConfiguredAlgorithm.getTreeFrom.3 : Failed to get Algorithm for algo !\n", err);
-        assertEquals(71, err.length());
-    }
-
-    @Test
-    public void testGetTreeFromAlgo()
-    {
-        ContextStub ctx = new ContextStub(null);
-        SolutionStub s = new SolutionStub();
-        ctx.addSolution(s);
-        Element root = new Element(Project.SOLUTION_ELEMENT_NAME);
-        Element child = new Element("bad");
-        child.setAttribute(Algorithm.ALGORITHM_REFFERENCE_ATTRIBUTE_NAME, "algo");
-        root.addContent(child);
-        s.setRootElement(root);
-        Algorithm algo = new Algorithm(child, ctx);
-        s.addAlgorithm("algo", algo);
-        ConfiguredAlgorithm res = ConfiguredAlgorithm.getTreeFrom(ctx, null);
-        assertNotNull(res);
-        // String[] err = ctx.getErrors();
-        // assertEquals(1, err.length);
-        // assertEquals("ConfiguredAlgorithm.getTree : Failed to get Algorithm for null !", err[0]);
     }
 
     @Test
     public void testHasApiNull()
     {
-        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null);
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", null, null, null, null);
         assertEquals("dut", dut.getName());
         assertFalse(dut.hasApi("bla"));
     }
-
+/*
     @Test
     public void testHasApiNoApi()
     {
         Context ctx = new ContextStub(null);
         Element root = new Element("testElement");
         Algorithm algo = new Algorithm(root, ctx);
-        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null);
+        ConfiguredAlgorithm dut = new ConfiguredAlgorithm("dut", algo, ctx, null, null);
         assertEquals("dut", dut.getName());
         assertFalse(dut.hasApi("bla"));
     }
@@ -466,4 +359,5 @@ public class ConfiguredAlgorithmTest
         assertSame(child, res.get(0));
         assertSame(sibling, res.get(1));
     }
+    */
 }
