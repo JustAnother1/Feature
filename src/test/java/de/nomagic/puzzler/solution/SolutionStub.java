@@ -1,10 +1,13 @@
 package de.nomagic.puzzler.solution;
 
+import java.util.HashMap;
+
 import de.nomagic.puzzler.Project;
 
 public class SolutionStub implements Solution
 {
     private String availableElement = null;
+    private HashMap<String, AlgorithmInstanceInterface> availableAlgorithms = new HashMap<String,AlgorithmInstanceInterface>();
 
     public SolutionStub()
     {
@@ -51,11 +54,15 @@ public class SolutionStub implements Solution
 		return null;
 	}
 
+	public void addAlgorithm(String name, AlgorithmInstanceInterface algo)
+	{
+		availableAlgorithms.put(name, algo);
+	}
+	
 	@Override
 	public AlgorithmInstanceInterface getAlgorithm(String name)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return availableAlgorithms.get(name);
 	}
 
 }

@@ -25,6 +25,7 @@ import de.nomagic.puzzler.FileGroup.FileGroup;
 import de.nomagic.puzzler.configuration.Configuration;
 import de.nomagic.puzzler.solution.Ago_c_code_stub;
 import de.nomagic.puzzler.solution.ConfiguredAlgorithmStub;
+import de.nomagic.puzzler.solution.SolutionStub;
 
 public class C_CodeGeneratorTest
 {
@@ -653,9 +654,9 @@ public class C_CodeGeneratorTest
         assertNull(fg);
     }
     
-    /*
+
     @Test
-    public void testGenerateFor_func()
+    public void testGenerateFor_Solution()
     {
         ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
         ContextStub ctx = new ContextStub(new Configuration());
@@ -671,12 +672,301 @@ public class C_CodeGeneratorTest
         res.addContent(func);
         fgs.setGetFtromFileResult(res);
         ctx.addFileGetter(fgs);  
+        SolutionStub s = new SolutionStub();
+        ctx.addSolution(s);
         cas.setApi("run");
         Ago_c_code_stub code = new Ago_c_code_stub();
         code.setFunctionImplementation("€initialize:initialize()€" + System.getProperty("line.separator"));
         cas.setAlgo_c_code(code);
         Element add = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, add);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(2, logsList.size());
+        assertEquals("Could not get an Implementation for initialize:initialize()", logsList.get(0).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+        assertEquals("Could not get an Implementation for execute", logsList.get(1).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(1).getLevel());
+        assertEquals("C_CodeGenerator : Function call to null Algorithm !\n"
+        		+ "C_CodeGenerator : Could not get an Implementation for initialize:initialize()\n"       		
+        		+ "C_CodeGenerator : Could not get an Implementation for execute\n", ctx.getErrors());
+        assertNull(fg);
+    }
+
+    @Test
+    public void testGenerateFor_Algo_wrong_API()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);
+        SolutionStub s = new SolutionStub();
+        ctx.addSolution(s);
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€initialize:initialize()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);
+        Element add = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, add);
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        cas.addChildWithApi("initialize", algo);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(5, logsList.size());
+        assertEquals("C_CodeGenerator : Function call to wrong API!(API: initialize)", logsList.get(0).getFormattedMessage());
+        assertEquals(Level.WARN, logsList.get(0).getLevel());
+        assertEquals("valid APIs : null", logsList.get(1).getFormattedMessage());
+        assertEquals(Level.WARN, logsList.get(1).getLevel());
+        assertEquals("Function called: initialize", logsList.get(2).getFormattedMessage());
+        assertEquals(Level.WARN, logsList.get(2).getLevel());
+        assertEquals("Could not get an Implementation for initialize:initialize() from ConfiguredAlgorithmStub", logsList.get(3).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(3).getLevel());
+        assertEquals("Could not get an Implementation for execute", logsList.get(4).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(4).getLevel());
+        assertEquals("C_CodeGenerator : Could not get an Implementation for initialize:initialize() from ConfiguredAlgorithmStub\n"
+        		+ "C_CodeGenerator : Could not get an Implementation for execute\n", ctx.getErrors());
+        assertNull(fg);
+    }
+    
+    @Test
+    public void testGenerateFor_Algo_wrong_root_API()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "initialize");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);
+        SolutionStub s = new SolutionStub();
+        ctx.addSolution(s);
+        cas.setApi("initialize");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€initialize:initialize()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);
+        Element add = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, add);
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        cas.addChildWithApi("initialize", algo);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+        assertEquals("C_CodeGenerator : ConfiguredAlgorithmStub : Root element of the solution is not an run !\n", ctx.getErrors());
+        assertNull(fg);
+    }
+    
+    @Test
+    public void testGenerateFor_no_matching_algo()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);
+        SolutionStub s = new SolutionStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        s.addAlgorithm("execute", algo);
+        ctx.addSolution(s);
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€run:execute()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);
+        Element add = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, add);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(2, logsList.size());
+        assertEquals("Could not get an Implementation for run:execute()", logsList.get(0).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+        assertEquals("Could not get an Implementation for execute", logsList.get(1).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(1).getLevel());        
+        assertEquals("C_CodeGenerator : Function call to null Algorithm !\n"
+        		+ "C_CodeGenerator : Could not get an Implementation for run:execute()\n"
+        		+ "C_CodeGenerator : Could not get an Implementation for execute\n", ctx.getErrors());
+        assertNull(fg);
+    }
+    
+    @Test
+    public void testGenerateFor_Algo_no_impl()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);
+        SolutionStub s = new SolutionStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        s.addAlgorithm("execute", algo);
+        ctx.addSolution(s);
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€run:execute()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);
+        Element add = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, add);
+        ConfiguredAlgorithmStub runStub = new ConfiguredAlgorithmStub();
+        cas.addChildWithApi("run", runStub);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(5, logsList.size());
+        assertEquals("C_CodeGenerator : Function call to wrong API!(API: run)", logsList.get(0).getFormattedMessage());
+        assertEquals(Level.WARN, logsList.get(0).getLevel());
+        assertEquals("valid APIs : null", logsList.get(1).getFormattedMessage());
+        assertEquals(Level.WARN, logsList.get(1).getLevel());
+        assertEquals("Function called: execute", logsList.get(2).getFormattedMessage());
+        assertEquals(Level.WARN, logsList.get(2).getLevel());
+        assertEquals("Could not get an Implementation for run:execute() from ConfiguredAlgorithmStub", logsList.get(3).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(3).getLevel());
+        assertEquals("Could not get an Implementation for execute", logsList.get(4).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(4).getLevel());
+        assertEquals("C_CodeGenerator : Could not get an Implementation for run:execute() from ConfiguredAlgorithmStub\n"
+        		+ "C_CodeGenerator : Could not get an Implementation for execute\n", ctx.getErrors());
+        assertNull(fg);
+    }
+    
+    
+    @Test
+    public void testGenerateFor_Algo_no_C_Code()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);
+        SolutionStub s = new SolutionStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        s.addAlgorithm("execute", algo);
+        ctx.addSolution(s);
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€run:execute()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);
+        Element add = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, add);
+        ConfiguredAlgorithmStub runStub = new ConfiguredAlgorithmStub();
+        runStub.setApi("run");
+        cas.addChildWithApi("run", runStub);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertFalse(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(3, logsList.size());
+        assertEquals("The algorithm ConfiguredAlgorithmStub does not have C-code!", logsList.get(0).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+        assertEquals("Could not get an Implementation for run:execute() from ConfiguredAlgorithmStub", logsList.get(1).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(1).getLevel());
+        assertEquals("Could not get an Implementation for execute", logsList.get(2).getFormattedMessage());
+        assertEquals(Level.ERROR, logsList.get(2).getLevel());        
+        assertEquals("C_CodeGenerator : Could not get an Implementation for run:execute() from ConfiguredAlgorithmStub\n"
+        		+ "C_CodeGenerator : Could not get an Implementation for execute\n", ctx.getErrors());
+        assertNull(fg);
+    }
+    
+    @Test
+    public void testGenerateFor_Algo_OK()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);
+        SolutionStub s = new SolutionStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        s.addAlgorithm("execute", algo);
+        ctx.addSolution(s);
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€run:execute()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);
+        Element add = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, add);
+        ConfiguredAlgorithmStub runStub = new ConfiguredAlgorithmStub();
+        runStub.setApi("run");
+        Ago_c_code_stub runCode = new Ago_c_code_stub();
+        runCode.setFunctionImplementation("printf(\"Hello World!\");" + System.getProperty("line.separator"));
+        runStub.setAlgo_c_code(runCode);
+        cas.addChildWithApi("run", runStub);
         
         C_CodeGenerator gen = new C_CodeGenerator(ctx);
         assertNotNull(gen);
@@ -706,6 +996,5 @@ public class C_CodeGeneratorTest
 			fail("Could not read generated main.c");
 		}
     }
-    */
     
 }

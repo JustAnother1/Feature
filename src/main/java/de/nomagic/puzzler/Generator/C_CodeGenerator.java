@@ -145,6 +145,11 @@ public class C_CodeGenerator extends Generator
 
     private boolean checkImplementationRequest(C_FunctionCall functionToCall, AlgorithmInstanceInterface algo)
     {
+        if(null == algo)
+        {
+            ctx.addError(this, "Function call to null Algorithm !");
+            return false;
+        }
         if(null == functionToCall)
         {
             ctx.addError(this, "" + algo + " : Function call to null function!");
@@ -160,7 +165,7 @@ public class C_CodeGenerator extends Generator
         {
             ctx.addError(this, "" + algo + " : Function call to unnamed function!");
             return false;
-        }
+        }        
 
         String api = functionToCall.getApi();
         if(null != api)

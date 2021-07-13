@@ -2,6 +2,7 @@ package de.nomagic.puzzler.solution;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Vector;
 
 import org.jdom2.Element;
 
@@ -12,6 +13,8 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     private HashMap<String, String> parameters = new HashMap<String, String>();
     private HashMap<String, Element> elements = new HashMap<String, Element>();
     private HashMap<String, String> buildIn = new HashMap<String, String>();
+    private HashMap<String, AlgorithmInstanceInterface> apiChilds = new HashMap<String,AlgorithmInstanceInterface>();
+
     private String api = "";
     private Algo_c_code code = null;
 
@@ -79,7 +82,7 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
 
     public void setApi(String enabledApi)
     {
-        api = api + enabledApi;
+        api = api + enabledApi + ", ";
     }
 
     public void addAlgorithmElement(String Name, Element data)
@@ -134,11 +137,22 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
         return code;
     }
 
+
+	public void addChildWithApi(String api, ConfiguredAlgorithmStub algo) 
+	{
+		apiChilds.put(api, algo);
+	}
+    
 	@Override
 	public AlgorithmInstanceInterface[] getChildsWithAPI(String apiStr) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		Vector<AlgorithmInstanceInterface> res = new Vector<AlgorithmInstanceInterface>();
+		AlgorithmInstanceInterface child = apiChilds.get(apiStr);
+		if(null != child)
+		{
+			res.add(child);
+		}
+		return res.toArray(new AlgorithmInstanceInterface[0]);
 	}
 
 	@Override
