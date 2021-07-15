@@ -24,6 +24,11 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
     {
     }
     
+    public ConfiguredAlgorithmStub(String name)
+    {
+    	this.Name = name;
+    }
+    
     @Override
     public String toString()
     {

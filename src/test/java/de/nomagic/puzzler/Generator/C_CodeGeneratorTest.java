@@ -933,7 +933,7 @@ public class C_CodeGeneratorTest
     @Test
     public void testGenerateFor_Algo_OK()
     {
-        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub();
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub("cas");
         ContextStub ctx = new ContextStub(new Configuration());
         EnvironmentStub e = new EnvironmentStub();
         e.setRootApi("run");      		
@@ -948,8 +948,12 @@ public class C_CodeGeneratorTest
         fgs.setGetFtromFileResult(res);
         ctx.addFileGetter(fgs);
         SolutionStub s = new SolutionStub();
-        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
-        s.addAlgorithm("execute", algo);
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub("algo");
+        Ago_c_code_stub emptyCode = new Ago_c_code_stub();        
+        algo.setAlgo_c_code(emptyCode);
+        Element algoAlternative = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, algoAlternative);        
+        s.addAlgorithm("execute", algo);        
         ctx.addSolution(s);
         cas.setApi("run");
         Ago_c_code_stub code = new Ago_c_code_stub();
@@ -957,8 +961,10 @@ public class C_CodeGeneratorTest
         cas.setAlgo_c_code(code);
         Element add = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
         cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, add);
-        ConfiguredAlgorithmStub runStub = new ConfiguredAlgorithmStub();
+        ConfiguredAlgorithmStub runStub = new ConfiguredAlgorithmStub("runStub");
         runStub.setApi("run");
+        Element runAlternative = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        runStub.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, runAlternative);
         Ago_c_code_stub runCode = new Ago_c_code_stub();
         runCode.setFunctionImplementation("printf(\"Hello World!\");" + System.getProperty("line.separator"));
         runStub.setAlgo_c_code(runCode);

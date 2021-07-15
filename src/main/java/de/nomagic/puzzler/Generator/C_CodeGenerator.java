@@ -520,6 +520,7 @@ public class C_CodeGenerator extends Generator
 	            		}
 	            		else
 	            		{
+	            			extraAlgoList.add(matchingChilds[0]);
 	    	                String implementation = getImplementationOf(fc, matchingChilds[0]);
 	    	                if(null == implementation)
 	    	                {
@@ -550,6 +551,7 @@ public class C_CodeGenerator extends Generator
                     log.error("Library algorithm {} missing !", apiStr);
                     return null;
             	}
+            	extraAlgoList.add(otherAlgo);
                 String implementation = getImplementationOf(fc, otherAlgo);
                 if(null == implementation)
                 {
