@@ -9,12 +9,14 @@ import org.jdom2.Element;
 
 public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
 {
-    private HashMap<String, String> properties = new HashMap<String, String>();
-    private HashMap<String, String> parameters = new HashMap<String, String>();
-    private HashMap<String, Element> elements = new HashMap<String, Element>();
-    private HashMap<String, String> buildIn = new HashMap<String, String>();
-    private HashMap<String, AlgorithmInstanceInterface> apiChilds = new HashMap<String,AlgorithmInstanceInterface>();
+    private final HashMap<String, String> properties = new HashMap<String, String>();
+    private final HashMap<String, String> parameters = new HashMap<String, String>();
+    private final HashMap<String, Element> elements = new HashMap<String, Element>();
+    private final HashMap<String, String> buildIn = new HashMap<String, String>();
+    private final HashMap<String, AlgorithmInstanceInterface> apiChilds = new HashMap<String,AlgorithmInstanceInterface>();
+    private final HashMap<String, AlgorithmInstanceInterface> cfgAlgorithms = new HashMap<String, AlgorithmInstanceInterface>();
 
+    private String Name = null;
     private String api = "";
     private Algo_c_code code = null;
 
@@ -96,22 +98,32 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
         return elements.get(elementName);
     }
 
+    public void addChild(AlgorithmInstanceInterface algo)
+    {
+    	cfgAlgorithms.put(algo.getName(), algo);
+    }
+    
     @Override
     public Iterator<String> getAllChildren()
     {
-        return null;
+        return cfgAlgorithms.keySet().iterator();
     }
 
     @Override
-    public ConfiguredAlgorithm getChild(String name)
+    public AlgorithmInstanceInterface getChild(String name)
     {
-        return null;
+        return cfgAlgorithms.get(name);
     }
 
+    public void setName(String val)
+    {
+    	Name = val;
+    }
+    
     @Override
     public String getName()
     {
-        return null;
+        return Name;
     }
 
     @Override
@@ -158,14 +170,12 @@ public class ConfiguredAlgorithmStub implements AlgorithmInstanceInterface
 	@Override
 	public boolean containsElement(String tagName) 
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean allRequiredDataAvailable()
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 

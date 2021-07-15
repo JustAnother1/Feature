@@ -60,7 +60,7 @@ public class SolutionStub implements Solution
 	}
 	
 	@Override
-	public AlgorithmInstanceInterface getAlgorithm(String name)
+	public AlgorithmInstanceInterface getAlgorithm(String name, AlgorithmInstanceInterface algo)
 	{
 		return availableAlgorithms.get(name);
 	}

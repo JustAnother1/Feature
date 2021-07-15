@@ -688,13 +688,11 @@ public class C_CodeGeneratorTest
         assertFalse(ctx.wasSucessful());
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(2, logsList.size());
-        assertEquals("Could not get an Implementation for initialize:initialize()", logsList.get(0).getFormattedMessage());
+        assertEquals("Library algorithm initialize missing !", logsList.get(0).getFormattedMessage());
         assertEquals(Level.ERROR, logsList.get(0).getLevel());
         assertEquals("Could not get an Implementation for execute", logsList.get(1).getFormattedMessage());
         assertEquals(Level.ERROR, logsList.get(1).getLevel());
-        assertEquals("C_CodeGenerator : Function call to null Algorithm !\n"
-        		+ "C_CodeGenerator : Could not get an Implementation for initialize:initialize()\n"       		
-        		+ "C_CodeGenerator : Could not get an Implementation for execute\n", ctx.getErrors());
+        assertEquals("C_CodeGenerator : Could not get an Implementation for execute\n", ctx.getErrors());
         assertNull(fg);
     }
 
@@ -822,13 +820,11 @@ public class C_CodeGeneratorTest
         assertFalse(ctx.wasSucessful());
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(2, logsList.size());
-        assertEquals("Could not get an Implementation for run:execute()", logsList.get(0).getFormattedMessage());
+        assertEquals("Library algorithm run missing !", logsList.get(0).getFormattedMessage());
         assertEquals(Level.ERROR, logsList.get(0).getLevel());
         assertEquals("Could not get an Implementation for execute", logsList.get(1).getFormattedMessage());
         assertEquals(Level.ERROR, logsList.get(1).getLevel());        
-        assertEquals("C_CodeGenerator : Function call to null Algorithm !\n"
-        		+ "C_CodeGenerator : Could not get an Implementation for run:execute()\n"
-        		+ "C_CodeGenerator : Could not get an Implementation for execute\n", ctx.getErrors());
+        assertEquals("C_CodeGenerator : Could not get an Implementation for execute\n", ctx.getErrors());
         assertNull(fg);
     }
     

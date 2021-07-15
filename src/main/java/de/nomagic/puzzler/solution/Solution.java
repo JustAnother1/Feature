@@ -8,5 +8,5 @@ public interface Solution
     boolean checkAndTestAgainstEnvironment();
 	boolean treeContainsElement(String TagName);
 	AlgorithmInstanceInterface getRootAlgorithm();
-    AlgorithmInstanceInterface getAlgorithm(String name);
+    AlgorithmInstanceInterface getAlgorithm(String name, AlgorithmInstanceInterface parent);
 }

@@ -124,6 +124,7 @@ public class C_CodeGenerator extends Generator
         {
             C_FunctionCall fc = new C_FunctionCall(funcs[i].getName());
             fc.setApi(api.toString());
+            log.trace("getting implementation for {} !", fc);
             String implementation = getImplementationOf(fc, logic);
             if(null == implementation)
             {
@@ -172,10 +173,18 @@ public class C_CodeGenerator extends Generator
         {
             if(false == algo.hasApi(api))
             {
-                log.warn("{} : Function call to wrong API!(API: {})", this, api);
-                log.warn("valid APIs : {}",  algo.getApis());
-                log.warn("Function called: {}",  functionToCall.getName());
-                return false;
+            	if(true == api.equals(algo.getName()))
+            	{
+            		// Algorithm is part of the Environment
+            		// -> OK
+            	}
+            	else
+            	{
+	                log.warn("{} : Function call to wrong API!(API: {})", this, api);
+	                log.warn("valid APIs : {}",  algo.getApis());
+	                log.warn("Function called: {}",  functionToCall.getName());
+	                return false;
+            	}
             }
             else
             {
@@ -223,6 +232,7 @@ public class C_CodeGenerator extends Generator
         {
             return null;
         }
+        log.trace("got the implementation {} !", implementation);
 
         implementation = replacePlaceholders(implementation,
                 functionToCall,
@@ -494,6 +504,7 @@ public class C_CodeGenerator extends Generator
             }
             else
             {
+            	log.trace("api is {} !", apiStr);
                 // call to child apiStr or library function
             	AlgorithmInstanceInterface[] matchingChilds = algo.getChildsWithAPI(apiStr);
             	if(null != matchingChilds)
@@ -526,14 +537,19 @@ public class C_CodeGenerator extends Generator
 	            	// else Library
             	}
             	// else Library
+            	log.trace("requested Algorithm {} is a library algorithm !", apiStr);
             	Solution s = ctx.getSolution();
             	if(null == s)
             	{
                     log.error("No solution available in this context !");
                     return null;
             	}
-            	AlgorithmInstanceInterface otherAlgo = s.getAlgorithm(apiStr);
-
+            	AlgorithmInstanceInterface otherAlgo = s.getAlgorithm(apiStr, algo);
+            	if(null == otherAlgo)
+            	{
+                    log.error("Library algorithm {} missing !", apiStr);
+                    return null;
+            	}
                 String implementation = getImplementationOf(fc, otherAlgo);
                 if(null == implementation)
                 {

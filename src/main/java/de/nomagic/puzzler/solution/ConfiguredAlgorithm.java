@@ -91,7 +91,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         }
     }
 
-    public static ConfiguredAlgorithm getFromFile(Element cfgElement, Context ctx, ConfiguredAlgorithm parent)
+    public static AlgorithmInstanceInterface getFromFile(Element cfgElement, Context ctx, AlgorithmInstanceInterface parent)
     {
         if(null == ctx)
         {
@@ -114,7 +114,7 @@ public class ConfiguredAlgorithm extends Base implements AlgorithmInstanceInterf
         {
             return null;
         }
-        ConfiguredAlgorithm res = new ConfiguredAlgorithm(Name, root, ctx, parent, cfgElement);
+        AlgorithmInstanceInterface res = new ConfiguredAlgorithm(Name, root, ctx, parent, cfgElement);
         return res;
     }
 

@@ -21,6 +21,7 @@ import ch.qos.logback.core.read.ListAppender;
 
 import de.nomagic.puzzler.Context;
 import de.nomagic.puzzler.ContextStub;
+import de.nomagic.puzzler.FileGetterStub;
 import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.Generator.C_CodeGenerator;
 import de.nomagic.puzzler.Generator.C_FunctionCall;
@@ -37,6 +38,7 @@ public class Algo_c_code_implTest {
     {
         listAppender = new ListAppender<>();
         listAppender.start();
+        testedLog.setLevel(Level.WARN);
         testedLog.addAppender(listAppender);
     }
 
@@ -67,6 +69,8 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("");
         String res = cut.getFunctionImplementation(fc);
 
+        assertFalse(ctx.wasSucessful());
+        assertEquals("Algo_c_code_impl for ConfiguredAlgorithmStub : Could not read implementation for  from Algo_c_code_impl for ConfiguredAlgorithmStub\n", ctx.getErrors());
         assertNull(res);
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(0, logsList.size());
@@ -82,6 +86,8 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
+        assertFalse(ctx.wasSucessful());
+        assertEquals("Algo_c_code_impl for ConfiguredAlgorithmStub : Could not read implementation for main from Algo_c_code_impl for ConfiguredAlgorithmStub\n", ctx.getErrors());
         assertNull(res);
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(0, logsList.size());
@@ -99,6 +105,8 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
+        assertFalse(ctx.wasSucessful());
+        assertEquals("Algo_c_code_impl for ConfiguredAlgorithmStub : Function call to missing function! (ConfiguredAlgorithmStub, function name : main)\n", ctx.getErrors());
         assertNull(res);
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(0, logsList.size());
@@ -121,6 +129,8 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
+        assertFalse(ctx.wasSucessful());
+        assertEquals("Algo_c_code_impl for ConfiguredAlgorithmStub : Function call to missing function! (ConfiguredAlgorithmStub, function name : main)\n", ctx.getErrors());
         assertNull(res);
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(0, logsList.size());
@@ -146,6 +156,8 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNotNull(res);
         assertEquals("", res);
         List<ILoggingEvent> logsList = listAppender.list;
@@ -176,6 +188,8 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNotNull(res);
         assertEquals("", res);
         List<ILoggingEvent> logsList = listAppender.list;
@@ -206,6 +220,8 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNotNull(res);
         assertEquals("i=i++;" + System.getProperty("line.separator"), res);
         List<ILoggingEvent> logsList = listAppender.list;
@@ -238,6 +254,8 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNotNull(res);
         assertEquals("i=i++;" + System.getProperty("line.separator"), res);
         List<ILoggingEvent> logsList = listAppender.list;
@@ -269,6 +287,8 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNotNull(res);
         assertEquals("", res);
         List<ILoggingEvent> logsList = listAppender.list;
@@ -303,6 +323,8 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNotNull(res);
         assertEquals("", res);
         List<ILoggingEvent> logsList = listAppender.list;
@@ -330,10 +352,130 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNotNull(res);
         assertEquals("€initialize:initialize()€" + System.getProperty("line.separator"), res);
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(0, logsList.size());
+    }
+    
+    @Test
+    public void getImplementationForFunction_function_call_forChilds_no_FileGetter()
+    {
+        Context ctx = new ContextStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        Document doc = Tool.getXmlDocumentFrom(
+                "<c_code>"
+                + "<additional>"
+                + "<function name=\"main\">"
+                + "<forChilds api=\"run\"><![CDATA[€run:execute()€]]></forChilds>"
+                + "</function>"
+                + "</additional>"
+                + "</c_code>");
+
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, doc.getRootElement());
+
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
+        C_FunctionCall fc = new C_FunctionCall("main()");
+        String res = cut.getFunctionImplementation(fc);
+
+        // file getter not needed
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
+        assertNotNull(res);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+        assertEquals("", res);
+    }
+    
+    @Test
+    public void getImplementationForFunction_function_call_forChilds_no_children()
+    {
+        Context ctx = new ContextStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        Document doc = Tool.getXmlDocumentFrom(
+                "<c_code>"
+                + "<additional>"
+                + "<function name=\"main\">"
+                + "<forChilds api=\"run\"><![CDATA[€run:execute()€]]></forChilds>"
+                + "</function>"
+                + "</additional>"
+                + "</c_code>");
+
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, doc.getRootElement());
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        Element funcB = new Element("function");
+        funcB.setAttribute("name", "initialize");
+        funcB.setAttribute("type", "required");
+        res.addContent(funcB);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs); 
+
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
+        C_FunctionCall fc = new C_FunctionCall("main()");
+        String impl = cut.getFunctionImplementation(fc);
+
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
+        assertNotNull(impl);
+        assertEquals("", impl);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());        
+    }
+    
+    @Test
+    public void getImplementationForFunction_function_call_forChilds_has_Childs()
+    {
+        Context ctx = new ContextStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub();
+        Document doc = Tool.getXmlDocumentFrom(
+                "<c_code>"
+                + "<additional>"
+                + "<function name=\"main\">"
+                + "<forChilds api=\"run\"><![CDATA[€run:execute()€]]></forChilds>"
+                + "</function>"
+                + "</additional>"
+                + "</c_code>");
+
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, doc.getRootElement());
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        Element funcB = new Element("function");
+        funcB.setAttribute("name", "initialize");
+        funcB.setAttribute("type", "required");
+        res.addContent(funcB);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs); 
+        ConfiguredAlgorithmStub child = new ConfiguredAlgorithmStub();
+        child.setName("someAlgo");
+        algo.addChild(child);
+        ConfiguredAlgorithmStub child2 = new ConfiguredAlgorithmStub();
+        child2.setName("AlgoWithApi");
+        child2.setApi("run");
+        algo.addChild(child2);
+
+        Algo_c_code cut = new Algo_c_code_impl(ctx, algo);
+        C_FunctionCall fc = new C_FunctionCall("main()");
+        String impl = cut.getFunctionImplementation(fc);
+
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
+        assertNotNull(impl);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+        assertEquals("€AlgoWithApi:execute()€" + System.getProperty("line.separator"), impl);
     }
 
 }

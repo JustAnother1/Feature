@@ -16,6 +16,7 @@ public interface AlgorithmInstanceInterface
     boolean hasApi(String api);
     Element getAlgorithmElement(String elementName);
     Iterator<String> getAllChildren();
+    void addChild(AlgorithmInstanceInterface algo);
     AlgorithmInstanceInterface getChild(String name);
     ConfigurationHandler getCfgHandler();
     Algo_c_code get_c_code();

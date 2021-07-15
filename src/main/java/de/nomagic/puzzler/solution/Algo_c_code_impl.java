@@ -42,6 +42,12 @@ public class Algo_c_code_impl extends Base implements Algo_c_code
         this.algo = configuredAlgorithm;
     }
     
+    @Override
+    public String toString()
+    {
+    	return "Algo_c_code_impl for " + algo.toString();
+    }
+    
     /** extract the implementation of the function from the XML.
     *
     * @param functionToCall requested function
@@ -58,6 +64,7 @@ public class Algo_c_code_impl extends Base implements Algo_c_code
        {
            return null;
        }
+       log.trace("function element: {} !", func);
        String implementation = getImplementationFromFunctionElement(func, functionToCall.getArguments());
        return implementation;
    }
@@ -192,6 +199,7 @@ public class Algo_c_code_impl extends Base implements Algo_c_code
            Content curC = parts.get(i);
            if(CType.Element == curC.getCType())
            {
+        	   log.trace("found elment {} !", curC);
                String impl = getImplementationFromElement( (Element)curC, FunctionArguments,function);
                if(null != impl)
                {
@@ -265,35 +273,28 @@ public class Algo_c_code_impl extends Base implements Algo_c_code
            ctx.addError(this, "" + algo + " : for childs element with missing api attribute !)");
            return null;
        }
-       Api theApi = Api.getFromFile(apiName, ctx);
-       if(null == theApi)
-       {
-           ctx.addError(this, "" + algo + " : for childs element with invalid api attribute ! (" + apiName + "))");
-           return null;
-       }
+       log.trace("api : {} !", apiName);
 
        StringBuilder sb = new StringBuilder();
        String commonCode = element.getText();
+       log.trace("generic code : {} !", commonCode);
+       
        Iterator<String> it = algo.getAllChildren();
+       if(null == it)
+       {
+    	   return null;
+       }
        while(it.hasNext())
        {
            String childName = it.next();
+           log.trace("child : {} !", childName);
            AlgorithmInstanceInterface curChild = algo.getChild(childName);
            if(true == curChild.hasApi(apiName))
            {
-               Api api = Api.getFromFile(apiName, ctx);
-               if(null == api)
-               {
-                   ctx.addError(this, "" + curChild + " : Failed to load the api " + apiName + " !");
-                   return null;
-               }
-               Function[] funcs = api.getRequiredFunctions();
-               for(int i = 0; i < funcs.length; i++)
-               {
-                   String implementation = replaceGenericWithSpecific(commonCode, apiName, curChild.getName());
-                   implementation = beautifyImplementation(implementation);
-                   sb.append(implementation);
-               }
+               String implementation = replaceGenericWithSpecific(commonCode, apiName, curChild.getName());
+               implementation = beautifyImplementation(implementation);
+               log.trace("implementation : {} !", implementation);
+               sb.append(implementation);
            }
            // else don't care for that child
        }
@@ -332,7 +333,7 @@ public class Algo_c_code_impl extends Base implements Algo_c_code
            return "";
        }
        if(true == line.contains(IMPLEMENTATION_PLACEHOLDER_REGEX))
-       {
+       {    	   
            StringBuilder res = new StringBuilder();
            String[] parts = line.split(IMPLEMENTATION_PLACEHOLDER_REGEX);
            for(int i = 0; i < parts.length; i++)
@@ -345,10 +346,14 @@ public class Algo_c_code_impl extends Base implements Algo_c_code
                else
                {
                    // this is where we want to replace
-                   res.append(parts[i].replace(generic, specific));
-               }
+            	   res.append(IMPLEMENTATION_PLACEHOLDER_REGEX);
+                   res.append(parts[i].replaceFirst(generic, specific));
+                   res.append(IMPLEMENTATION_PLACEHOLDER_REGEX);
+               }               
            }
-           return res.toString();
+           String res_str = res.toString();
+           log.trace("replacing {} to {} !", line, res_str);
+           return res_str;
        }
        else
        {

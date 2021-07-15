@@ -18,7 +18,7 @@ public class SolutionImplTest
     public void testGetAlgorithm()
     {
         SolutionImpl dut = new SolutionImpl(null);
-        assertNull(dut.getAlgorithm("Bob"));
+        assertNull(dut.getAlgorithm("Bob", null));
     }
 
     @Test
