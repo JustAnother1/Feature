@@ -119,7 +119,7 @@ public class SolutionImpl extends Base implements Solution
         }
         if(null == algo)
         {
-        	log.error("Could not geth the Algorithm {} !", val.getName());
+        	log.error("Could not get the Algorithm {} !", val.getName());
         }
         else
         {
