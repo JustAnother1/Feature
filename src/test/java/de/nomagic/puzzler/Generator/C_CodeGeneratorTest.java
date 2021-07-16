@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +19,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import de.nomagic.puzzler.ContextStub;
 import de.nomagic.puzzler.FileGetterStub;
+import de.nomagic.puzzler.Tool;
 import de.nomagic.puzzler.Environment.EnvironmentStub;
 import de.nomagic.puzzler.FileGroup.AbstractFile;
 import de.nomagic.puzzler.FileGroup.CFile;
@@ -991,6 +993,321 @@ public class C_CodeGeneratorTest
 			String sourceCode =  codeFile.toString("UTF8");
 			assertTrue(sourceCode.contains("printf(\"Hello World!\");"));
 			assertTrue(sourceCode.contains("execute"));
+		}
+        catch (IOException e1) 
+        {
+			e1.printStackTrace();
+			fail("Could not read generated main.c");
+		}
+    }
+    
+    @Test
+    public void testGenerateFor_additional_include()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub("cas");
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);
+        SolutionStub s = new SolutionStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub("algo");
+        Ago_c_code_stub emptyCode = new Ago_c_code_stub();        
+        algo.setAlgo_c_code(emptyCode);
+        Element algoAlternative = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, algoAlternative);        
+        s.addAlgorithm("execute", algo);        
+        ctx.addSolution(s);
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€run:execute()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);              
+        Document doc = Tool.getXmlDocumentFrom(
+                "<c_code>"
+                + "<additional>"
+                + "<include>"
+                + "<![CDATA[someAdditional.h]]>"
+                + "</include>"
+                + "</additional>"
+                + "</c_code>");
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, doc.getRootElement());
+        ConfiguredAlgorithmStub runStub = new ConfiguredAlgorithmStub("runStub");
+        runStub.setApi("run");
+        Element runAlternative = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        runStub.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, runAlternative);
+        Ago_c_code_stub runCode = new Ago_c_code_stub();
+        runCode.setFunctionImplementation("printf(\"Hello World!\");" + System.getProperty("line.separator"));
+        runStub.setAlgo_c_code(runCode);
+        cas.addChildWithApi("run", runStub);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertTrue(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+        assertEquals("", ctx.getErrors());
+        assertNotNull(fg);
+        assertEquals(1, fg.numEntries());
+        AbstractFile main = fg.getFileWithName("main.c");
+        assertNotNull(main);
+        assertTrue(main instanceof CFile);
+        // CFile c_main = (CFile)main;
+        ByteArrayOutputStream codeFile = new ByteArrayOutputStream();
+        try 
+        {
+			main.writeToStream(codeFile);
+			String sourceCode =  codeFile.toString("UTF8");
+			System.out.println(sourceCode);
+			assertTrue(sourceCode.contains("printf(\"Hello World!\");"));
+			assertTrue(sourceCode.contains("execute"));
+			assertTrue(sourceCode.contains("#include <someAdditional.h>"));
+		}
+        catch (IOException e1) 
+        {
+			e1.printStackTrace();
+			fail("Could not read generated main.c");
+		}
+    }
+    
+    @Test
+    public void testGenerateFor_additional_function()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub("cas");
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);
+        SolutionStub s = new SolutionStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub("algo");
+        Ago_c_code_stub emptyCode = new Ago_c_code_stub();        
+        algo.setAlgo_c_code(emptyCode);
+        Element algoAlternative = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, algoAlternative);        
+        s.addAlgorithm("execute", algo);        
+        ctx.addSolution(s);
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€run:execute()€" + System.getProperty("line.separator"));
+        code.setFunctionImplementation("mDelayImplementation;" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);              
+        Document doc = Tool.getXmlDocumentFrom(
+                "<c_code>"
+                + "<additional>"
+                + "<function name=\"mDelay\" result=\"void\" param0_type=\"int\" param0_name=\"msec\">"
+                + "<![CDATA[uDelay(msec * 1000);]]>"
+                + "</function>"
+                + "</additional>"
+                + "</c_code>");
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, doc.getRootElement());
+        ConfiguredAlgorithmStub runStub = new ConfiguredAlgorithmStub("runStub");
+        runStub.setApi("run");
+        Element runAlternative = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        runStub.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, runAlternative);
+        Ago_c_code_stub runCode = new Ago_c_code_stub();
+        runCode.setFunctionImplementation("printf(\"Hello World!\");" + System.getProperty("line.separator"));
+        runStub.setAlgo_c_code(runCode);
+        cas.addChildWithApi("run", runStub);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertTrue(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+        assertEquals("", ctx.getErrors());
+        assertNotNull(fg);
+        assertEquals(1, fg.numEntries());
+        AbstractFile main = fg.getFileWithName("main.c");
+        assertNotNull(main);
+        assertTrue(main instanceof CFile);
+        // CFile c_main = (CFile)main;
+        ByteArrayOutputStream codeFile = new ByteArrayOutputStream();
+        try 
+        {
+			main.writeToStream(codeFile);
+			String sourceCode =  codeFile.toString("UTF8");
+			System.out.println(sourceCode);
+			assertTrue(sourceCode.contains("printf(\"Hello World!\");"));
+			assertTrue(sourceCode.contains("execute"));
+			assertTrue(sourceCode.contains("void mDelay"));
+		}
+        catch (IOException e1) 
+        {
+			e1.printStackTrace();
+			fail("Could not read generated main.c");
+		}
+    }    
+    
+    @Test
+    public void testGenerateFor_additional_file()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub("cas");
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);
+        SolutionStub s = new SolutionStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub("algo");
+        Ago_c_code_stub emptyCode = new Ago_c_code_stub();        
+        algo.setAlgo_c_code(emptyCode);
+        Element algoAlternative = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, algoAlternative);        
+        s.addAlgorithm("execute", algo);        
+        ctx.addSolution(s);
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€run:execute()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);              
+        Document doc = Tool.getXmlDocumentFrom(
+                "<c_code>"
+                + "<additional>"
+                + "<file name=\"dev.h\">"
+                + "<![CDATA["
+                + "The files content."
+                + "]]></file>"
+                + "</additional>"
+                + "</c_code>");
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, doc.getRootElement());
+        ConfiguredAlgorithmStub runStub = new ConfiguredAlgorithmStub("runStub");
+        runStub.setApi("run");
+        Element runAlternative = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        runStub.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, runAlternative);
+        Ago_c_code_stub runCode = new Ago_c_code_stub();
+        runCode.setFunctionImplementation("printf(\"Hello World!\");" + System.getProperty("line.separator"));
+        runStub.setAlgo_c_code(runCode);
+        cas.addChildWithApi("run", runStub);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertTrue(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+        assertEquals("", ctx.getErrors());
+        assertNotNull(fg);
+        assertEquals(2, fg.numEntries());
+        AbstractFile additional = fg.getFileWithName("dev.h");
+        assertNotNull(additional);
+        AbstractFile main = fg.getFileWithName("main.c");
+        assertNotNull(main);
+        assertTrue(main instanceof CFile);
+        // CFile c_main = (CFile)main;
+        ByteArrayOutputStream codeFile = new ByteArrayOutputStream();
+        try 
+        {
+			main.writeToStream(codeFile);
+			String sourceCode =  codeFile.toString("UTF8");
+			System.out.println(sourceCode);
+			assertTrue(sourceCode.contains("printf(\"Hello World!\");"));
+			assertTrue(sourceCode.contains("execute"));
+		}
+        catch (IOException e1) 
+        {
+			e1.printStackTrace();
+			fail("Could not read generated main.c");
+		}
+    }    
+    
+    @Test
+    public void testGenerateFor_additional_variable()
+    {
+        ConfiguredAlgorithmStub cas = new ConfiguredAlgorithmStub("cas");
+        ContextStub ctx = new ContextStub(new Configuration());
+        EnvironmentStub e = new EnvironmentStub();
+        e.setRootApi("run");      		
+        ctx.addEnvironment(e);
+        FileGetterStub fgs = new FileGetterStub();
+        Element res = new Element("api");
+        res.setAttribute("name", "run");
+        Element func = new Element("function");
+        func.setAttribute("name", "execute");
+        func.setAttribute("type", "required");
+        res.addContent(func);
+        fgs.setGetFtromFileResult(res);
+        ctx.addFileGetter(fgs);
+        SolutionStub s = new SolutionStub();
+        ConfiguredAlgorithmStub algo = new ConfiguredAlgorithmStub("algo");
+        Ago_c_code_stub emptyCode = new Ago_c_code_stub();        
+        algo.setAlgo_c_code(emptyCode);
+        Element algoAlternative = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        algo.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, algoAlternative);        
+        s.addAlgorithm("execute", algo);        
+        ctx.addSolution(s);
+        cas.setApi("run");
+        Ago_c_code_stub code = new Ago_c_code_stub();
+        code.setFunctionImplementation("€run:execute()€" + System.getProperty("line.separator"));
+        cas.setAlgo_c_code(code);              
+        Document doc = Tool.getXmlDocumentFrom(
+                "<c_code>"
+                + "<additional>"
+                + "<variable>"
+                + "<![CDATA[uint8_t important_var;]]>"
+                + "</variable>"
+                + "</additional>"
+                + "</c_code>");
+        cas.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, doc.getRootElement());
+        ConfiguredAlgorithmStub runStub = new ConfiguredAlgorithmStub("runStub");
+        runStub.setApi("run");
+        Element runAlternative = new Element(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
+        runStub.addAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME, runAlternative);
+        Ago_c_code_stub runCode = new Ago_c_code_stub();
+        runCode.setFunctionImplementation("printf(\"Hello World!\");" + System.getProperty("line.separator"));
+        runStub.setAlgo_c_code(runCode);
+        cas.addChildWithApi("run", runStub);
+        
+        C_CodeGenerator gen = new C_CodeGenerator(ctx);
+        assertNotNull(gen);
+        FileGroup fg = gen.generateFor(cas);
+
+        assertTrue(ctx.wasSucessful());
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0, logsList.size());
+        assertEquals("", ctx.getErrors());
+        assertNotNull(fg);
+        assertEquals(1, fg.numEntries());
+        AbstractFile main = fg.getFileWithName("main.c");
+        assertNotNull(main);
+        assertTrue(main instanceof CFile);
+        // CFile c_main = (CFile)main;
+        ByteArrayOutputStream codeFile = new ByteArrayOutputStream();
+        try 
+        {
+			main.writeToStream(codeFile);
+			String sourceCode =  codeFile.toString("UTF8");
+			System.out.println(sourceCode);
+			assertTrue(sourceCode.contains("printf(\"Hello World!\");"));
+			assertTrue(sourceCode.contains("execute"));
+			assertTrue(sourceCode.contains("uint8_t important_var"));
 		}
         catch (IOException e1) 
         {
