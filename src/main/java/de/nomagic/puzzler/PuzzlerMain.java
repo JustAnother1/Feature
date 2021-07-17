@@ -95,7 +95,7 @@ public class PuzzlerMain
               "<appender name='STDERR' class='ch.qos.logback.core.ConsoleAppender'>" +
               "<target>System.err</target>" +
                 "<encoder>" +
-                  "<pattern>%-5level [%logger{36}] %msg%n</pattern>" +
+                  "<pattern>%highlight(%-5level) [%logger{36}] %msg%n</pattern>" +
                 "</encoder>" +
               "</appender>" +
               "<root level='" + LogLevel + "'>" +
