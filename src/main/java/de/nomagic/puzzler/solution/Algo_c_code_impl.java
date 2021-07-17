@@ -74,18 +74,18 @@ public class Algo_c_code_impl extends Base implements Algo_c_code
    {
        if(null == ParameterName)
        {
-           log.error("Function parameter name is null !");
+           log.warn("Function parameter name is null !");
            return null;
        }
        if(null == Function)
        {
-           log.error("Function parameters are null !");
+           log.warn("Function parameters are null !");
            return null;
        }
        Element functionElement = getFunctionElement(Function.getName());
        if(null == functionElement)
        {
-           log.error("Function name is null or invalid ({}) !", Function.getName());
+           log.warn("Function name is null or invalid ({}) !", Function.getName());
            return null;
        }
 
@@ -149,9 +149,7 @@ public class Algo_c_code_impl extends Base implements Algo_c_code
        Element cCode = algo.getAlgorithmElement(C_CodeGenerator.ALGORITHM_CODE_CHILD_NAME);
        if(null == cCode)
        {
-           ctx.addError(this,
-               "Could not read implementation for " + searchedFunctionName +
-               " from " + toString());
+    	   log.warn("Could not read implementation for {} from {} !",  searchedFunctionName, this);
            return null;
        }
 
@@ -173,8 +171,7 @@ public class Algo_c_code_impl extends Base implements Algo_c_code
        if(null == res)
        {
            // function not found
-           ctx.addError(this, "Function call to missing function! (" + algo
-                           + ", function name : " + searchedFunctionName + ")");
+    	   log.warn("Function call to missing function! ({}, function name : {})", algo, searchedFunctionName);
        }
        return res;
    }

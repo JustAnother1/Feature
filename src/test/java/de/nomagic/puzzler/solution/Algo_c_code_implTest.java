@@ -69,11 +69,14 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("");
         String res = cut.getFunctionImplementation(fc);
 
-        assertFalse(ctx.wasSucessful());
-        assertEquals("Algo_c_code_impl for ConfiguredAlgorithmStub : Could not read implementation for  from Algo_c_code_impl for ConfiguredAlgorithmStub\n", ctx.getErrors());
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNull(res);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals(0, logsList.size());
+        assertEquals(1, logsList.size());
+        assertEquals("Could not read implementation for  from Algo_c_code_impl for ConfiguredAlgorithmStub !",
+                logsList.get(0).getFormattedMessage());
+        assertEquals(Level.WARN, logsList.get(0).getLevel());
     }
 
     @Test
@@ -86,11 +89,14 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
-        assertFalse(ctx.wasSucessful());
-        assertEquals("Algo_c_code_impl for ConfiguredAlgorithmStub : Could not read implementation for main from Algo_c_code_impl for ConfiguredAlgorithmStub\n", ctx.getErrors());
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNull(res);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals(0, logsList.size());
+        assertEquals(1, logsList.size());
+        assertEquals("Could not read implementation for main from Algo_c_code_impl for ConfiguredAlgorithmStub !",
+                logsList.get(0).getFormattedMessage());
+        assertEquals(Level.WARN, logsList.get(0).getLevel());
     }
 
     @Test
@@ -105,11 +111,14 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
-        assertFalse(ctx.wasSucessful());
-        assertEquals("Algo_c_code_impl for ConfiguredAlgorithmStub : Function call to missing function! (ConfiguredAlgorithmStub, function name : main)\n", ctx.getErrors());
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNull(res);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals(0, logsList.size());
+        assertEquals(1, logsList.size());
+        assertEquals("Function call to missing function! (ConfiguredAlgorithmStub, function name : main)",
+                logsList.get(0).getFormattedMessage());
+        assertEquals(Level.WARN, logsList.get(0).getLevel());
     }
 
     @Test
@@ -129,11 +138,14 @@ public class Algo_c_code_implTest {
         C_FunctionCall fc = new C_FunctionCall("main()");
         String res = cut.getFunctionImplementation(fc);
 
-        assertFalse(ctx.wasSucessful());
-        assertEquals("Algo_c_code_impl for ConfiguredAlgorithmStub : Function call to missing function! (ConfiguredAlgorithmStub, function name : main)\n", ctx.getErrors());
+        assertTrue(ctx.wasSucessful());
+        assertEquals("", ctx.getErrors());
         assertNull(res);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals(0, logsList.size());
+        assertEquals(1, logsList.size());
+        assertEquals("Function call to missing function! (ConfiguredAlgorithmStub, function name : main)",
+                logsList.get(0).getFormattedMessage());
+        assertEquals(Level.WARN, logsList.get(0).getLevel());
     }
 
     @Test
@@ -293,8 +305,9 @@ public class Algo_c_code_implTest {
         assertEquals("", res);
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals(1, logsList.size());
-        assertEquals("Ignoring not recognised Element in implementation ! text:  {} element: {}",
-                logsList.get(0).getMessage());
+        assertEquals("Ignoring not recognised Element in implementation ! text:  this is no implementation\n"
+        		+ " element: [Element: <somethingCrazy/>]",
+                logsList.get(0).getFormattedMessage());
         assertEquals(Level.WARN, logsList.get(0).getLevel());
     }
 
